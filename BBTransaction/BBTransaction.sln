@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransaction", "BBTransaction\BBTransaction.csproj", "{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransactionTests", "BBTransactionTests\BBTransactionTests.csproj", "{912879C5-5496-4EB0-9151-97A49030D9C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{912879C5-5496-4EB0-9151-97A49030D9C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{912879C5-5496-4EB0-9151-97A49030D9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A63BD576-0DD2-428B-A03F-EDB6DC55ECE2}
+	EndGlobalSection
+EndGlobal
