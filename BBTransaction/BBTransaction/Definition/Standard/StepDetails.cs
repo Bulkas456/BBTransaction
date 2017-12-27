@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Step;
 
-namespace BBTransaction.Definition
+namespace BBTransaction.Definition.Standard
 {
     /// <summary>
     /// The details for a transaction step.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    public class StepDetails<TStepId, TData>
+    public class StepDetails<TStepId, TData> : IStepDetails<TStepId, TData>
     {
         /// <summary>
         /// The index of the step in the definition.

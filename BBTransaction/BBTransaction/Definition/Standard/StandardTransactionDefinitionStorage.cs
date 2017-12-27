@@ -35,7 +35,7 @@ namespace BBTransaction.Definition.Standard
         /// </summary>
         /// <param name="state">The state.</param>
         /// <returns>The step details for the transaction state.</returns>
-        public StepDetails<TStepId, TData> this[ITransactionState<TStepId, TData> state]
+        public IStepDetails<TStepId, TData> this[ITransactionState<TStepId, TData> state]
         {
             get
             {
