@@ -9,6 +9,11 @@ using BBTransaction.Result;
 
 namespace BBTransaction
 {
+    /// <summary>
+    /// The transaction.
+    /// </summary>
+    /// <typeparam name="TStepId">The type of the step id.</typeparam>
+    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
     public interface ITransaction<TStepId, TData>
     {
         /// <summary>

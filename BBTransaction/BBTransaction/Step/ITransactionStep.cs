@@ -9,6 +9,11 @@ using BBTransaction.Step.Executor;
 
 namespace BBTransaction.Step
 {
+    /// <summary>
+    /// The step for the transaction.
+    /// </summary>
+    /// <typeparam name="TStepId">The type of the step id.</typeparam>
+    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
     public interface ITransactionStep<TStepId, TData>
     {
         /// <summary>
@@ -20,7 +25,7 @@ namespace BBTransaction.Step
         }
 
         /// <summary>
-        /// Gets the step description.
+        /// Gets the step description (optional).
         /// </summary>
         string Description
         {
@@ -46,7 +51,7 @@ namespace BBTransaction.Step
 #endif
 
         /// <summary>
-        /// Gets the undo action for the step which will be invoked during transaction rollback.
+        /// Gets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
         Action<TData, ITransactionInfo<TStepId>> UndoAction
         {
@@ -55,7 +60,7 @@ namespace BBTransaction.Step
 
 #if !NET35
         /// <summary>
-        /// Gets the undo action for the step which will be invoked during transaction rollback.
+        /// Gets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
         Func<TData, ITransactionInfo<TStepId>, Task> AsyncUndoAction
         {
@@ -64,7 +69,7 @@ namespace BBTransaction.Step
 #endif
 
         /// <summary>
-        /// Gets the action which will be invoked after transaction success.
+        /// Gets the action which will be invoked after transaction success (optional).
         /// </summary>
         Action<TData> PostAction
         {
@@ -73,7 +78,7 @@ namespace BBTransaction.Step
 
 #if !NET35
         /// <summary>
-        /// Gets the action which will be invoked after transaction success.
+        /// Gets the action which will be invoked after transaction success (optional).
         /// </summary>
         Func<TData, Task> AsyncPostAction
         {
@@ -98,7 +103,7 @@ namespace BBTransaction.Step
         }
 
         /// <summary>
-        /// Gets an executor for the step.
+        /// Gets an executor for the step (optional).
         /// </summary>
         IStepExecutor<TData> Executor
         {
