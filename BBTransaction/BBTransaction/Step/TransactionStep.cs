@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 #endif
 using BBTransaction.Info;
 using BBTransaction.Step.Executor;
+using BBTransaction.Step.Settings;
 
 namespace BBTransaction.Step
 {
@@ -95,18 +96,9 @@ namespace BBTransaction.Step
 #endif
 
         /// <summary>
-        /// Gets or sets a value indicating whether the step should be invoked when the transaction was recovered.
+        /// Gets the settings for the step.
         /// </summary>
-        public bool RunOnRecovered
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the undo method for the step should be invoked when the step was recovered and is the first step to run. 
-        /// </summary>
-        public bool UndoOnRecover
+        public StepSettings Settings
         {
             get;
             set;
