@@ -33,7 +33,7 @@ namespace BBTransaction.Transaction.Context
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        ITransactionInfo Info
+        ITransactionCreateInfo Info
         {
             get;
         }

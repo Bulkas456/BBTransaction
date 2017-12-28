@@ -22,7 +22,7 @@ namespace BBTransaction.Factory.Context
         /// <summary>
         /// The transaction info.
         /// </summary>
-        private readonly TransactionInfo transactionInfo = new TransactionInfo();
+        private readonly TransactionInfoContext transactionInfo = new TransactionInfoContext();
 
         /// <summary>
         /// Gets or sets the definition for the transaction (optional).
@@ -41,6 +41,6 @@ namespace BBTransaction.Factory.Context
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        public TransactionInfo TransactionInfo => this.transactionInfo;
+        public TransactionInfoContext TransactionInfo => this.transactionInfo;
     }
 }

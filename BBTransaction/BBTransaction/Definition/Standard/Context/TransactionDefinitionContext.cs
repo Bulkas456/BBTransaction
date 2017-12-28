@@ -13,7 +13,7 @@ namespace BBTransaction.Definition.Standard.Context
         /// <summary>
         /// Gets or sets the transaction info (required).
         /// </summary>
-        public ITransactionInfo Info
+        public ITransactionCreateInfo Info
         {
             get;
             set;

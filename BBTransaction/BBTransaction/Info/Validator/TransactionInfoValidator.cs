@@ -9,14 +9,12 @@ namespace BBTransaction.Info.Validator
     /// </summary>
     public static class TransactionInfoValidator
     {
-        public static ITransactionInfo Validate(this ITransactionInfo info)
+        public static void Validate(this TransactionInfoContext info)
         {
             if (string.IsNullOrEmpty(info.Name))
             {
-                throw new ArgumentException(string.Format("'{0}': '{0}' cannot be null or empty.", typeof(ITransactionInfo).Name, nameof(info.Name)));
+                throw new ArgumentException(string.Format("'{0}': '{0}' cannot be null or empty.", typeof(TransactionInfoContext).Name, nameof(info.Name)));
             }
-
-            return info;
         }
     }
 }

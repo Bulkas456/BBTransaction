@@ -18,7 +18,7 @@ namespace BBTransaction.Factory
         public ITransaction<TStepId, TData> Create<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
         {
             ILogger logger = this.CreateLogger<TStepId, TData>(context);
-            ITransactionInfo info = this.CreateTransactionInfo<TStepId, TData>(context);
+            ITransactionCreateInfo info = this.CreateTransactionInfo<TStepId, TData>(context);
             ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(context, logger, info);
 
             TransactionContext<TStepId, TData> transactionContext = new TransactionContext<TStepId, TData>()
@@ -35,12 +35,17 @@ namespace BBTransaction.Factory
             return context.LoggerContext.Logger ?? new TransactionLogger(context.LoggerContext);
         }
 
-        protected virtual ITransactionInfo CreateTransactionInfo<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
+        protected virtual ITransactionCreateInfo CreateTransactionInfo<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
         {
-            return context.TransactionInfo.Validate();
+            context.TransactionInfo.Validate();
+            return new TransactionCreateInfo()
+            {
+                Name = context.TransactionInfo.Name,
+                GetCurrentTimeFunction = context.TransactionInfo.GetCurrentTimeFunction ?? new Func<DateTime>(() => DateTime.Now)
+            };
         }
 
-        protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context, ILogger logger, ITransactionInfo info)
+        protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context, ILogger logger, ITransactionCreateInfo info)
         {
             return context.Definition ?? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext()
             {

@@ -14,7 +14,7 @@ namespace BBTransaction.Definition.Standard.Context
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        ITransactionInfo Info
+        ITransactionCreateInfo Info
         {
             get;
         }
