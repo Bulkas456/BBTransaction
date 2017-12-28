@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Info;
+using BBTransaction.Session;
 using BBTransaction.Step.Executor;
 using BBTransaction.Step.Settings;
 
@@ -36,7 +37,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets the action which will be invoked for the step.
         /// </summary>
-        Action<TData, ITransactionInfo<TStepId>> StepAction
+        Action<TData, ITransactionSession<TStepId>> StepAction
         {
             get;
         }
@@ -45,7 +46,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets the action which will be invoked for the step.
         /// </summary>
-        Func<TData, ITransactionInfo<TStepId>, Task> AsyncStepAction
+        Func<TData, ITransactionSession<TStepId>, Task> AsyncStepAction
         {
             get;
         }
@@ -54,7 +55,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
-        Action<TData, ITransactionInfo<TStepId>> UndoAction
+        Action<TData, ITransactionSession<TStepId>> UndoAction
         {
             get;
         }
@@ -63,7 +64,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
-        Func<TData, ITransactionInfo<TStepId>, Task> AsyncUndoAction
+        Func<TData, ITransactionSession<TStepId>, Task> AsyncUndoAction
         {
             get;
         }

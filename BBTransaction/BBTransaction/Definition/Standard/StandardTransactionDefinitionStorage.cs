@@ -78,7 +78,13 @@ namespace BBTransaction.Definition.Standard
         /// </summary>
         public void NotifyTransactionStarted()
         {
-            this.canAddStep = false;
+            if (!this.canAddStep)
+            {
+                lock (this.syncLock)
+                {
+                    this.canAddStep = false;
+                }
+            }
         }
 
         /// <summary>
