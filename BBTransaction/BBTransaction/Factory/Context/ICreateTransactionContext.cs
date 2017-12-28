@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
-using BBTransaction.Factory.Context.Logger;
 using BBTransaction.Info;
+using BBTransaction.Logger;
 
 namespace BBTransaction.Factory.Context
 {

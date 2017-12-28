@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Logger;
 
-namespace BBTransaction.Factory.Context.Logger
+namespace BBTransaction.Logger
 {
     /// <summary>
     /// The context for a logger.
