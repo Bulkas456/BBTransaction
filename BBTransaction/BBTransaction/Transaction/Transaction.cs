@@ -52,6 +52,21 @@ namespace BBTransaction.Transaction
             RunSettings<TStepId, TData> runSettings = new RunSettings<TStepId, TData>();
             settings(runSettings);
             runSettings.Validate(this.context);
+
+            switch (runSettings.Mode)
+            {
+                case RunMode.Run:
+                    break;
+                case RunMode.RunFromStep:
+                    break;
+                case RunMode.RecoverAndUndoAndRun:
+                    break;
+                case RunMode.RecoverAndContinue:
+                    break;
+
+                default:
+                    throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
+            }
         }
     }
 }

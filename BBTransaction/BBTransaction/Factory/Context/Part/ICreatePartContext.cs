@@ -32,7 +32,7 @@ namespace BBTransaction.Factory.Context.Part
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        ITransactionCreateInfo Info
+        ITransactionCreateInfo<TStepId> Info
         {
             get;
         }

@@ -9,12 +9,13 @@ namespace BBTransaction.Definition.Standard.Context
     /// <summary>
     /// The transaction definition context.
     /// </summary>
-    public interface ITransactionDefinitionContext
+    /// <typeparam name="TStepId">The type of the step id.</typeparam>
+    public interface ITransactionDefinitionContext<TStepId>
     {
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        ITransactionCreateInfo Info
+        ITransactionCreateInfo<TStepId> Info
         {
             get;
         }

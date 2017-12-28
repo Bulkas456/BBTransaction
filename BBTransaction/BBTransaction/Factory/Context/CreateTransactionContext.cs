@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
+using BBTransaction.Factory.Context.Info;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Info;
 using BBTransaction.Logger;
@@ -45,9 +46,9 @@ namespace BBTransaction.Factory.Context
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        public TransactionInfoContext TransactionInfo
+        public ITransactionInfoContext<TStepId> TransactionInfo
         {
             get;
-        } = new TransactionInfoContext();
+        } = new TransactionInfoContext<TStepId>();
     }
 }

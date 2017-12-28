@@ -2,36 +2,39 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BBTransaction.Info
+namespace BBTransaction.Factory.Context.Info
 {
     /// <summary>
-    /// The transaction info.
+    /// The context for transaction info.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    public interface ITransactionCreateInfo<TStepId>
+    public interface ITransactionInfoContext<TStepId>
     {
         /// <summary>
-        /// Gets the name of the transaction.
+        /// Gets or sets the name of the transaction (required).
         /// </summary>
         string Name
         {
             get;
+            set;
         }
 
         /// <summary>
-        /// Gets the current time.
+        /// Gets or sets the unciton which return the current time (optional).
         /// </summary>
-        DateTime Now
+        Func<DateTime> GetCurrentTimeFunction
         {
             get;
+            set;
         }
 
         /// <summary>
-        /// Gets the step id equality comparer (optional).
+        /// Gets or sets the step id equality comparer (optional).
         /// </summary>
         IEqualityComparer<TStepId> StepIdComparer
         {
             get;
+            set;
         }
     }
 }

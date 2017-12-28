@@ -7,8 +7,12 @@ namespace BBTransaction.Info
     /// <summary>
     /// The transaction create info.
     /// </summary>
-    public class TransactionCreateInfo : ITransactionCreateInfo
+    /// <typeparam name="TStepId">The type of the step id.</typeparam>
+    public class TransactionCreateInfo<TStepId> : ITransactionCreateInfo<TStepId>
     {
+        /// <summary>
+        /// Gets or sets the name of the transaction.
+        /// </summary>
         public string Name
         {
             get;
@@ -24,6 +28,15 @@ namespace BBTransaction.Info
         /// Gets or sets the unciton which return the current time.
         /// </summary>
         public Func<DateTime> GetCurrentTimeFunction
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the step id equality comparer.
+        /// </summary>
+        public IEqualityComparer<TStepId> StepIdComparer
         {
             get;
             set;

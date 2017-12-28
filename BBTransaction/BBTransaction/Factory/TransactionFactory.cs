@@ -35,7 +35,7 @@ namespace BBTransaction.Factory
             ICreateTransactionContext<TStepId, TData> context = new CreateTransactionContext<TStepId, TData>();
             options(context);
             ILogger logger = this.CreateLogger<TStepId, TData>(context);
-            ITransactionCreateInfo info = this.CreateTransactionInfo<TStepId, TData>(context);
+            ITransactionCreateInfo<TStepId> info = this.CreateTransactionInfo<TStepId, TData>(context);
             CreatePartContext<TStepId, TData> partContext = new CreatePartContext<TStepId, TData>()
             {
                 Context = context,
@@ -60,20 +60,21 @@ namespace BBTransaction.Factory
             return context.LoggerContext.Logger ?? new TransactionLogger(context.LoggerContext);
         }
 
-        protected virtual ITransactionCreateInfo CreateTransactionInfo<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
+        protected virtual ITransactionCreateInfo<TStepId> CreateTransactionInfo<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
         {
             context.TransactionInfo.Validate();
-            return new TransactionCreateInfo()
+            return new TransactionCreateInfo<TStepId>()
             {
                 Name = context.TransactionInfo.Name,
-                GetCurrentTimeFunction = context.TransactionInfo.GetCurrentTimeFunction ?? new Func<DateTime>(() => DateTime.Now)
+                GetCurrentTimeFunction = context.TransactionInfo.GetCurrentTimeFunction ?? new Func<DateTime>(() => DateTime.Now),
+                StepIdComparer = context.TransactionInfo.StepIdComparer ?? EqualityComparer<TStepId>.Default
             };
         }
 
         protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
             ITransactionDefinitionStorage<TStepId, TData> definition = context.Context.DefinitionCreator == null
-                    ? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext()
+                    ? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext<TStepId>()
                     {
                         Info = context.Info
                     })

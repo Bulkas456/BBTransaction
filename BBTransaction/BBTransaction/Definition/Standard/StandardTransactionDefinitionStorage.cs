@@ -29,7 +29,7 @@ namespace BBTransaction.Definition.Standard
         /// <summary>
         /// The context.
         /// </summary>
-        private readonly ITransactionDefinitionContext context;
+        private readonly ITransactionDefinitionContext<TStepId> context;
 
         /// <summary>
         /// A value indicating whether a new steps can be added.
@@ -40,7 +40,7 @@ namespace BBTransaction.Definition.Standard
         /// Initializes a new instance of the <see cref=""/>class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public StandardTransactionDefinitionStorage(ITransactionDefinitionContext context)
+        public StandardTransactionDefinitionStorage(ITransactionDefinitionContext<TStepId> context)
         {
             this.context = context;
         }

@@ -10,7 +10,6 @@ namespace ConsoleApp1
         {
             var transaction = new TransactionFactory().Create<int, string>(options => 
             {
-                
             });
         }
     }
