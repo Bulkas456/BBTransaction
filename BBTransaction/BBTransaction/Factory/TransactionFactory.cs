@@ -10,16 +10,40 @@ using BBTransaction.Info.Validator;
 using BBTransaction.Definition;
 using BBTransaction.Definition.Standard;
 using BBTransaction.Definition.Standard.Context;
+using BBTransaction.StateStorage;
+using BBTransaction.StateStorage.Default;
+using BBTransaction.Factory.Context.Part;
 
 namespace BBTransaction.Factory
 {
     public class TransactionFactory : ITransactionFactory
     {
-        public ITransaction<TStepId, TData> Create<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context)
+        /// <summary>
+        /// Creates a transaction.
+        /// </summary>
+        /// <typeparam name="TStepId">The type of the step id.</typeparam>
+        /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+        /// <param name="options">The action to set options.</param>
+        /// <returns>The transaction.</returns>
+        public ITransaction<TStepId, TData> Create<TStepId, TData>(Action<ICreateTransactionContext<TStepId, TData>> options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            ICreateTransactionContext<TStepId, TData> context = new CreateTransactionContext<TStepId, TData>();
+            options(context);
             ILogger logger = this.CreateLogger<TStepId, TData>(context);
             ITransactionCreateInfo info = this.CreateTransactionInfo<TStepId, TData>(context);
-            ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(context, logger, info);
+            CreatePartContext<TStepId, TData> partContext = new CreatePartContext<TStepId, TData>()
+            {
+                Context = context,
+                Logger = logger,
+                Info = info
+            };
+            ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(partContext);
+            IStateStorage<TStepId, TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
 
             TransactionContext<TStepId, TData> transactionContext = new TransactionContext<TStepId, TData>()
             {
@@ -45,12 +69,35 @@ namespace BBTransaction.Factory
             };
         }
 
-        protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context, ILogger logger, ITransactionCreateInfo info)
+        protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            return context.Definition ?? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext()
+            ITransactionDefinitionStorage<TStepId, TData> definition = context.Context.DefinitionCreator == null
+                    ? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext()
+                    {
+                        Info = context.Info
+                    })
+                    : context.Context.DefinitionCreator(context);
+
+            if (definition == null)
             {
-                Info = info
-            });
+                throw new InvalidOperationException(string.Format("Transaction '{0}': no definiton created from definition creator.", context.Info.Name));
+            }
+
+            return definition;
+        }
+
+        protected virtual IStateStorage<TStepId, TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
+        {
+            IStateStorage<TStepId, TData> stateStorage = context.Context.StateStorageCreator == null
+                   ? DefaultStateStorage<TStepId, TData>.Instance
+                   : context.Context.StateStorageCreator(context);
+
+            if (stateStorage == null)
+            {
+                throw new InvalidOperationException(string.Format("Transaction '{0}': no state storage created from state storage creator.", context.Info.Name));
+            }
+
+            return stateStorage;
         }
     }
 }

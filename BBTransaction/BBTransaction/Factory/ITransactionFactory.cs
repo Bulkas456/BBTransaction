@@ -16,8 +16,8 @@ namespace BBTransaction.Factory
         /// </summary>
         /// <typeparam name="TStepId">The type of the step id.</typeparam>
         /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-        /// <param name="context">The create context.</param>
+        /// <param name="options">The action to set options.</param>
         /// <returns>The transaction.</returns>
-        ITransaction<TStepId, TData> Create<TStepId, TData>(ICreateTransactionContext<TStepId, TData> context);
+        ITransaction<TStepId, TData> Create<TStepId, TData>(Action<ICreateTransactionContext<TStepId, TData>> options);
     }
 }

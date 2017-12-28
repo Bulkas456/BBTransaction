@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
+using BBTransaction.Factory.Context.Part;
 using BBTransaction.Info;
 using BBTransaction.Logger;
+using BBTransaction.StateStorage;
 
 namespace BBTransaction.Factory.Context
 {
@@ -15,11 +17,21 @@ namespace BBTransaction.Factory.Context
     public interface ICreateTransactionContext<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaction (optional).
+        /// Gets or sets the definition creator for the transaction (optional).
         /// </summary>
-        ITransactionDefinitionStorage<TStepId, TData> Definition
+        Func<ICreatePartContext<TStepId, TData>, ITransactionDefinitionStorage<TStepId, TData>> DefinitionCreator
         {
             get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the state storage creator (optional).
+        /// </summary>
+        Func<ICreatePartContext<TStepId, TData>, IStateStorage<TStepId, TData>> StateStorageCreator
+        {
+            get;
+            set;
         }
 
         /// <summary>

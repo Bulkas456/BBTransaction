@@ -4,8 +4,4 @@
     <TargetFrameworks>netcoreapp1.0;net45;net35</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="StateStorage\" />
-  </ItemGroup>
-
 </Project>

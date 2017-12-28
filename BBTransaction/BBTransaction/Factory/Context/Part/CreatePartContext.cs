@@ -1,33 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BBTransaction.Definition;
 using BBTransaction.Info;
 using BBTransaction.Logger;
-using BBTransaction.StateStorage;
 
-namespace BBTransaction.Transaction.Context
+namespace BBTransaction.Factory.Context.Part
 {
     /// <summary>
-    /// The context for the transaction.
+    /// The create part of transaction core context.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    public class TransactionContext<TStepId, TData> : ITransactionContext<TStepId, TData>
+    internal struct CreatePartContext<TStepId, TData> : ICreatePartContext<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaction.
+        /// Gets the create transaction context.
         /// </summary>
-        public ITransactionDefinitionStorage<TStepId, TData> Definition
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets the state storage.
-        /// </summary>
-        public IStateStorage<TStepId, TData> StateStorage
+        public ICreateTransactionContext<TStepId, TData> Context
         {
             get;
             set;

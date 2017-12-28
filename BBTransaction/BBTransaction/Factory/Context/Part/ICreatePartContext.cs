@@ -1,36 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BBTransaction.Definition;
 using BBTransaction.Info;
 using BBTransaction.Logger;
-using BBTransaction.StateStorage;
 
-namespace BBTransaction.Transaction.Context
+namespace BBTransaction.Factory.Context.Part
 {
     /// <summary>
-    /// The context for the transaction.
+    /// The create part of transaction core context.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    public interface ITransactionContext<TStepId, TData>
+    public interface ICreatePartContext<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaction.
+        /// Gets the create transaction context.
         /// </summary>
-        ITransactionDefinitionStorage<TStepId, TData> Definition
+        ICreateTransactionContext<TStepId, TData> Context
         {
             get;
-        }
-
-        /// <summary>
-        /// Gets the state storage.
-        /// </summary>
-        IStateStorage<TStepId, TData> StateStorage
-        {
-            get;
-        }
-
+        } 
+        
         /// <summary>
         /// Gets the logger.
         /// </summary>
@@ -38,7 +28,7 @@ namespace BBTransaction.Transaction.Context
         {
             get;
         }
-
+        
         /// <summary>
         /// Gets the transaction info.
         /// </summary>

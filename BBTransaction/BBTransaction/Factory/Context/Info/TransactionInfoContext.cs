@@ -19,7 +19,7 @@ namespace BBTransaction.Info
         }
 
         /// <summary>
-        /// Gets or sets the unciton which return the current time.
+        /// Gets or sets the unciton which return the current time (optional).
         /// </summary>
         public Func<DateTime> GetCurrentTimeFunction
         {
