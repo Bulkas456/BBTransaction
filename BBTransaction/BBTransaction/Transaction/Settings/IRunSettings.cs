@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using BBTransaction.Result;
+using BBTransaction.Transaction.TransactionResult;
+
+namespace BBTransaction.Transaction.Settings
+{
+    /// <summary>
+    /// The transaction run settings.
+    /// </summary>
+    /// <typeparam name="TStepId">The type of the step id.</typeparam>
+    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    public interface IRunSettings<TStepId, TData>
+    {
+        /// <summary>
+        /// Gets or sets the run mode (required).
+        /// </summary>
+        RunMode Mode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the transaction data (optional).
+        /// </summary>
+        TData Data
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the first step id to run (optional, ignored if mode not set to RunFromStep).
+        /// </summary>
+        TStepId FirstStepId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the callback for the transaction result (optional).
+        /// </summary>
+        Action<ITransactionResult<TData>> TransactionResultCallback
+        {
+            get;
+            set;
+        }
+    }
+}

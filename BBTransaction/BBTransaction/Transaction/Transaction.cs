@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using BBTransaction.Definition;
 using BBTransaction.Result;
 using BBTransaction.Transaction.Context;
+using BBTransaction.Transaction.Settings;
+using BBTransaction.Transaction.Settings.Validator;
 
 namespace BBTransaction.Transaction
 {
@@ -36,16 +38,20 @@ namespace BBTransaction.Transaction
         /// </summary>
         public ITransactionDefinition<TStepId, TData> Definition => this.context.Definition;
 
-        public IOperationResult Run()
+        /// <summary>
+        /// Runs the transaction.
+        /// </summary>
+        /// <param name="settings">The action to set settings.</param>
+        public void Run(Action<IRunSettings<TStepId, TData>> settings)
         {
-            throw new NotImplementedException();
-        }
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
 
-#if !NET35
-        public Task<IOperationResult> RunAsync()
-        {
-            throw new NotImplementedException();
+            RunSettings<TStepId, TData> runSettings = new RunSettings<TStepId, TData>();
+            settings(runSettings);
+            runSettings.Validate(this.context);
         }
-#endif
     }
 }
