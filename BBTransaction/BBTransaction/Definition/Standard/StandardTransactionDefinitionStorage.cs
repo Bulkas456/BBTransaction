@@ -5,6 +5,7 @@ using BBTransaction.Step;
 using BBTransaction.Step.Validator;
 using System.Linq;
 using BBTransaction.State;
+using BBTransaction.Definition.Standard.Context;
 
 namespace BBTransaction.Definition.Standard
 {
@@ -13,7 +14,7 @@ namespace BBTransaction.Definition.Standard
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    internal class StandardTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinition<TStepId, TData>
+    internal class StandardTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinitionStorage<TStepId, TData>
     {
         /// <summary>
         /// The synchronization lock.
@@ -26,9 +27,23 @@ namespace BBTransaction.Definition.Standard
         private readonly List<StepDetails<TStepId, TData>> steps = new List<StepDetails<TStepId, TData>>();
 
         /// <summary>
+        /// The context.
+        /// </summary>
+        private readonly ITransactionDefinitionContext context;
+
+        /// <summary>
         /// A value indicating whether a new steps can be added.
         /// </summary>
         private bool canAddStep = true;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""/>class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        public StandardTransactionDefinitionStorage(ITransactionDefinitionContext context)
+        {
+            this.context = context;
+        }
 
         /// <summary>
         /// Gets the step details for the transaction state.
@@ -94,7 +109,7 @@ namespace BBTransaction.Definition.Standard
         {
             if (!this.canAddStep)
             {
-                throw new InvalidOperationException("Cannot add a step when a transaction was started.");
+                throw new InvalidOperationException(string.Format("Transaction '{0}': cannot add a step when a transaction was started.", this.context.Info.Name));
             }
         }
     }

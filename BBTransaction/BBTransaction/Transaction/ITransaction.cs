@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using BBTransaction.Definition;
 using BBTransaction.Result;
 
-namespace BBTransaction
+namespace BBTransaction.Transaction
 {
     /// <summary>
     /// The transaction.
@@ -17,7 +17,7 @@ namespace BBTransaction
     public interface ITransaction<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaciton.
+        /// Gets the definition for the transaction.
         /// </summary>
         ITransactionDefinition<TStepId, TData> Definition
         {

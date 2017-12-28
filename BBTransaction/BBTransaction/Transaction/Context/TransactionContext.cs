@@ -2,40 +2,43 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
-using BBTransaction.Factory.Context.Logger;
 using BBTransaction.Info;
+using BBTransaction.Logger;
 
-namespace BBTransaction.Factory.Context
+namespace BBTransaction.Transaction.Context
 {
     /// <summary>
-    /// The create transaction context.
+    /// The context for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    public interface ICreateTransactionContext<TStepId, TData>
+    public class TransactionContext<TStepId, TData> : ITransactionContext<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaction (optional).
+        /// Gets the definition for the transaction.
         /// </summary>
-        ITransactionDefinitionStorage<TStepId, TData> Definition
+        public ITransactionDefinitionStorage<TStepId, TData> Definition
         {
             get;
+            set;
         }
 
         /// <summary>
-        /// Gets the logger context.
+        /// Gets the logger.
         /// </summary>
-        LoggerContext LoggerContext
+        public ILogger Logger
         {
             get;
+            set;
         }
 
         /// <summary>
         /// Gets the transaction info.
         /// </summary>
-        TransactionInfo TransactionInfo
+        public ITransactionInfo Info
         {
             get;
+            set;
         }
     }
 }

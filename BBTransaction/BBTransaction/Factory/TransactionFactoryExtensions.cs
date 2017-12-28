@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Factory.Context;
+using BBTransaction.Transaction;
 
 namespace BBTransaction.Factory
 {
