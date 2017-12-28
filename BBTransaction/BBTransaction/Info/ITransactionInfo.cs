@@ -4,7 +4,17 @@ using System.Text;
 
 namespace BBTransaction.Info
 {
-    public interface ITransactionInfo<TStepId>
+    /// <summary>
+    /// The transaction info.
+    /// </summary>
+    public interface ITransactionInfo
     {
+        /// <summary>
+        /// Gets the name of the transaction.
+        /// </summary>
+        string Name
+        {
+            get;
+        }
     }
 }
