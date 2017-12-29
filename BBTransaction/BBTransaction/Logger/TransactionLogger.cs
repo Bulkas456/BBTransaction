@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Factory.Context.Logger;
 
 namespace BBTransaction.Logger
 {
@@ -12,13 +13,13 @@ namespace BBTransaction.Logger
         /// <summary>
         /// The context.
         /// </summary>
-        private readonly LoggerContext context;
+        private readonly ILoggerContext context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionLogger"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public TransactionLogger(LoggerContext context)
+        public TransactionLogger(ILoggerContext context)
         {
             this.context = context;
         }

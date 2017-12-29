@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
 using BBTransaction.Factory.Context.Info;
+using BBTransaction.Factory.Context.Logger;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Info;
 using BBTransaction.Logger;
@@ -38,7 +39,7 @@ namespace BBTransaction.Factory.Context
         /// <summary>
         /// Gets the logger context.
         /// </summary>
-        public LoggerContext LoggerContext
+        public ILoggerContext LoggerContext
         {
             get;
         } = new LoggerContext();

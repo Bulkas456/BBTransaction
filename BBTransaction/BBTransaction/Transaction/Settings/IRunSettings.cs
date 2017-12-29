@@ -48,5 +48,14 @@ namespace BBTransaction.Transaction.Settings
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the additional settings.
+        /// </summary>
+        TransactionSettings Settings
+        {
+            get;
+            set;
+        }
     }
 }
