@@ -23,6 +23,14 @@ namespace BBTransaction.Definition
         }
 
         /// <summary>
+        /// Gets the colleciton of all steps.
+        /// </summary>
+        IEnumerable<IStepDetails<TStepId, TData>> Steps
+        {
+            get;
+        } 
+
+        /// <summary>
         /// Notifies the definition that a transaction was started.
         /// </summary>
         void NotifyTransactionStarted();

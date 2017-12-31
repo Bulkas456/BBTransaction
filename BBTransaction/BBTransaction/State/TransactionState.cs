@@ -10,30 +10,33 @@ namespace BBTransaction.State
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    public interface ITransactionState<TStepId, TData>
+    internal class TransactionState<TStepId, TData> : ITransactionState<TStepId, TData>
     {
         /// <summary>
         /// Gets the index in the definition for the current step.
         /// </summary>
-        int CurrentStepIndex
+        public int CurrentStepIndex
         {
             get;
+            set;
         }
 
         /// <summary>
         /// Gets the run transaction settings.
         /// </summary>
-        IRunSettings<TStepId, TData> Settings
+        public IRunSettings<TStepId, TData> Settings
         {
             get;
+            set;
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether the transaction was recovered.
         /// </summary>
-        bool Recovered
+        public bool Recovered
         {
             get;
+            set;
         }
     }
 }

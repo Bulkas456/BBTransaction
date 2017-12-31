@@ -60,6 +60,17 @@ namespace BBTransaction.Definition.Standard
             }
         }
 
+        /// <summary>
+        /// Gets the colleciton of all steps.
+        /// </summary>
+        public IEnumerable<IStepDetails<TStepId, TData>> Steps
+        {
+            get
+            {
+                return this.steps.Cast<IStepDetails<TStepId, TData>>();
+            }
+        }
+
         public ITransactionDefinition<TStepId, TData> Add(ITransactionStep<TStepId, TData> step)
         {
             lock (this.syncLock)

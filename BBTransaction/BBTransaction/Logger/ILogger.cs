@@ -30,5 +30,12 @@ namespace BBTransaction.Logger
         /// <param name="format">The format.</param>
         /// <param name="args">The format arguments.</param>
         void ErrorFormat(Exception e, string format, params object[] args);
+
+        /// <summary>
+        /// Logs an execution time.
+        /// </summary>
+        /// <param name="info">The log info.</param>
+        /// <param name="executionTime">The execution time.</param>
+        void LogExecutionTime(string info, TimeSpan executionTime);
     }
 }

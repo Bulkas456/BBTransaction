@@ -16,9 +16,9 @@ namespace BBTransaction.Transaction.Settings
         /// <typeparam name="TData">The type of the transaciton data.</typeparam>
         /// <param name="settings">The run settings.</param>
         /// <returns><c>True</c> if the TransactionSettings.ProfileAllSteps is set, otherwise <c>false</c>.</returns>
-        public static bool ProfileAllSteps<TStepId, TData>(this IRunSettings<TStepId, TData> settings)
+        public static bool LogTimeExecutionForAllSteps<TStepId, TData>(this IRunSettings<TStepId, TData> settings)
         {
-            return (settings.Settings & TransactionSettings.ProfileAllSteps) != 0;
+            return (settings.Settings & TransactionSettings.LogTimeExecutionForAllSteps) != 0;
         }
     }
 }

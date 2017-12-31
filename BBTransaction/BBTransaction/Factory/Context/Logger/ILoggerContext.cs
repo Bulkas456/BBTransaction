@@ -38,6 +38,15 @@ namespace BBTransaction.Factory.Context.Logger
         }
 
         /// <summary>
+        /// Gets or sets the execution time log action (optional).
+        /// </summary>
+        Action<string, TimeSpan> ExecutionTimeLogAction
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the logger instance which will be used in the transaciton (optional).
         /// </summary>
         ILogger Logger

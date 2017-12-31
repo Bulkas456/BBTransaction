@@ -23,6 +23,11 @@ namespace BBTransaction.Step.Settings
         /// <summary>
         /// The undo method for the step should be invoked when the step was recovered and is the first step to run.
         /// </summary>
-        UndoOnRecover = 2
+        UndoOnRecover = 2,
+
+        /// <summary>
+        /// Time execution for the step method will be written to log.
+        /// </summary>
+        LogExecutionTime = 4
     }
 }

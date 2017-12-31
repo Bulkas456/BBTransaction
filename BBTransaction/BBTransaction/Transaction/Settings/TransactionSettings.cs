@@ -18,6 +18,6 @@ namespace BBTransaction.Transaction.Settings
         /// <summary>
         /// Time execution for each step method will be written to log.
         /// </summary>
-        ProfileAllSteps = 1
+        LogTimeExecutionForAllSteps = 1
     }
 }

@@ -54,5 +54,15 @@ namespace BBTransaction.Logger
         {
             this.context.ErrorFormatAction?.Invoke(e, format, args);
         }
+
+        /// <summary>
+        /// Logs an execution time.
+        /// </summary>
+        /// <param name="info">The log info.</param>
+        /// <param name="executionTime">The execution time.</param>
+        public void LogExecutionTime(string info, TimeSpan executionTime)
+        {
+            this.context.ExecutionTimeLogAction?.Invoke(info, executionTime);
+        }
     }
 }
