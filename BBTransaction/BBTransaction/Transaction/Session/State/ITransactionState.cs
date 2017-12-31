@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Settings;
 
-namespace BBTransaction.State
+namespace BBTransaction.Transaction.Session.State
 {
     /// <summary>
     /// The state for the transaction.
@@ -16,22 +16,6 @@ namespace BBTransaction.State
         /// Gets the index in the definition for the current step.
         /// </summary>
         int CurrentStepIndex
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the run transaction settings.
-        /// </summary>
-        IRunSettings<TStepId, TData> Settings
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the transaction was recovered.
-        /// </summary>
-        bool Recovered
         {
             get;
         }

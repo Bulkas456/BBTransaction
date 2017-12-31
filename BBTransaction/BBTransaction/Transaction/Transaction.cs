@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
 using BBTransaction.Result;
-using BBTransaction.State;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.Settings.Validator;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Step.Settings;
+using System.Threading;
+using BBTransaction.Transaction.Session;
+using BBTransaction.Transaction.Session.State;
 
 namespace BBTransaction.Transaction
 {
@@ -42,11 +44,15 @@ namespace BBTransaction.Transaction
         /// </summary>
         public ITransactionDefinition<TStepId, TData> Definition => this.context.Definition;
 
+#if NET35
         /// <summary>
         /// Runs the transaction.
         /// </summary>
         /// <param name="settings">The action to set settings.</param>
         public void Run(Action<IRunSettings<TStepId, TData>> settings)
+#else
+        public async Task<ITransactionResult<TData>> Run(Action<IRunSettings<TStepId, TData>> settings)
+#endif
         {
             if (settings == null)
             {
@@ -71,25 +77,30 @@ namespace BBTransaction.Transaction
                 default:
                     throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
             }
+
+#if !NET35
+            return null;
+#endif
         }
 
-        protected virtual void NotifyTransactionEnded(ITransactionResult<TData> result)
+        /*protected virtual void NotifyTransactionEnded(ITransactionResult<TData> result)
         {
         }
 
         private void Run(IRunSettings<TStepId, TData> settings)
         {
-            TransactionState<TStepId, TData> state = new TransactionState<TStepId, TData>()
+            TransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
             {
-                Settings = settings
+                RunSettings = settings,
+                State = new TransactionState<TStepId, TData>()
             };
 
-            this.RunTransaction(state);
+            this.RunTransaction(session);
         }
 
-        private void RunTransaction(ITransactionState<TStepId, TData> state)
+        private void RunTransaction(ITransactionSession<TStepId, TData> session)
         {
-            TransactionResult<TStepId, TData> notifyTransactionStartedResult = this.NotifyTransactionStarted(state);
+            TransactionResult<TStepId, TData> notifyTransactionStartedResult = this.NotifyTransactionStarted(session);
 
             if (notifyTransactionStartedResult != null)
             {
@@ -105,7 +116,7 @@ namespace BBTransaction.Transaction
             if (result.Success
                 && result.HasState)
             {
-                TransactionResult<TStepId, TData> runPostActionResult = this.RunPostAction(result.State);
+                TransactionResult<TStepId, TData> runPostActionResult = null;// this.RunPostAction(result.State);
 
                 if (runPostActionResult != null)
                 {
@@ -130,7 +141,7 @@ namespace BBTransaction.Transaction
             this.NotifyTransactionEnded(result);
         }
 
-        private TransactionResult<TStepId, TData> NotifyTransactionStarted(ITransactionState<TStepId, TData> state)
+        private TransactionResult<TStepId, TData> NotifyTransactionStarted(ITransactionSession<TStepId, TData> session)
         {
             try
             {
@@ -145,10 +156,13 @@ namespace BBTransaction.Transaction
             }
         }
 
-        private TransactionResult<TStepId, TData> RunPostAction(ITransactionState<TStepId, TData> state)
+#if NET35
+        private TransactionResult<TStepId, TData> RunPostAction(ITransactionSession<TStepId, TData> session)
+#else
+        private async Task<TransactionResult<TStepId, TData>> RunPostAction(ITransactionSession<TStepId, TData> session)
+#endif
         {
             this.context.Logger.DebugFormat("Running post actions for transaction '{0}'.", this.context.Info.Name);
-
             foreach (IStepDetails<TStepId, TData> step in this.context.Definition.Steps)
             {
                 Stopwatch postActionWatch = new Stopwatch();
@@ -156,7 +170,19 @@ namespace BBTransaction.Transaction
                 try
                 {
                     postActionWatch.Start();
-                    //step.Step.PostAction();
+
+#if NET35
+                    step.Step.PostAction?.Invoke(state.Settings.Data);
+#else
+                    if (step.Step.PostAction == null)
+                    {
+                        await step.Step.AsyncPostAction(state.Settings.Data);
+                    }
+                    else
+                    {
+                        step.Step.PostAction(state.Settings.Data);
+                    }
+#endif
                     postActionWatch.Stop();
                     this.context.Logger.DebugFormat("Post action ended for step '{0}', step index '{1}' for transaction '{2}'.", step.Step.Id, step.Index, this.context.Info.Name);
 
@@ -183,7 +209,7 @@ namespace BBTransaction.Transaction
             return null;
         }
 
-        private TransactionResult<TStepId, TData> RemoveState(ITransactionState<TStepId, TData> state)
+        private TransactionResult<TStepId, TData> RemoveSession(ITransactionSession<TStepId, TData> session)
         {
             try
             {
@@ -196,6 +222,6 @@ namespace BBTransaction.Transaction
                 this.context.Logger.ErrorFormat(e, undoInfo);
                 return new TransactionResult<TStepId, TData>(state, new InvalidOperationException(undoInfo, e));
             }
-        }
+        }*/
     }
 }

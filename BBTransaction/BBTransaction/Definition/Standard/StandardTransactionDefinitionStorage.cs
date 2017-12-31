@@ -4,8 +4,8 @@ using System.Text;
 using BBTransaction.Step;
 using BBTransaction.Step.Validator;
 using System.Linq;
-using BBTransaction.State;
 using BBTransaction.Definition.Standard.Context;
+using BBTransaction.Transaction.Session.State;
 
 namespace BBTransaction.Definition.Standard
 {

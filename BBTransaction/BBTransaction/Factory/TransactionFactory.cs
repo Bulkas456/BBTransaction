@@ -10,9 +10,9 @@ using BBTransaction.Info.Validator;
 using BBTransaction.Definition;
 using BBTransaction.Definition.Standard;
 using BBTransaction.Definition.Standard.Context;
-using BBTransaction.StateStorage;
-using BBTransaction.StateStorage.Default;
 using BBTransaction.Factory.Context.Part;
+using BBTransaction.Transaction.Session.Storage;
+using BBTransaction.Transaction.Session.Storage.Default;
 
 namespace BBTransaction.Factory
 {
@@ -43,7 +43,7 @@ namespace BBTransaction.Factory
                 Info = info
             };
             ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(partContext);
-            IStateStorage<TStepId, TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
+            ITransactionStorage<TStepId, TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
 
             TransactionContext<TStepId, TData> transactionContext = new TransactionContext<TStepId, TData>()
             {
@@ -88,10 +88,10 @@ namespace BBTransaction.Factory
             return definition;
         }
 
-        protected virtual IStateStorage<TStepId, TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
+        protected virtual ITransactionStorage<TStepId, TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            IStateStorage<TStepId, TData> stateStorage = context.Context.StateStorageCreator == null
-                   ? DefaultStateStorage<TStepId, TData>.Instance
+            ITransactionStorage<TStepId, TData> stateStorage = context.Context.StateStorageCreator == null
+                   ? EmptyTransactionStorage<TStepId, TData>.Instance
                    : context.Context.StateStorageCreator(context);
 
             if (stateStorage == null)

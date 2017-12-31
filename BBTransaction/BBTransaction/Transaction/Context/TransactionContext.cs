@@ -4,7 +4,7 @@ using System.Text;
 using BBTransaction.Definition;
 using BBTransaction.Info;
 using BBTransaction.Logger;
-using BBTransaction.StateStorage;
+using BBTransaction.Transaction.Session.Storage;
 
 namespace BBTransaction.Transaction.Context
 {
@@ -27,7 +27,7 @@ namespace BBTransaction.Transaction.Context
         /// <summary>
         /// Gets the state storage.
         /// </summary>
-        public IStateStorage<TStepId, TData> StateStorage
+        public ITransactionStorage<TStepId, TData> StateStorage
         {
             get;
             set;

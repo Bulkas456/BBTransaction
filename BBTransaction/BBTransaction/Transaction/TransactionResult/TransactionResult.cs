@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Result;
-using BBTransaction.State;
+using BBTransaction.Transaction.Session;
 
 namespace BBTransaction.Transaction.TransactionResult
 {
@@ -17,27 +17,27 @@ namespace BBTransaction.Transaction.TransactionResult
         /// <summary>
         /// The transaction state.
         /// </summary>
-        private readonly ITransactionState<TStepId, TData> state;
+        private readonly ITransactionSession<TStepId, TData> session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionResult<TStepId, TData>"/> class.
         /// </summary>
-        /// <param name="state">The state.</param>
+        /// <param name="session">The state.</param>
         /// <param name="error">The error.</param>
-        public TransactionResult(ITransactionState<TStepId, TData> state, Exception error = null)
+        public TransactionResult(ITransactionSession<TStepId, TData> session, Exception error = null)
         {
-            this.state = state;
+            this.session = session;
             this.Add(error);
         }
 
         /// <summary>
-        /// Gets the transaction state.
+        /// Gets the transaction session.
         /// </summary>
-        public ITransactionState<TStepId, TData> State
+        public ITransactionSession<TStepId, TData> State
         {
             get
             {
-                return this.state;
+                return this.session;
             }
         }
 
@@ -49,7 +49,7 @@ namespace BBTransaction.Transaction.TransactionResult
             get
             {
                 return this.HasState
-                        ? this.state.Settings.Data
+                        ? this.session.RunSettings.Data
                         : default(TData);
             }
         }
@@ -61,9 +61,9 @@ namespace BBTransaction.Transaction.TransactionResult
         {
             get
             {
-                return this.state == null
+                return this.session == null
                         ? false
-                        : this.state.Recovered;
+                        : this.session.Recovered;
             }
         }
 
@@ -74,7 +74,7 @@ namespace BBTransaction.Transaction.TransactionResult
         {
             get
             {
-                return this.state != null;
+                return this.session != null;
             }
         }
     }

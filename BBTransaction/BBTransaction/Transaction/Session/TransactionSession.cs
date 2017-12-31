@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Transaction.Session.State;
 using BBTransaction.Transaction.Settings;
 
-namespace BBTransaction.State
+namespace BBTransaction.Transaction.Session
 {
     /// <summary>
-    /// The state for the transaction.
+    /// The session for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaciton data.</typeparam>
-    internal class TransactionState<TStepId, TData> : ITransactionState<TStepId, TData>
+    internal class TransactionSession<TStepId, TData> : ITransactionSession<TStepId, TData>
     {
         /// <summary>
-        /// Gets the index in the definition for the current step.
+        /// Gets the transaction state.
         /// </summary>
-        public int CurrentStepIndex
+        public ITransactionState<TStepId, TData> State
         {
             get;
             set;
@@ -24,7 +25,7 @@ namespace BBTransaction.State
         /// <summary>
         /// Gets the run transaction settings.
         /// </summary>
-        public IRunSettings<TStepId, TData> Settings
+        public IRunSettings<TStepId, TData> RunSettings
         {
             get;
             set;

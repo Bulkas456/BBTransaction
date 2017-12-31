@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 using BBTransaction.Definition;
 using BBTransaction.Result;
 using BBTransaction.Transaction.Settings;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction
 {
@@ -22,10 +26,14 @@ namespace BBTransaction.Transaction
             get;
         }
 
+#if NET35
         /// <summary>
         /// Runs the transaction.
         /// </summary>
         /// <param name="settings">The action to set settings.</param>
         void Run(Action<IRunSettings<TStepId, TData>> settings);
+#else
+        Task<ITransactionResult<TData>> Run(Action<IRunSettings<TStepId, TData>> settings);
+#endif
     }
 }

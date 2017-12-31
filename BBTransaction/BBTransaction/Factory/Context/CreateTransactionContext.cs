@@ -7,7 +7,7 @@ using BBTransaction.Factory.Context.Logger;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Info;
 using BBTransaction.Logger;
-using BBTransaction.StateStorage;
+using BBTransaction.Transaction.Session.Storage;
 
 namespace BBTransaction.Factory.Context
 {
@@ -30,7 +30,7 @@ namespace BBTransaction.Factory.Context
         /// <summary>
         /// Gets or sets the state storage creator (optional).
         /// </summary>
-        public Func<ICreatePartContext<TStepId, TData>, IStateStorage<TStepId, TData>> StateStorageCreator
+        public Func<ICreatePartContext<TStepId, TData>, ITransactionStorage<TStepId, TData>> StateStorageCreator
         {
             get;
             set;
