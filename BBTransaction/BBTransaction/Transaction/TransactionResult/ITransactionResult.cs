@@ -8,7 +8,7 @@ namespace BBTransaction.Transaction.TransactionResult
     /// <summary>
     /// The transaction result.
     /// </summary>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ITransactionResult<TData> : IOperationResult
     {
         /// <summary>

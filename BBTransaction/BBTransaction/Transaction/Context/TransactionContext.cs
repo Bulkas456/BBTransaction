@@ -12,7 +12,7 @@ namespace BBTransaction.Transaction.Context
     /// The context for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public class TransactionContext<TStepId, TData> : ITransactionContext<TStepId, TData>
     {
         /// <summary>
@@ -27,7 +27,7 @@ namespace BBTransaction.Transaction.Context
         /// <summary>
         /// Gets the state storage.
         /// </summary>
-        public ITransactionStorage<TStepId, TData> StateStorage
+        public ITransactionStorage<TData> StateStorage
         {
             get;
             set;

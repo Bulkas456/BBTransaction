@@ -47,7 +47,7 @@ namespace BBTransaction.Factory.Context.Logger
         }
 
         /// <summary>
-        /// Gets or sets the logger instance which will be used in the transaciton (optional).
+        /// Gets or sets the logger instance which will be used in the transaction (optional).
         /// </summary>
         ILogger Logger
         {

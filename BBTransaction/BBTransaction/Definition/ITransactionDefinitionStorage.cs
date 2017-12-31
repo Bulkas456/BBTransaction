@@ -9,7 +9,7 @@ namespace BBTransaction.Definition
     /// The definition storage for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ITransactionDefinitionStorage<TStepId, TData> : ITransactionDefinition<TStepId, TData>
     {
         /// <summary>
@@ -23,9 +23,11 @@ namespace BBTransaction.Definition
         }
 
         /// <summary>
-        /// Gets the colleciton of all steps.
+        /// Gets the step details for the step id.
         /// </summary>
-        IEnumerable<IStepDetails<TStepId, TData>> Steps
+        /// <param name="state">The state.</param>
+        /// <returns>The step details for the transaction state.</returns>
+        IStepDetails<TStepId, TData> this[TStepId id]
         {
             get;
         } 

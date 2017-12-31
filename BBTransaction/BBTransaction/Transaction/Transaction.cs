@@ -15,6 +15,7 @@ using BBTransaction.Step.Settings;
 using System.Threading;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.Storage.TransactionData;
 
 namespace BBTransaction.Transaction
 {
@@ -22,7 +23,7 @@ namespace BBTransaction.Transaction
     /// The transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public class Transaction<TStepId, TData> : ITransaction<TStepId, TData>
     {
         /// <summary>
@@ -51,6 +52,11 @@ namespace BBTransaction.Transaction
         /// <param name="settings">The action to set settings.</param>
         public void Run(Action<IRunSettings<TStepId, TData>> settings)
 #else
+        /// <summary>
+        /// Runs the transaction.
+        /// </summary>
+        /// <param name="settings">The action to set settings.</param>
+        /// <returns>The result.</returns>
         public async Task<ITransactionResult<TData>> Run(Action<IRunSettings<TStepId, TData>> settings)
 #endif
         {
@@ -62,15 +68,33 @@ namespace BBTransaction.Transaction
             RunSettings<TStepId, TData> runSettings = new RunSettings<TStepId, TData>();
             settings(runSettings);
             runSettings.Validate(this.context);
+            ITransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
+            {
+                RunSettings = runSettings,
+                //Context = this.context
+            };
 
             switch (runSettings.Mode)
             {
                 case RunMode.Run:
+#if NET35
+                    this.RunFromStart(session);
+#else
+                    await this.RunFromStart(session);
+#endif
                     break;
+
                 case RunMode.RunFromStep:
+#if NET35
+                    this.RunFromStep(session);
+#else
+                    await this.RunFromStep(session);
+#endif
                     break;
+
                 case RunMode.RecoverAndUndoAndRun:
                     break;
+
                 case RunMode.RecoverAndContinue:
                     break;
 
@@ -79,24 +103,117 @@ namespace BBTransaction.Transaction
             }
 
 #if !NET35
-            return null;
+            return await session.WaitForResultAsync();
 #endif
         }
 
-        /*protected virtual void NotifyTransactionEnded(ITransactionResult<TData> result)
+#if NET35
+        /// <summary>
+        /// Runs the session from the start step.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        public void RunFromStart(ITransactionSession<TStepId, TData> session)
+#else
+        /// <summary>
+        /// Runs the session from the start step.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <returns>The task.</returns>
+        public async Task RunFromStart(ITransactionSession<TStepId, TData> session)
+#endif
         {
+#if NET35
+            this.Run(session);
+#else
+            await this.Run(session);
+#endif
         }
 
-        private void Run(IRunSettings<TStepId, TData> settings)
+#if NET35
+        /// <summary>
+        /// Runs the session from the specific step.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        public void RunFromStep(ITransactionSession<TStepId, TData> session)
+#else
+        /// <summary>
+        /// Runs the session from the specific step.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <returns>The task.</returns>
+        public async Task RunFromStep(ITransactionSession<TStepId, TData> session)
+#endif
         {
-            TransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
+            IStepDetails<TStepId, TData> step = this.context.Definition[session.RunSettings.FirstStepId];
+            session.State.Increment(step.Index);
+#if NET35
+            this.Run(session);
+#else
+            await this.Run(session);
+#endif
+        }
+
+#if NET35
+        /// <summary>
+        /// Runs the session.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        public void Run(ITransactionSession<TStepId, TData> session)
+#else
+        /// <summary>
+        /// Runs the session.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <returns>The task.</returns>
+        public async Task Run(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            session.Start();
+            /*TransactionResult<TStepId, TData> notifyTransactionStartedResult = this.NotifyTransactionStarted(session);
+
+            if (notifyTransactionStartedResult != null)
             {
-                RunSettings = settings,
-                State = new TransactionState<TStepId, TData>()
-            };
+               // this.TransactionEnded(notifyTransactionStartedResult);
+                //return;
+            }
 
-            this.RunTransaction(session);
+            // this.RunStep(state);*/
         }
+
+#if NET35
+        /// <summary>
+        /// Starts the session. 
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <returns>An instance of a <see cref="TransactionResult<TStepId, TData>"/> if an error occurred during starting the session, otherwise <c>null</c>.</returns>
+        private TransactionResult<TStepId, TData> StartSession(ITransactionSession<TStepId, TData> session)
+#else
+        /// <summary>
+        /// Starts the session. 
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <returns>An instance of a <see cref="TransactionResult<TStepId, TData>"/> if an error occurred during starting the session, otherwise <c>null</c>.</returns>
+        private async Task<TransactionResult<TStepId, TData>> StartSession(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            try
+            {
+                this.context.Definition.NotifyTransactionStarted();
+#if NET35
+                this.context.StateStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+#else
+                await this.context.StateStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+#endif
+                return null;
+            }
+            catch (Exception e)
+            {
+                this.context.Logger.ErrorFormat(e, "An error occurred during starting a session for transaction '{0}'.", this.context.Info.Name);
+                return new TransactionResult<TStepId, TData>(session, e);
+            }
+        }
+
+        /*
 
         private void RunTransaction(ITransactionSession<TStepId, TData> session)
         {
@@ -141,20 +258,7 @@ namespace BBTransaction.Transaction
             this.NotifyTransactionEnded(result);
         }
 
-        private TransactionResult<TStepId, TData> NotifyTransactionStarted(ITransactionSession<TStepId, TData> session)
-        {
-            try
-            {
-                this.context.Definition.NotifyTransactionStarted();
-                this.context.StateStorage.NotifyTransactionStarted(state);
-                return null;
-            }
-            catch (Exception e)
-            {
-                this.context.Logger.ErrorFormat(e, "An error occurred during notifying a transaction start for transaction '{0}'.", this.context.Info.Name);
-                return new TransactionResult<TStepId, TData>(state, e);
-            }
-        }
+        
 
 #if NET35
         private TransactionResult<TStepId, TData> RunPostAction(ITransactionSession<TStepId, TData> session)

@@ -13,7 +13,7 @@ namespace BBTransaction.Step.Validator
         /// Validates a transaction step.
         /// </summary>
         /// <typeparam name="TStepId">The type of the step id.</typeparam>
-        /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+        /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="step">The step to validate.</param>
         public static ITransactionStep<TStepId, TData> Validate<TStepId, TData>(this ITransactionStep<TStepId, TData> step)
         {

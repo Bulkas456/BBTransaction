@@ -13,7 +13,7 @@ namespace BBTransaction.Transaction.Settings
         /// Checks if the TransactionSettings.ProfileAllSteps setting is set.
         /// </summary>
         /// <typeparam name="TStepId">The type of the step id.</typeparam>
-        /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+        /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="settings">The run settings.</param>
         /// <returns><c>True</c> if the TransactionSettings.ProfileAllSteps is set, otherwise <c>false</c>.</returns>
         public static bool LogTimeExecutionForAllSteps<TStepId, TData>(this IRunSettings<TStepId, TData> settings)

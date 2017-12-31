@@ -9,7 +9,7 @@ namespace BBTransaction.Definition
     /// The details for a transaction step.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface IStepDetails<TStepId, TData>
     {
         /// <summary>

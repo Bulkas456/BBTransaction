@@ -22,7 +22,7 @@ namespace BBTransaction.Factory
         /// Creates a transaction.
         /// </summary>
         /// <typeparam name="TStepId">The type of the step id.</typeparam>
-        /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+        /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="options">The action to set options.</param>
         /// <returns>The transaction.</returns>
         public ITransaction<TStepId, TData> Create<TStepId, TData>(Action<ICreateTransactionContext<TStepId, TData>> options)
@@ -43,7 +43,7 @@ namespace BBTransaction.Factory
                 Info = info
             };
             ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(partContext);
-            ITransactionStorage<TStepId, TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
+            ITransactionStorage<TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
 
             TransactionContext<TStepId, TData> transactionContext = new TransactionContext<TStepId, TData>()
             {
@@ -67,7 +67,8 @@ namespace BBTransaction.Factory
             {
                 Name = context.TransactionInfo.Name,
                 GetCurrentTimeFunction = context.TransactionInfo.GetCurrentTimeFunction ?? new Func<DateTime>(() => DateTime.Now),
-                StepIdComparer = context.TransactionInfo.StepIdComparer ?? EqualityComparer<TStepId>.Default
+                StepIdComparer = context.TransactionInfo.StepIdComparer ?? EqualityComparer<TStepId>.Default,
+                SessionIdCreator = context.TransactionInfo.SessionIdCreator
             };
         }
 
@@ -88,11 +89,11 @@ namespace BBTransaction.Factory
             return definition;
         }
 
-        protected virtual ITransactionStorage<TStepId, TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
+        protected virtual ITransactionStorage<TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            ITransactionStorage<TStepId, TData> stateStorage = context.Context.StateStorageCreator == null
-                   ? EmptyTransactionStorage<TStepId, TData>.Instance
-                   : context.Context.StateStorageCreator(context);
+            ITransactionStorage<TData> stateStorage = context.Context.TransactionStorageCreator == null
+                   ? EmptyTransactionStorage<TData>.Instance
+                   : context.Context.TransactionStorageCreator(context);
 
             if (stateStorage == null)
             {

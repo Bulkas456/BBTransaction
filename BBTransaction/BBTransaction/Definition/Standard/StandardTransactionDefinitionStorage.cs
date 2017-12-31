@@ -13,7 +13,7 @@ namespace BBTransaction.Definition.Standard
     /// The standard definition storage for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     internal class StandardTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinitionStorage<TStepId, TData>
     {
         /// <summary>
@@ -61,13 +61,15 @@ namespace BBTransaction.Definition.Standard
         }
 
         /// <summary>
-        /// Gets the colleciton of all steps.
+        /// Gets the step details for the step id.
         /// </summary>
-        public IEnumerable<IStepDetails<TStepId, TData>> Steps
+        /// <param name="state">The state.</param>
+        /// <returns>The step details for the transaction state.</returns>
+        public IStepDetails<TStepId, TData> this[TStepId id]
         {
             get
             {
-                return this.steps.Cast<IStepDetails<TStepId, TData>>();
+                return this.steps.FirstOrDefault(step => this.context.Info.StepIdComparer.Equals(step.Step.Id, id));
             }
         }
 

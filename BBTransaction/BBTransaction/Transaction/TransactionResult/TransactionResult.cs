@@ -10,7 +10,7 @@ namespace BBTransaction.Transaction.TransactionResult
     /// The transaction result.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     internal class TransactionResult<TStepId, TData> : OperationResult,
                                                        ITransactionResult<TData>
     {

@@ -10,7 +10,7 @@ namespace BBTransaction.Factory.Context.Part
     /// The create part of transaction core context.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     internal struct CreatePartContext<TStepId, TData> : ICreatePartContext<TStepId, TData>
     {
         /// <summary>

@@ -15,7 +15,7 @@ namespace BBTransaction.Step
     /// The step for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ITransactionStep<TStepId, TData>
     {
         /// <summary>

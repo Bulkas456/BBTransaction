@@ -9,7 +9,7 @@ namespace BBTransaction.Transaction.Session.State
     /// The state for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ITransactionState<TStepId, TData>
     {
         /// <summary>
@@ -19,5 +19,16 @@ namespace BBTransaction.Transaction.Session.State
         {
             get;
         }
+
+        /// <summary>
+        /// Increments the state.
+        /// </summary>
+        /// <param name="incrementValue">The increment value.</param>
+        void Increment(int incrementValue = 1);
+
+        /// <summary>
+        /// Decrements the state.
+        /// </summary>
+        void Decrement();
     }
 }

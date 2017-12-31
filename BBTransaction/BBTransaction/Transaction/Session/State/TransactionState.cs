@@ -9,7 +9,7 @@ namespace BBTransaction.Transaction.Session.State
     /// The state for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     internal class TransactionState<TStepId, TData> : ITransactionState<TStepId, TData>
     {
         /// <summary>
@@ -18,7 +18,24 @@ namespace BBTransaction.Transaction.Session.State
         public int CurrentStepIndex
         {
             get;
-            set;
+            private set;
+        }
+
+        /// <summary>
+        /// Increments the state.
+        /// </summary>
+        /// <param name="incrementValue">The increment value.</param>
+        public void Increment(int incrementValue = 1)
+        {
+            this.CurrentStepIndex += incrementValue;
+        }
+
+        /// <summary>
+        /// Decrements the state.
+        /// </summary>
+        public void Decrement()
+        {
+            this.Increment(-1);
         }
     }
 }

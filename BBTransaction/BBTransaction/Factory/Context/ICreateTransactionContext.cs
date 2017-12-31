@@ -15,7 +15,7 @@ namespace BBTransaction.Factory.Context
     /// The create transaction context.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ICreateTransactionContext<TStepId, TData>
     {
         /// <summary>
@@ -28,9 +28,9 @@ namespace BBTransaction.Factory.Context
         }
 
         /// <summary>
-        /// Gets or sets the state storage creator (optional).
+        /// Gets or sets the transaction storage creator (optional).
         /// </summary>
-        Func<ICreatePartContext<TStepId, TData>, ITransactionStorage<TStepId, TData>> StateStorageCreator
+        Func<ICreatePartContext<TStepId, TData>, ITransactionStorage<TData>> TransactionStorageCreator
         {
             get;
             set;

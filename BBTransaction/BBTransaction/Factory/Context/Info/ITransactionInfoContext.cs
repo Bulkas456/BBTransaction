@@ -36,5 +36,14 @@ namespace BBTransaction.Factory.Context.Info
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the session id creator (optional).
+        /// </summary>
+        Func<Guid> SessionIdCreator
+        {
+            get;
+            set;
+        }
     }
 }

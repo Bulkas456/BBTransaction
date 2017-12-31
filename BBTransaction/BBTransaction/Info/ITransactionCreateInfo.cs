@@ -33,5 +33,13 @@ namespace BBTransaction.Info
         {
             get;
         }
+
+        /// <summary>
+        /// Gets the session id creator (optional).
+        /// </summary>
+        Func<Guid> SessionIdCreator
+        {
+            get;
+        }
     }
 }

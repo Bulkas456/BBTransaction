@@ -15,7 +15,7 @@ namespace BBTransaction.Transaction
     /// The transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
-    /// <typeparam name="TData">The type of the transaciton data.</typeparam>
+    /// <typeparam name="TData">The type of the transaction data.</typeparam>
     public interface ITransaction<TStepId, TData>
     {
         /// <summary>
@@ -33,6 +33,11 @@ namespace BBTransaction.Transaction
         /// <param name="settings">The action to set settings.</param>
         void Run(Action<IRunSettings<TStepId, TData>> settings);
 #else
+        /// <summary>
+        /// Runs the transaction.
+        /// </summary>
+        /// <param name="settings">The action to set settings.</param>
+        /// <returns>The result.</returns>
         Task<ITransactionResult<TData>> Run(Action<IRunSettings<TStepId, TData>> settings);
 #endif
     }
