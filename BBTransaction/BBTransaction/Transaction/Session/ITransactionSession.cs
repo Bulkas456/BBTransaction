@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Transaction.Session.Info;
 #if !NET35
 using System.Threading.Tasks;
 #endif
@@ -15,7 +16,7 @@ namespace BBTransaction.Transaction.Session
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    public interface ITransactionSession<TStepId, TData>
+    public interface ITransactionSession<TStepId, TData> : ITransactionSessionInfo<TStepId>
     {
         /// <summary>
         /// Gets the transaction state.

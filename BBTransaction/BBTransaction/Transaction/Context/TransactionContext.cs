@@ -27,7 +27,7 @@ namespace BBTransaction.Transaction.Context
         /// <summary>
         /// Gets the state storage.
         /// </summary>
-        public ITransactionStorage<TData> StateStorage
+        public ITransactionStorage<TData> SessionStorage
         {
             get;
             set;

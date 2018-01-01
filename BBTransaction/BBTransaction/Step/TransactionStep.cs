@@ -108,7 +108,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets an executor for the step (optional).
         /// </summary>
-        public IStepExecutor<TData> Executor
+        public IStepExecutor Executor
         {
             get;
             set;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Definition;
 using BBTransaction.Transaction.Settings;
 
 namespace BBTransaction.Transaction.Session.State
@@ -26,6 +27,15 @@ namespace BBTransaction.Transaction.Session.State
         TData Data
         {
             get;
+        }
+
+        /// <summary>
+        /// Gets or sets the current step.
+        /// </summary>
+        IStepDetails<TStepId, TData> CurrentStep
+        {
+            get;
+            set;
         }
 
         /// <summary>

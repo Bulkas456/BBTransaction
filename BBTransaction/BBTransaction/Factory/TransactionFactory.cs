@@ -50,7 +50,7 @@ namespace BBTransaction.Factory
                 Logger = logger,
                 Info = info,
                 Definition = definition,
-                StateStorage = stateStorage
+                SessionStorage = stateStorage
             };
             return new Transaction<TStepId, TData>(transactionContext);
         }

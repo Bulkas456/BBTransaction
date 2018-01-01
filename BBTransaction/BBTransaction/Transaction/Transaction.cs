@@ -16,6 +16,9 @@ using System.Threading;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.Session.State;
 using BBTransaction.Transaction.Session.Storage.TransactionData;
+using BBTransaction.Transaction.Session.Storage;
+using BBTransaction.Step.Executor;
+using BBTransaction.Step;
 
 namespace BBTransaction.Transaction
 {
@@ -106,8 +109,11 @@ namespace BBTransaction.Transaction
                 session.End(startTransactionResult);
                 return;
             }
-
-            //this.RunStep(state);
+#if NET35
+            this.RunSession(session);
+#else
+            await this.RunSession(session);
+#endif
         }
 
 #if NET35
@@ -130,9 +136,9 @@ namespace BBTransaction.Transaction
             {
                 this.context.Definition.NotifyTransactionStarted();
 #if NET35
-                this.context.StateStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+                this.context.SessionStorage.SessionStarted(session);
 #else
-                await this.context.StateStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+                await this.context.SessionStorage.SessionStarted(session);
 #endif
                 return null;
             }
@@ -194,9 +200,9 @@ namespace BBTransaction.Transaction
                     try
                     {
 #if NET35
-                        recoveredData = this.context.StateStorage.RecoverTransaction();
+                        recoveredData = this.context.SessionStorage.RecoverTransaction();
 #else
-                        recoveredData = await this.context.StateStorage.RecoverTransaction();
+                        recoveredData = await this.context.SessionStorage.RecoverTransaction();
 #endif
                     }
                     catch (Exception e)
@@ -226,6 +232,237 @@ namespace BBTransaction.Transaction
             }
 
             return session;
+        }
+
+#if NET35
+        private void EndSession(TransactionResult<TStepId, TData> result)
+#else
+        private async Task EndSession(TransactionResult<TStepId, TData> result)
+#endif
+        {
+            if (result.Success)
+            {
+                // post actions
+            }
+
+           // session.End(result);
+            /*this.context.StateStorage.RemoveSession(
+
+                && result.HasState)
+            {
+                TransactionResult<TItem> runPostActionResult = this.RunPostAction(result.State);
+
+                if (runPostActionResult != null)
+                {
+                    result.AddError(runPostActionResult.Errors);
+                    session.End(result);
+                    return;
+                }
+            }
+
+            if (result.HasState)
+            {
+                TransactionResult<TItem> removeStateResult = this.RemoveState(result.State);
+
+                if (removeStateResult != null)
+                {
+                    result.AddError(removeStateResult.Errors);
+                    session.End(result);
+                    return;
+                }
+            }
+
+            */
+        }
+
+#if NET35
+        private void RunSession(ITransactionSession<TStepId, TData> session)
+#else
+        private async Task RunSession(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            while (true)
+            {
+                IStepDetails<TStepId, TData> step = this.context.Definition[session.State];
+                session.State.CurrentStep = step;
+
+                if (step == null)
+                {
+#if NET35
+                    this.EndSession(new TransactionResult<TStepId, TData>(session));
+#else
+                    await this.EndSession(new TransactionResult<TStepId, TData>(session));
+#endif
+                    return;
+                }
+
+#if NET35
+                TransactionResult<TStepId, TData> prepareStepResult =  this.PrepareStep(session);
+#else
+                TransactionResult<TStepId, TData> prepareStepResult = await this.PrepareStep(session);
+#endif
+
+                if (prepareStepResult != null)
+                {
+#if NET35
+                    this.EndSession(prepareStepResult);
+#else
+                    await this.EndSession(prepareStepResult);
+#endif
+                    return;
+                }
+
+
+
+                if (session.Recovered
+                    && step.Step.Settings.RunOnRecovered())
+                {
+                    this.context.Logger.DebugFormat("Transaction '{0}: running step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
+
+                    IStepExecutor executor = session.State.CurrentStep.Step.Executor;
+
+                    if (executor != null
+                        && executor.ShouldRun)
+                    {
+#if NET35
+                        executor.Run(() => 
+                        {
+                            TransactionResult<TStepId, TData> processStepResult = this.PrepareStep(session);
+
+                            if (processStepResult != null)
+                            {
+                                this.EndSession(processStepResult);
+                            }
+                            else
+                            {
+                                this.RunSession(session);
+                            }
+                        });
+#else
+                        executor.Run(async () => 
+                        {
+                            TransactionResult<TStepId, TData> processStepResult = await this.PrepareStep(session);
+
+                            if (processStepResult != null)
+                            {
+                                await this.EndSession(processStepResult);
+                            }
+                            else
+                            {
+                                await this.RunSession(session);
+                            }
+                        });
+#endif
+                    }
+                    else
+                    {
+#if NET35
+                        TransactionResult<TStepId, TData> processStepResult = this.PrepareStep(session);
+#else
+                        TransactionResult<TStepId, TData> processStepResult = await this.PrepareStep(session);
+#endif
+
+                        if (processStepResult != null)
+                        {
+#if NET35
+                            this.EndSession(processStepResult);
+#else
+                            await this.EndSession(processStepResult);
+#endif
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    this.context.Logger.DebugFormat("Transaction '{0}': ignoring step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
+                }
+            }
+        }
+
+#if NET35
+        private TransactionResult<TStepId, TData> PrepareStep(ITransactionSession<TStepId, TData> session)
+#else
+        private async Task<TransactionResult<TStepId, TData>> PrepareStep(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            try
+            {
+#if NET35
+                this.context.SessionStorage.StepPrepared(session);
+#else
+                await this.context.SessionStorage.StepPrepared(session);
+#endif
+                return null;
+            }
+            catch (Exception e)
+            {
+                string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", this.context.Info.Name);
+                this.context.Logger.ErrorFormat(e, info);
+                session.State.Decrement();
+
+                TransactionResult<TStepId, TData> undoResult = null;// this.ProcessUndo(state, true);
+
+                if (undoResult != null)
+                {
+                    undoResult.Add(e);
+                    return undoResult;
+                }
+
+                return new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e));
+            }
+        }
+
+#if NET35
+        private TransactionResult<TStepId, TData> ProcessStep(ITransactionSession<TStepId, TData> session)
+#else
+        private async Task<TransactionResult<TStepId, TData>> ProcessStep(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            Stopwatch watch = new Stopwatch();
+            ITransactionStep<TStepId, TData> currentStep = session.State.CurrentStep.Step;
+
+            try
+            {
+                watch.Start();
+#if NET35
+                currentStep.StepAction(session.State.Data, session);
+#else
+                if (currentStep.StepAction != null)
+                {
+                    currentStep.StepAction(session.State.Data, session); 
+                }
+                else
+                {
+                   await currentStep.AsyncStepAction(session.State.Data, session); 
+                }
+#endif
+                watch.Stop();
+
+                if (session.ShouldLogStepExecution())
+                {
+                    this.context.Logger.LogExecutionTime(watch.Elapsed, "Transaction '{0}': execution time for step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, currentStep.Id);
+                }
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                watch.Stop();
+                string info = string.Format("Transaction '{0}': an error occurred during processing step '{1}' with id '{2}', execution time '{3}'.", this.context.Info.Name, session.State.CurrentStepIndex, currentStep.Id, watch.Elapsed);
+                this.context.Logger.ErrorFormat(e, info);
+                session.State.Decrement();
+
+                TransactionResult<TStepId, TData> undoResult = null;// this.ProcessUndo(state, true);
+
+                if (undoResult != null)
+                {
+                    undoResult.Add(e);
+                    return undoResult;
+                }
+
+                return new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e));
+            }
         }
     }
 }

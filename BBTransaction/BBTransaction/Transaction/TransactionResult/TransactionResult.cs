@@ -38,7 +38,7 @@ namespace BBTransaction.Transaction.TransactionResult
         /// <summary>
         /// Gets the transaction session.
         /// </summary>
-        public ITransactionSession<TStepId, TData> State
+        public ITransactionSession<TStepId, TData> Session
         {
             get
             {
