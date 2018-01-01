@@ -21,10 +21,17 @@ namespace BBTransaction.Transaction.Session.State
         }
 
         /// <summary>
+        /// Gets the data for the transaction.
+        /// </summary>
+        TData Data
+        {
+            get;
+        }
+
+        /// <summary>
         /// Increments the state.
         /// </summary>
-        /// <param name="incrementValue">The increment value.</param>
-        void Increment(int incrementValue = 1);
+        void Increment();
 
         /// <summary>
         /// Decrements the state.

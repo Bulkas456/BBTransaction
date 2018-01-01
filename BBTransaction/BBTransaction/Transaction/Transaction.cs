@@ -68,88 +68,14 @@ namespace BBTransaction.Transaction
             RunSettings<TStepId, TData> runSettings = new RunSettings<TStepId, TData>();
             settings(runSettings);
             runSettings.Validate(this.context);
-            ITransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
-            {
-                RunSettings = runSettings,
-                //Context = this.context
-            };
 
-            switch (runSettings.Mode)
-            {
-                case RunMode.Run:
 #if NET35
-                    this.RunFromStart(session);
+            ITransactionSession<TStepId, TData> session = this.CreateSession(runSettings);
+            this.Run(session);
 #else
-                    await this.RunFromStart(session);
-#endif
-                    break;
-
-                case RunMode.RunFromStep:
-#if NET35
-                    this.RunFromStep(session);
-#else
-                    await this.RunFromStep(session);
-#endif
-                    break;
-
-                case RunMode.RecoverAndUndoAndRun:
-                    break;
-
-                case RunMode.RecoverAndContinue:
-                    break;
-
-                default:
-                    throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
-            }
-
-#if !NET35
+            ITransactionSession<TStepId, TData> session = await this.CreateSession(runSettings);
+            await this.Run(session);
             return await session.WaitForResultAsync();
-#endif
-        }
-
-#if NET35
-        /// <summary>
-        /// Runs the session from the start step.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        public void RunFromStart(ITransactionSession<TStepId, TData> session)
-#else
-        /// <summary>
-        /// Runs the session from the start step.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        /// <returns>The task.</returns>
-        public async Task RunFromStart(ITransactionSession<TStepId, TData> session)
-#endif
-        {
-#if NET35
-            this.Run(session);
-#else
-            await this.Run(session);
-#endif
-        }
-
-#if NET35
-        /// <summary>
-        /// Runs the session from the specific step.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        public void RunFromStep(ITransactionSession<TStepId, TData> session)
-#else
-        /// <summary>
-        /// Runs the session from the specific step.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        /// <returns>The task.</returns>
-        public async Task RunFromStep(ITransactionSession<TStepId, TData> session)
-#endif
-        {
-            IStepDetails<TStepId, TData> step = this.context.Definition[session.RunSettings.FirstStepId];
-            session.State.Increment(step.Index);
-#if NET35
-            this.Run(session);
-#else
-            await this.Run(session);
 #endif
         }
 
@@ -169,15 +95,19 @@ namespace BBTransaction.Transaction
 #endif
         {
             session.Start();
-            /*TransactionResult<TStepId, TData> notifyTransactionStartedResult = this.NotifyTransactionStarted(session);
+#if NET35
+            TransactionResult<TStepId, TData> startTransactionResult = this.StartSession(session);
+#else
+            TransactionResult<TStepId, TData> startTransactionResult = await this.StartSession(session);
+#endif
 
-            if (notifyTransactionStartedResult != null)
+            if (startTransactionResult != null)
             {
-               // this.TransactionEnded(notifyTransactionStartedResult);
-                //return;
+                session.End(startTransactionResult);
+                return;
             }
 
-            // this.RunStep(state);*/
+            //this.RunStep(state);
         }
 
 #if NET35
@@ -213,119 +143,89 @@ namespace BBTransaction.Transaction
             }
         }
 
-        /*
-
-        private void RunTransaction(ITransactionSession<TStepId, TData> session)
-        {
-            TransactionResult<TStepId, TData> notifyTransactionStartedResult = this.NotifyTransactionStarted(session);
-
-            if (notifyTransactionStartedResult != null)
-            {
-                this.TransactionEnded(notifyTransactionStartedResult);
-                return;
-            }
-
-           // this.RunStep(state);
-        }
-
-        private void TransactionEnded(TransactionResult<TStepId, TData> result)
-        {
-            if (result.Success
-                && result.HasState)
-            {
-                TransactionResult<TStepId, TData> runPostActionResult = null;// this.RunPostAction(result.State);
-
-                if (runPostActionResult != null)
-                {
-                    result.Add(runPostActionResult);
-                    this.NotifyTransactionEnded(result);
-                    return;
-                }
-            }
-            
-            if (result.HasState)
-            {
-                TransactionResult<TStepId, TData> removeStateResult = this.RemoveState(result.State);
-
-                if (removeStateResult != null)
-                {
-                    result.Add(removeStateResult);
-                    this.NotifyTransactionEnded(result);
-                    return;
-                }
-            }
-
-            this.NotifyTransactionEnded(result);
-        }
-
-        
-
 #if NET35
-        private TransactionResult<TStepId, TData> RunPostAction(ITransactionSession<TStepId, TData> session)
+         /// <summary>
+        /// Creates a session.
+        /// </summary>
+        /// <param name="runSettings">The run settings.</param>
+        /// <returns>The session.</returns>
+        ITransactionSession<TStepId, TData> CreateSession(IRunSettings<TStepId, TData> runSettings)
 #else
-        private async Task<TransactionResult<TStepId, TData>> RunPostAction(ITransactionSession<TStepId, TData> session)
+        /// <summary>
+        /// Creates a session.
+        /// </summary>
+        /// <param name="runSettings">The run settings.</param>
+        /// <returns>The session.</returns>
+        private async Task<ITransactionSession<TStepId, TData>> CreateSession(IRunSettings<TStepId, TData> runSettings)
 #endif
         {
-            this.context.Logger.DebugFormat("Running post actions for transaction '{0}'.", this.context.Info.Name);
-            foreach (IStepDetails<TStepId, TData> step in this.context.Definition.Steps)
+            TransactionState<TStepId, TData> state = new TransactionState<TStepId, TData>()
             {
-                Stopwatch postActionWatch = new Stopwatch();
+                Data = runSettings.Data
+            };
+            TransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
+            {
+                RunSettings = runSettings,
+                StateInstance = state,
+                TransactionContext = this.context
+            };
 
-                try
-                {
-                    postActionWatch.Start();
+            switch (runSettings.Mode)
+            {
+                case RunMode.Run:
+                    break;
 
-#if NET35
-                    step.Step.PostAction?.Invoke(state.Settings.Data);
-#else
-                    if (step.Step.PostAction == null)
+                case RunMode.RunFromStep:
+                    IStepDetails<TStepId, TData> step = this.context.Definition[session.RunSettings.FirstStepId];
+
+                    if (step == null)
                     {
-                        await step.Step.AsyncPostAction(state.Settings.Data);
+                        throw new ArgumentException(string.Format("Transaction '{0}': no first step '{1}' for mode '{2}'.", this.context.Info.Name, runSettings.FirstStepId, runSettings.Mode));
+                    }
+
+                    state.CurrentStepIndex = step.Index;
+                    break;
+
+                case RunMode.RecoverAndUndoAndRun:
+                case RunMode.RecoverAndContinue:
+
+                    ITransactionData<TData> recoveredData = null;
+
+                    try
+                    {
+#if NET35
+                        recoveredData = this.context.StateStorage.RecoverTransaction();
+#else
+                        recoveredData = await this.context.StateStorage.RecoverTransaction();
+#endif
+                    }
+                    catch (Exception e)
+                    {
+                        this.context.Logger.ErrorFormat(e, "An error occurred during recovering the transaction '{0}'.", this.context.Info.Name);
+                        session.End(new TransactionResult<TStepId, TData>(session, e));
+                        return session;
+                    }
+
+                    if (recoveredData == null)
+                    {
+                        this.context.Logger.InfoFormat("Transaction '{0}': no session to recover.", this.context.Info.Name);
+                        session.End(new TransactionResult<TStepId, TData>(session)
+                        {
+                            Info = "No session to recover."
+                        });
                     }
                     else
                     {
-                        step.Step.PostAction(state.Settings.Data);
+                        session.Recover(recoveredData);
                     }
-#endif
-                    postActionWatch.Stop();
-                    this.context.Logger.DebugFormat("Post action ended for step '{0}', step index '{1}' for transaction '{2}'.", step.Step.Id, step.Index, this.context.Info.Name);
 
-                    if (state.Settings.LogTimeExecutionForAllSteps()
-                        || step.Step.Settings.LogExecutionTime())
-                    {
-                        this.context.Logger.LogExecutionTime(string.Format("Post action for step '{0}' execution time", step.Step.Id), postActionWatch.Elapsed);
-                    }
-                }
-                catch (Exception e)
-                {
-                    postActionWatch.Stop();
-                    string info = string.Format(
-                                    "An error occurred during a post action for transaction '{0}', step index '{1}', step id '{2}', execution time '{3} ms'.",
-                                    this.context.Info.Name,
-                                    step.Index,
-                                    step.Step.Id,
-                                    postActionWatch.ElapsedMilliseconds);
-                    this.context.Logger.ErrorFormat(e, info, e);
-                    return new TransactionResult<TStepId, TData>(state, new InvalidOperationException(info, e));
-                }
+                    break;
+
+                default:
+                    throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
             }
 
-            return null;
+            return session;
         }
-
-        private TransactionResult<TStepId, TData> RemoveSession(ITransactionSession<TStepId, TData> session)
-        {
-            try
-            {
-               // this.context.StateStorage.RemoveStates();
-                return null;
-            }
-            catch (Exception e)
-            {
-                string undoInfo = string.Format("Error during removing a transaction state, transaction '{0}'.", this.context.Info.Name);
-                this.context.Logger.ErrorFormat(e, undoInfo);
-                return new TransactionResult<TStepId, TData>(state, new InvalidOperationException(undoInfo, e));
-            }
-        }*/
     }
 }

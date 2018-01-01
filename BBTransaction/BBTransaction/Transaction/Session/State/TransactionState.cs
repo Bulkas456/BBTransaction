@@ -18,16 +18,24 @@ namespace BBTransaction.Transaction.Session.State
         public int CurrentStepIndex
         {
             get;
-            private set;
+            set;
+        }
+
+        /// <summary>
+        /// Gets the data for the transaction.
+        /// </summary>
+        public TData Data
+        {
+            get;
+            set;
         }
 
         /// <summary>
         /// Increments the state.
         /// </summary>
-        /// <param name="incrementValue">The increment value.</param>
-        public void Increment(int incrementValue = 1)
+        public void Increment()
         {
-            this.CurrentStepIndex += incrementValue;
+           ++this.CurrentStepIndex;
         }
 
         /// <summary>
@@ -35,7 +43,7 @@ namespace BBTransaction.Transaction.Session.State
         /// </summary>
         public void Decrement()
         {
-            this.Increment(-1);
+            this.CurrentStepIndex = Math.Max(0, this.CurrentStepIndex - 1);
         }
     }
 }

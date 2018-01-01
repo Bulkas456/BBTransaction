@@ -28,6 +28,11 @@ namespace BBTransaction.Transaction.TransactionResult
         {
             this.session = session;
             this.Add(error);
+
+            if (!this.Success)
+            {
+                this.Info = "An error occurred.";
+            }
         }
 
         /// <summary>
@@ -66,6 +71,15 @@ namespace BBTransaction.Transaction.TransactionResult
                         : this.session.Recovered;
             }
         }
+
+        /// <summary>
+        /// Gets an additional info about the result.
+        /// </summary>
+        public string Info
+        {
+            get;
+            set;
+        } = string.Empty;
 
         /// <summary>
         /// Gets a value indicating whether the transaction result has a transaction state.

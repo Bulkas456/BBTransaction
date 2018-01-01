@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
 
@@ -19,11 +20,16 @@ namespace BBTransaction.Transaction.Session
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
     internal class TransactionSession<TStepId, TData> : ITransactionSession<TStepId, TData>
     {
+        /// <summary>
+        /// A value indicating whether the session has started.
+        /// </summary>
+        private bool started;
+
 #if !NET35
         /// <summary>
         /// The wait for result semaphore.
         /// </summary>
-        private readonly SemaphoreSlim waitForResultSemaphor = new SemaphoreSlim(1);
+        private SemaphoreSlim waitForResultSemaphor = new SemaphoreSlim(1);
 #endif
 
         /// <summary>
@@ -34,10 +40,16 @@ namespace BBTransaction.Transaction.Session
         /// <summary>
         /// Gets the transaction state.
         /// </summary>
-        public ITransactionState<TStepId, TData> State
+        public ITransactionState<TStepId, TData> State => this.StateInstance;
+
+        /// <summary>
+        /// Gets the transaction state.
+        /// </summary>
+        public TransactionState<TStepId, TData> StateInstance
         {
             get;
-        } = new TransactionState<TStepId, TData>();
+            set;
+        }
 
         /// <summary>
         /// Gets the run transaction settings.
@@ -84,6 +96,15 @@ namespace BBTransaction.Transaction.Session
             set;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the session is ended.
+        /// </summary>
+        public bool Ended
+        {
+            get;
+            private set;
+        }
+
 #if !NET35
         /// <summary>
         /// Waits for a transaction result.
@@ -92,6 +113,8 @@ namespace BBTransaction.Transaction.Session
         public async Task<ITransactionResult<TData>> WaitForResultAsync()
         {
             await this.waitForResultSemaphor.WaitAsync();
+            this.waitForResultSemaphor.Dispose();
+            this.waitForResultSemaphor = null;
             return this.result;
         }
 #endif
@@ -101,10 +124,13 @@ namespace BBTransaction.Transaction.Session
         /// </summary>
         public void Start()
         {
-            this.StartTimestamp = this.TransactionContext.Info.Now;
-            this.SessionId = this.TransactionContext.Info.SessionIdCreator == null
-                               ? Guid.NewGuid()
-                               : this.TransactionContext.Info.SessionIdCreator();
+            if (!this.started)
+            {
+                this.StartTimestamp = this.TransactionContext.Info.Now;
+                this.SessionId = this.TransactionContext.Info.SessionIdCreator == null
+                                   ? Guid.NewGuid()
+                                   : this.TransactionContext.Info.SessionIdCreator();
+            }
         }
 
         /// <summary>
@@ -113,11 +139,26 @@ namespace BBTransaction.Transaction.Session
         /// <param name="result">The transaction result.</param>
         public void End(ITransactionResult<TData> result)
         {
+            this.Ended = true;
             this.result = result;
             this.RunSettings.TransactionResultCallback?.Invoke(this.result);
 #if !NET35
             this.waitForResultSemaphor.Release();
 #endif
+        }
+
+        /// <summary>
+        /// Recovers the session.
+        /// </summary>
+        /// <param name="recoveredData">The recovered data.</param>
+        public void Recover(ITransactionData<TData> recoveredData)
+        {
+            this.started = true;
+            this.Recovered = true;
+            this.StateInstance.CurrentStepIndex = recoveredData.CurrentStepIndex;
+            this.StateInstance.Data = recoveredData.Data;
+            this.SessionId = recoveredData.SessionId;
+            this.StartTimestamp = recoveredData.StartTimestamp;
         }
     }
 }

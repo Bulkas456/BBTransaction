@@ -40,7 +40,7 @@ namespace BBTransaction.Factory.Context.Logger
         /// <summary>
         /// Gets or sets the execution time log action (optional).
         /// </summary>
-        public Action<string, TimeSpan> ExecutionTimeLogAction
+        public Action<TimeSpan, string, object[]> ExecutionTimeLogAction
         {
             get;
             set;

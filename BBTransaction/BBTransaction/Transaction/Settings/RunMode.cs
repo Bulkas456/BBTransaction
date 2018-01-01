@@ -21,11 +21,13 @@ namespace BBTransaction.Transaction.Settings
 
         /// <summary>
         /// Recovers the transaction, runs undo operations for completed steps and then starts the transaction from the first step to the last one.
+        /// If there is no session to recover the transaction is ended without run.
         /// </summary>
         RecoverAndUndoAndRun,
 
         /// <summary>
         /// Recovers the transaction and runs not completed steps.
+        /// If there is no session to recover the transaction is ended without run.
         /// </summary>
         RecoverAndContinue
     }

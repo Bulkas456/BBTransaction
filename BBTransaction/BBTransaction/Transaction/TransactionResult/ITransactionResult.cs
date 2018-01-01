@@ -22,6 +22,17 @@ namespace BBTransaction.Transaction.TransactionResult
         /// <summary>
         /// Gets a value indicating whether the transaction was recovered.
         /// </summary>
-        bool Recovered { get; }
+        bool Recovered
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets an additional info about the result.
+        /// </summary>
+        string Info
+        {
+            get;
+        }
     }
 }

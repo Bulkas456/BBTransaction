@@ -57,6 +57,14 @@ namespace BBTransaction.Transaction.Session
             get;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the session is ended.
+        /// </summary>
+        bool Ended
+        {
+            get;
+        }
+
 #if !NET35
         /// <summary>
         /// Waits for a transaction result.
