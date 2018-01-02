@@ -245,7 +245,7 @@ namespace BBTransaction.Transaction
                 // post actions
             }
 
-           // session.End(result);
+            result.Session.End(result);
             /*this.context.StateStorage.RemoveSession(
 
                 && result.HasState)
@@ -297,7 +297,7 @@ namespace BBTransaction.Transaction
                 }
 
 #if NET35
-                TransactionResult<TStepId, TData> prepareStepResult =  this.PrepareStep(session);
+                TransactionResult<TStepId, TData> prepareStepResult = this.PrepareStep(session);
 #else
                 TransactionResult<TStepId, TData> prepareStepResult = await this.PrepareStep(session);
 #endif
@@ -312,70 +312,77 @@ namespace BBTransaction.Transaction
                     return;
                 }
 
-
-
                 if (session.Recovered
-                    && step.Step.Settings.RunOnRecovered())
+                    && !step.Step.Settings.RunOnRecovered())
                 {
-                    this.context.Logger.DebugFormat("Transaction '{0}: running step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
+                    this.context.Logger.DebugFormat(
+                        "Transaction '{0}': ignoring step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.",
+                        this.context.Info.Name,
+                        session.State.CurrentStepIndex,
+                        session.State.CurrentStep.Step.Id);
+                    session.State.Increment();
+                    continue;
+                }
 
-                    IStepExecutor executor = session.State.CurrentStep.Step.Executor;
+                this.context.Logger.DebugFormat("Transaction '{0}: running step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
 
-                    if (executor != null
-                        && executor.ShouldRun)
-                    {
+                IStepExecutor executor = session.State.CurrentStep.Step.Executor;
+
+                if (executor != null
+                    && executor.ShouldRun)
+                {
 #if NET35
-                        executor.Run(() => 
-                        {
-                            TransactionResult<TStepId, TData> processStepResult = this.PrepareStep(session);
-
-                            if (processStepResult != null)
-                            {
-                                this.EndSession(processStepResult);
-                            }
-                            else
-                            {
-                                this.RunSession(session);
-                            }
-                        });
-#else
-                        executor.Run(async () => 
-                        {
-                            TransactionResult<TStepId, TData> processStepResult = await this.PrepareStep(session);
-
-                            if (processStepResult != null)
-                            {
-                                await this.EndSession(processStepResult);
-                            }
-                            else
-                            {
-                                await this.RunSession(session);
-                            }
-                        });
-#endif
-                    }
-                    else
+                    executor.Run(() =>
                     {
-#if NET35
-                        TransactionResult<TStepId, TData> processStepResult = this.PrepareStep(session);
-#else
-                        TransactionResult<TStepId, TData> processStepResult = await this.PrepareStep(session);
-#endif
+                        TransactionResult<TStepId, TData> processStepResult = this.ProcessStep(session);
 
                         if (processStepResult != null)
                         {
-#if NET35
                             this.EndSession(processStepResult);
-#else
-                            await this.EndSession(processStepResult);
-#endif
-                            return;
                         }
-                    }
+                        else
+                        {
+                            session.State.Increment();
+                            this.RunSession(session);
+                        }
+                    });
+#else
+                    executor.Run(async () => 
+                    {
+                        TransactionResult<TStepId, TData> processStepResult = await this.ProcessStep(session);
+
+                        if (processStepResult != null)
+                        {
+                            await this.EndSession(processStepResult);
+                        }
+                        else
+                        {
+                            session.State.Increment();
+                            await this.RunSession(session);
+                        }
+                    });
+#endif
+                    return;
                 }
                 else
                 {
-                    this.context.Logger.DebugFormat("Transaction '{0}': ignoring step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
+#if NET35
+                    TransactionResult<TStepId, TData> processStepResult = this.ProcessStep(session);
+#else
+                    TransactionResult<TStepId, TData> processStepResult = await this.ProcessStep(session);
+#endif
+
+                    if (processStepResult != null)
+                    {
+#if NET35
+                        this.EndSession(processStepResult);
+#else
+                        await this.EndSession(processStepResult);
+#endif
+                        return;
+                    }
+
+                    session.State.Increment();
                 }
             }
         }

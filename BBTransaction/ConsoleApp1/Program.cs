@@ -6,6 +6,8 @@ using BBTransaction.Step;
 using BBTransaction;
 using BBTransaction.Transaction.Session.Info;
 using System.Threading.Tasks;
+using BBTransaction.Step.Executor;
+using System.Threading;
 
 namespace ConsoleApp1
 {
@@ -13,7 +15,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Task.Factory.StartNew(async () => 
+            Task.Factory.StartNew(async () =>
             {
                 var transaction = new TransactionFactory().Create<int, string>(options =>
                 {
@@ -29,7 +31,8 @@ namespace ConsoleApp1
                 {
                     Id = 2,
                     Settings = BBTransaction.Step.Settings.StepSettings.LogExecutionTime,
-                    StepAction = Step2
+                    AsyncStepAction = Step2Async,
+                    Executor = new TestExecutor()
                 });
                 transaction.Definition.Add(new TransactionStep<int, string>()
                 {
@@ -46,12 +49,18 @@ namespace ConsoleApp1
                     {
                     };
                 });
-            }).Wait();
 
-            
+                int a = 1;
+            });
+
+            Console.ReadKey();
         }
 
         private static void Step1(string data, ITransactionSessionInfo<int> info)
+        {
+        }
+
+        private static async Task Step2Async(string data, ITransactionSessionInfo<int> info)
         {
         }
 
@@ -61,6 +70,21 @@ namespace ConsoleApp1
 
         private static void Step3(string data, ITransactionSessionInfo<int> info)
         {
+        }
+
+        internal class TestExecutor : IStepExecutor
+        {
+            public bool ShouldRun => true;
+
+            public void Run(Func<Task> action)
+            {
+                ThreadPool.QueueUserWorkItem(async x =>
+                {
+                    Thread.Sleep(1000);
+                    await action();
+                    Thread.Sleep(2000);
+                });
+            }
         }
     }
 }

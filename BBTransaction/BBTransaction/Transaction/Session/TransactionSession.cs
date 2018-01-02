@@ -29,7 +29,7 @@ namespace BBTransaction.Transaction.Session
         /// <summary>
         /// The wait for result semaphore.
         /// </summary>
-        private SemaphoreSlim waitForResultSemaphor = new SemaphoreSlim(1);
+        private SemaphoreSlim waitForResultSemaphor = new SemaphoreSlim(0);
 #endif
 
         /// <summary>
