@@ -32,7 +32,7 @@ namespace ConsoleApp1
                     Id = 2,
                     Settings = BBTransaction.Step.Settings.StepSettings.LogExecutionTime,
                     AsyncStepAction = Step2Async,
-                    Executor = new TestExecutor()
+                    StepActionExecutor = new TestExecutor()
                 });
                 transaction.Definition.Add(new TransactionStep<int, string>()
                 {

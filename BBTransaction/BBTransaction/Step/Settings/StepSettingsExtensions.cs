@@ -37,6 +37,16 @@ namespace BBTransaction.Step.Settings
         public static bool LogExecutionTime(this StepSettings settings)
         {
             return (settings & StepSettings.LogExecutionTime) != 0;
-        }    
+        }
+
+        /// <summary>
+        /// Checks if the settings contain the 'SameExecutorForAllActions' setting.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
+        /// <returns><c>True</c> if the settings contain the 'SameExecutorForAllActions' setting, otherwise <c>false</c>.</returns>
+        public static bool SameExecutorForAllActions(this StepSettings settings)
+        {
+            return (settings & StepSettings.SameExecutorForAllActions) != 0;
+        }
     }
 }

@@ -53,6 +53,14 @@ namespace BBTransaction.Step
 #endif
 
         /// <summary>
+        /// Gets an executor for the step action (optional).
+        /// </summary>
+        IStepExecutor StepActionExecutor
+        {
+            get;
+        }
+
+        /// <summary>
         /// Gets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
         Action<TData, ITransactionSessionInfo<TStepId>> UndoAction
@@ -69,6 +77,14 @@ namespace BBTransaction.Step
             get;
         }
 #endif
+
+        /// <summary>
+        /// Gets an executor for the undo action (optional).
+        /// </summary>
+        IStepExecutor UndoActionExecutor
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the action which will be invoked after transaction success (optional).
@@ -92,14 +108,6 @@ namespace BBTransaction.Step
         /// Gets the settings for the step.
         /// </summary>
         StepSettings Settings
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets an executor for the step (optional).
-        /// </summary>
-        IStepExecutor Executor
         {
             get;
         }

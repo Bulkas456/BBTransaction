@@ -323,7 +323,7 @@ namespace BBTransaction.Transaction
 
                 this.context.Logger.DebugFormat("Transaction '{0}: running step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, session.State.CurrentStep.Step.Id);
 
-                IStepExecutor executor = session.State.CurrentStep.Step.Executor;
+                IStepExecutor executor = session.State.CurrentStep.Step.StepActionExecutor;
 
                 if (executor != null
                     && executor.ShouldRun)
@@ -340,7 +340,7 @@ namespace BBTransaction.Transaction
                         }
                     });
 #else
-                    executor.Run(async () => 
+                    executor.Run(async () =>
                     {
                         await this.ProcessStep(session);
 
@@ -390,7 +390,15 @@ namespace BBTransaction.Transaction
                 string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", this.context.Info.Name);
                 this.context.Logger.ErrorFormat(e, info);
                 session.State.Decrement();
-                // this.ProcessUndo(state, true, e);
+#if NET35
+                this.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+#else
+                await this.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+#endif
+                {
+                    Session = session,
+                    CaughtException = e
+                });
 
                 if (!session.Ended)
                 {
@@ -416,11 +424,11 @@ namespace BBTransaction.Transaction
 #else
                 if (currentStep.StepAction != null)
                 {
-                    currentStep.StepAction(session.State.Data, session); 
+                    currentStep.StepAction(session.State.Data, session);
                 }
                 else
                 {
-                   await currentStep.AsyncStepAction(session.State.Data, session); 
+                    await currentStep.AsyncStepAction(session.State.Data, session);
                 }
 #endif
                 watch.Stop();
@@ -435,13 +443,29 @@ namespace BBTransaction.Transaction
                 watch.Stop();
                 string info = string.Format("Transaction '{0}': an error occurred during processing step '{1}' with id '{2}', execution time '{3}'.", this.context.Info.Name, session.State.CurrentStepIndex, currentStep.Id, watch.Elapsed);
                 this.context.Logger.ErrorFormat(e, info);
-                // this.ProcessUndo(state, true, e);
+#if NET35
+                this.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+#else
+                await this.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+#endif
+                {
+                    Session = session,
+                    CaughtException = e
+                });
 
                 if (!session.Ended)
                 {
                     session.End(new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e)));
                 }
             }
+        }
+
+#if NET35
+        private void ProcessUndo(ProcessUndoContext<TStepId, TData> context)
+#else
+        private async Task ProcessUndo(ProcessUndoContext<TStepId, TData> context)
+#endif
+        {
         }
     }
 }

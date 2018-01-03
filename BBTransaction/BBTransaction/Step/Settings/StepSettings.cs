@@ -28,6 +28,11 @@ namespace BBTransaction.Step.Settings
         /// <summary>
         /// Time execution for the step method will be written to log.
         /// </summary>
-        LogExecutionTime = 4
+        LogExecutionTime = 4,
+
+        /// <summary>
+        /// A step executor for the step action will be used for the undo and post actions.
+        /// </summary>
+        SameExecutorForAllActions = 8
     }
 }
