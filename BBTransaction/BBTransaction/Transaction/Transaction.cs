@@ -77,7 +77,12 @@ namespace BBTransaction.Transaction
             this.Run(session);
 #else
             ITransactionSession<TStepId, TData> session = await this.CreateSession(runSettings);
-            await this.Run(session);
+
+            if (!session.Ended)
+            {
+                await this.Run(session);
+            }
+
             return await session.WaitForResultAsync();
 #endif
         }
@@ -87,28 +92,28 @@ namespace BBTransaction.Transaction
         /// Runs the session.
         /// </summary>
         /// <param name="session">The session.</param>
-        public void Run(ITransactionSession<TStepId, TData> session)
+        private void Run(ITransactionSession<TStepId, TData> session)
 #else
         /// <summary>
         /// Runs the session.
         /// </summary>
         /// <param name="session">The session.</param>
         /// <returns>The task.</returns>
-        public async Task Run(ITransactionSession<TStepId, TData> session)
+        private async Task Run(ITransactionSession<TStepId, TData> session)
 #endif
         {
             session.Start();
 #if NET35
-            TransactionResult<TStepId, TData> startTransactionResult = this.StartSession(session);
+            this.StartSession(session);
 #else
-            TransactionResult<TStepId, TData> startTransactionResult = await this.StartSession(session);
+            await this.StartSession(session);
 #endif
 
-            if (startTransactionResult != null)
+            if (session.Ended)
             {
-                session.End(startTransactionResult);
                 return;
             }
+
 #if NET35
             this.RunSession(session);
 #else
@@ -121,15 +126,13 @@ namespace BBTransaction.Transaction
         /// Starts the session. 
         /// </summary>
         /// <param name="session">The session.</param>
-        /// <returns>An instance of a <see cref="TransactionResult<TStepId, TData>"/> if an error occurred during starting the session, otherwise <c>null</c>.</returns>
-        private TransactionResult<TStepId, TData> StartSession(ITransactionSession<TStepId, TData> session)
+        private void StartSession(ITransactionSession<TStepId, TData> session)
 #else
         /// <summary>
         /// Starts the session. 
         /// </summary>
         /// <param name="session">The session.</param>
-        /// <returns>An instance of a <see cref="TransactionResult<TStepId, TData>"/> if an error occurred during starting the session, otherwise <c>null</c>.</returns>
-        private async Task<TransactionResult<TStepId, TData>> StartSession(ITransactionSession<TStepId, TData> session)
+        private async Task StartSession(ITransactionSession<TStepId, TData> session)
 #endif
         {
             try
@@ -140,12 +143,11 @@ namespace BBTransaction.Transaction
 #else
                 await this.context.SessionStorage.SessionStarted(session);
 #endif
-                return null;
             }
             catch (Exception e)
             {
                 this.context.Logger.ErrorFormat(e, "An error occurred during starting a session for transaction '{0}'.", this.context.Info.Name);
-                return new TransactionResult<TStepId, TData>(session, e);
+                session.End(new TransactionResult<TStepId, TData>(session, e));
             }
         }
 
@@ -297,18 +299,13 @@ namespace BBTransaction.Transaction
                 }
 
 #if NET35
-                TransactionResult<TStepId, TData> prepareStepResult = this.PrepareStep(session);
+                this.PrepareStep(session);
 #else
-                TransactionResult<TStepId, TData> prepareStepResult = await this.PrepareStep(session);
+                await this.PrepareStep(session);
 #endif
 
-                if (prepareStepResult != null)
+                if (session.Ended)
                 {
-#if NET35
-                    this.EndSession(prepareStepResult);
-#else
-                    await this.EndSession(prepareStepResult);
-#endif
                     return;
                 }
 
@@ -334,13 +331,9 @@ namespace BBTransaction.Transaction
 #if NET35
                     executor.Run(() =>
                     {
-                        TransactionResult<TStepId, TData> processStepResult = this.ProcessStep(session);
+                        this.ProcessStep(session);
 
-                        if (processStepResult != null)
-                        {
-                            this.EndSession(processStepResult);
-                        }
-                        else
+                        if (!session.Ended)
                         {
                             session.State.Increment();
                             this.RunSession(session);
@@ -349,13 +342,9 @@ namespace BBTransaction.Transaction
 #else
                     executor.Run(async () => 
                     {
-                        TransactionResult<TStepId, TData> processStepResult = await this.ProcessStep(session);
+                        await this.ProcessStep(session);
 
-                        if (processStepResult != null)
-                        {
-                            await this.EndSession(processStepResult);
-                        }
-                        else
+                        if (!session.Ended)
                         {
                             session.State.Increment();
                             await this.RunSession(session);
@@ -367,18 +356,13 @@ namespace BBTransaction.Transaction
                 else
                 {
 #if NET35
-                    TransactionResult<TStepId, TData> processStepResult = this.ProcessStep(session);
+                    this.ProcessStep(session);
 #else
-                    TransactionResult<TStepId, TData> processStepResult = await this.ProcessStep(session);
+                    await this.ProcessStep(session);
 #endif
 
-                    if (processStepResult != null)
+                    if (session.Ended)
                     {
-#if NET35
-                        this.EndSession(processStepResult);
-#else
-                        await this.EndSession(processStepResult);
-#endif
                         return;
                     }
 
@@ -388,9 +372,9 @@ namespace BBTransaction.Transaction
         }
 
 #if NET35
-        private TransactionResult<TStepId, TData> PrepareStep(ITransactionSession<TStepId, TData> session)
+        private void PrepareStep(ITransactionSession<TStepId, TData> session)
 #else
-        private async Task<TransactionResult<TStepId, TData>> PrepareStep(ITransactionSession<TStepId, TData> session)
+        private async Task PrepareStep(ITransactionSession<TStepId, TData> session)
 #endif
         {
             try
@@ -400,30 +384,25 @@ namespace BBTransaction.Transaction
 #else
                 await this.context.SessionStorage.StepPrepared(session);
 #endif
-                return null;
             }
             catch (Exception e)
             {
                 string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", this.context.Info.Name);
                 this.context.Logger.ErrorFormat(e, info);
                 session.State.Decrement();
+                // this.ProcessUndo(state, true, e);
 
-                TransactionResult<TStepId, TData> undoResult = null;// this.ProcessUndo(state, true);
-
-                if (undoResult != null)
+                if (!session.Ended)
                 {
-                    undoResult.Add(e);
-                    return undoResult;
+                    session.End(new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e)));
                 }
-
-                return new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e));
             }
         }
 
 #if NET35
-        private TransactionResult<TStepId, TData> ProcessStep(ITransactionSession<TStepId, TData> session)
+        private void ProcessStep(ITransactionSession<TStepId, TData> session)
 #else
-        private async Task<TransactionResult<TStepId, TData>> ProcessStep(ITransactionSession<TStepId, TData> session)
+        private async Task ProcessStep(ITransactionSession<TStepId, TData> session)
 #endif
         {
             Stopwatch watch = new Stopwatch();
@@ -450,25 +429,18 @@ namespace BBTransaction.Transaction
                 {
                     this.context.Logger.LogExecutionTime(watch.Elapsed, "Transaction '{0}': execution time for step '{1}' with id '{2}'.", this.context.Info.Name, session.State.CurrentStepIndex, currentStep.Id);
                 }
-
-                return null;
             }
             catch (Exception e)
             {
                 watch.Stop();
                 string info = string.Format("Transaction '{0}': an error occurred during processing step '{1}' with id '{2}', execution time '{3}'.", this.context.Info.Name, session.State.CurrentStepIndex, currentStep.Id, watch.Elapsed);
                 this.context.Logger.ErrorFormat(e, info);
-                session.State.Decrement();
+                // this.ProcessUndo(state, true, e);
 
-                TransactionResult<TStepId, TData> undoResult = null;// this.ProcessUndo(state, true);
-
-                if (undoResult != null)
+                if (!session.Ended)
                 {
-                    undoResult.Add(e);
-                    return undoResult;
+                    session.End(new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e)));
                 }
-
-                return new TransactionResult<TStepId, TData>(session, new InvalidOperationException(info, e));
             }
         }
     }
