@@ -139,6 +139,11 @@ namespace BBTransaction.Transaction.Session
         /// <param name="result">The transaction result.</param>
         public void End(ITransactionResult<TData> result)
         {
+            if (this.Ended)
+            {
+                return;
+            }
+
             this.Ended = true;
             this.result = result;
             this.RunSettings.TransactionResultCallback?.Invoke(this.result);

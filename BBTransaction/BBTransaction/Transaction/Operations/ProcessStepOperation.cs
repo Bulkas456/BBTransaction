@@ -69,6 +69,7 @@ namespace BBTransaction.Transaction.Operations
                     CaughtException = e
                 });
 
+                session.State.Decrement();
 #if NET35
                 SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
 #else

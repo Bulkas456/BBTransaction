@@ -24,8 +24,7 @@ namespace BBTransaction.Transaction.Operations
         {
             while (true)
             {
-                IStepDetails<TStepId, TData> step = session.TransactionContext.Definition[session.State];
-                session.State.CurrentStep = step;
+                IStepDetails<TStepId, TData> step = session.State.CurrentStep;
 
                 if (step == null)
                 {

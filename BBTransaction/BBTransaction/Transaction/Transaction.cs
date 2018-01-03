@@ -179,7 +179,8 @@ namespace BBTransaction.Transaction
         {
             TransactionState<TStepId, TData> state = new TransactionState<TStepId, TData>()
             {
-                Data = runSettings.Data
+                Data = runSettings.Data,
+                TransactionContext = this.context
             };
             TransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
             {
