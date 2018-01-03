@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Session;
 
-namespace BBTransaction.Transaction.Context
+namespace BBTransaction.Transaction.Operations
 {
     /// <summary>
     /// The context for the undo process.

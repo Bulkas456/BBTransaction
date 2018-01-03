@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Session.Info;
 #if !NET35
 using System.Threading.Tasks;
@@ -30,6 +31,14 @@ namespace BBTransaction.Transaction.Session
         /// Gets the run transaction settings.
         /// </summary>
         IRunSettings<TStepId, TData> RunSettings
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the transaction context.
+        /// </summary>
+        ITransactionContext<TStepId, TData> TransactionContext
         {
             get;
         }
