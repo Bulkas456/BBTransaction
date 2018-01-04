@@ -13,24 +13,18 @@ namespace BBTransaction.Definition
     public interface ITransactionDefinitionStorage<TStepId, TData> : ITransactionDefinition<TStepId, TData>
     {
         /// <summary>
-        /// Gets the step details for the transaction state.
+        /// Returns a step details for a step index.
         /// </summary>
-        /// <param name="state">The state.</param>
-        /// <returns>The step details for the transaction state.</returns>
-        IStepDetails<TStepId, TData> this[ITransactionState<TStepId, TData> state]
-        {
-            get;
-        }
+        /// <param name="stepIndex">The step index.</param>
+        /// <returns>The step details for the step index.</returns>
+        IStepDetails<TStepId, TData> GetByIndex(int stepIndex);
 
         /// <summary>
-        /// Gets the step details for the step id.
+        /// Returns a step details for a step id.
         /// </summary>
-        /// <param name="state">The state.</param>
-        /// <returns>The step details for the transaction state.</returns>
-        IStepDetails<TStepId, TData> this[TStepId id]
-        {
-            get;
-        } 
+        /// <param name="id">The step id.</param>
+        /// <returns>The step details for the step id.</returns>
+        IStepDetails<TStepId, TData> GetById(TStepId id);
 
         /// <summary>
         /// Notifies the definition that a transaction was started.

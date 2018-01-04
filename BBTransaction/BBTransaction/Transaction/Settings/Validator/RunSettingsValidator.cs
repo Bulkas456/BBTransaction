@@ -21,7 +21,7 @@ namespace BBTransaction.Transaction.Settings.Validator
             }
 
             if (settings.Mode == RunMode.RunFromStep
-                && transactionContext.Definition[settings.FirstStepId] == null)
+                && transactionContext.Definition.GetById(settings.FirstStepId) == null)
             {
                 throw new ArgumentException(string.Format(
                     "Transaction '{0}': could not found a step with id '{1}' for run mode '{2}'.", 

@@ -46,33 +46,32 @@ namespace BBTransaction.Definition.Standard
         }
 
         /// <summary>
-        /// Gets the step details for the transaction state.
+        /// Returns a step details for a step index.
         /// </summary>
-        /// <param name="state">The state.</param>
-        /// <returns>The step details for the transaction state.</returns>
-        public IStepDetails<TStepId, TData> this[ITransactionState<TStepId, TData> state]
+        /// <param name="stepIndex">The step index.</param>
+        /// <returns>The step details for the step index.</returns>
+        public IStepDetails<TStepId, TData> GetByIndex(int stepIndex)
         {
-            get
-            {
-                return state.CurrentStepIndex < this.steps.Count
-                        ? this.steps[state.CurrentStepIndex]
-                        : null;
-            }
+            return stepIndex < this.steps.Count
+                     ? this.steps[stepIndex]
+                     : null;
         }
 
         /// <summary>
-        /// Gets the step details for the step id.
+        /// Returns a step details for a step id.
         /// </summary>
-        /// <param name="state">The state.</param>
-        /// <returns>The step details for the transaction state.</returns>
-        public IStepDetails<TStepId, TData> this[TStepId id]
+        /// <param name="id">The step id.</param>
+        /// <returns>The step details for the step id.</returns>
+        public IStepDetails<TStepId, TData> GetById(TStepId id)
         {
-            get
-            {
-                return this.steps.FirstOrDefault(step => this.context.Info.StepIdComparer.Equals(step.Step.Id, id));
-            }
+            return this.steps.FirstOrDefault(step => this.context.Info.StepIdComparer.Equals(step.Step.Id, id));
         }
 
+        /// <summary>
+        /// Adds a step.
+        /// </summary>
+        /// <param name="step">The step to add.</param>
+        /// <returns>The definition.</returns>
         public ITransactionDefinition<TStepId, TData> Add(ITransactionStep<TStepId, TData> step)
         {
             lock (this.syncLock)

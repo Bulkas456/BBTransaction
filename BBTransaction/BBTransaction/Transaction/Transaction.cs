@@ -177,16 +177,14 @@ namespace BBTransaction.Transaction
         private async Task<ITransactionSession<TStepId, TData>> CreateSession(IRunSettings<TStepId, TData> runSettings)
 #endif
         {
-            TransactionState<TStepId, TData> state = new TransactionState<TStepId, TData>()
-            {
-                Data = runSettings.Data,
-                TransactionContext = this.context
-            };
             TransactionSession<TStepId, TData> session = new TransactionSession<TStepId, TData>
             {
                 RunSettings = runSettings,
-                StateInstance = state,
                 TransactionContext = this.context
+            };
+            session.StateInstance = new TransactionState<TStepId, TData>(session)
+            {
+                Data = runSettings.Data
             };
 
             switch (runSettings.Mode)
@@ -195,14 +193,14 @@ namespace BBTransaction.Transaction
                     break;
 
                 case RunMode.RunFromStep:
-                    IStepDetails<TStepId, TData> step = this.context.Definition[session.RunSettings.FirstStepId];
+                    IStepDetails<TStepId, TData> step = this.context.Definition.GetById(session.RunSettings.FirstStepId);
 
                     if (step == null)
                     {
                         throw new ArgumentException(string.Format("Transaction '{0}': no first step '{1}' for mode '{2}'.", this.context.Info.Name, runSettings.FirstStepId, runSettings.Mode));
                     }
 
-                    state.CurrentStepIndex = step.Index;
+                    session.StateInstance.CurrentStepIndex = step.Index;
                     break;
 
                 case RunMode.RecoverAndUndoAndRun:
@@ -247,6 +245,7 @@ namespace BBTransaction.Transaction
                             AdditionalInfo = "No session to recover.",
                             RunPostActions = false
                         });
+                        return session;
                     }
                     else
                     {
@@ -259,6 +258,7 @@ namespace BBTransaction.Transaction
                     throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
             }
 
+            session.StateInstance.FillStep();
             return session;
         }
     }
