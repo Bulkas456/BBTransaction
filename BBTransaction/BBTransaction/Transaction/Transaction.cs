@@ -14,7 +14,7 @@ using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Step.Settings;
 using System.Threading;
 using BBTransaction.Transaction.Session;
-using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Session.Storage;
 using BBTransaction.Step.Executor;
@@ -149,15 +149,15 @@ namespace BBTransaction.Transaction
             {
                 this.context.Logger.ErrorFormat(e, "An error occurred during starting a session for transaction '{0}'.", this.context.Info.Name);
 #if NET35
-                SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
-                await SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #endif
                 {
                     Session = session,
-                    RunPostActions = false,
-                    CaughtException = e
-                });
+                    RunPostActions = false
+                }
+                .AddError(e));
             }
         }
 
@@ -182,7 +182,7 @@ namespace BBTransaction.Transaction
                 RunSettings = runSettings,
                 TransactionContext = this.context
             };
-            session.StateInstance = new TransactionState<TStepId, TData>(session)
+            session.StepEnumeratorInstance = new StepEnumerator<TStepId, TData>(session)
             {
                 Data = runSettings.Data
             };
@@ -190,17 +190,6 @@ namespace BBTransaction.Transaction
             switch (runSettings.Mode)
             {
                 case RunMode.Run:
-                    break;
-
-                case RunMode.RunFromStep:
-                    IStepDetails<TStepId, TData> step = this.context.Definition.GetById(session.RunSettings.FirstStepId);
-
-                    if (step == null)
-                    {
-                        throw new ArgumentException(string.Format("Transaction '{0}': no first step '{1}' for mode '{2}'.", this.context.Info.Name, runSettings.FirstStepId, runSettings.Mode));
-                    }
-
-                    session.StateInstance.CurrentStepIndex = step.Index;
                     break;
 
                 case RunMode.RecoverAndUndoAndRun:
@@ -220,15 +209,15 @@ namespace BBTransaction.Transaction
                     {
                         this.context.Logger.ErrorFormat(e, "An error occurred during recovering the transaction '{0}'.", this.context.Info.Name);
 #if NET35
-                        SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                        SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
-                        await SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                        await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #endif
                         {
                             Session = session,
-                            CaughtException = e,
                             RunPostActions = false,
-                        });
+                        }
+                        .AddError(e));
                         return session;
                     }
 
@@ -236,9 +225,9 @@ namespace BBTransaction.Transaction
                     {
                         this.context.Logger.InfoFormat("Transaction '{0}': no session to recover.", this.context.Info.Name);
 #if NET35
-                        SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                        SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
-                        await SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                        await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #endif
                         {
                             Session = session,
@@ -258,7 +247,7 @@ namespace BBTransaction.Transaction
                     throw new ArgumentException(string.Format("Transaction '{0}': unknown run mode '{1}'.", this.context.Info.Name, runSettings.Mode));
             }
 
-            session.StateInstance.FillStep();
+            session.StepEnumeratorInstance.FillStep();
             return session;
         }
     }

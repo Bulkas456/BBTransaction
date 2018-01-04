@@ -46,13 +46,13 @@ namespace BBTransaction.Step.Validator
             if (step.UndoAction != null
                 && step.AsyncUndoAction != null)
             {
-                throw new NotSupportedException(string.Format("Improper step data for id '{0}': '{1}' and '{2}' cannot be set simultaneously.", nameof(step.UndoAction), nameof(step.AsyncUndoAction)));
+                throw new NotSupportedException(string.Format("Improper step data for id '{0}': '{1}' and '{2}' cannot be set simultaneously.", step.Id, nameof(step.UndoAction), nameof(step.AsyncUndoAction)));
             }
 
             if (step.PostAction != null
                 && step.AsyncPostAction != null)
             {
-                throw new NotSupportedException(string.Format("Improper step data for id '{0}': '{1}' and '{2}' cannot be set simultaneously.", nameof(step.PostAction), nameof(step.AsyncPostAction)));
+                throw new NotSupportedException(string.Format("Improper step data for id '{0}': '{1}' and '{2}' cannot be set simultaneously.", step.Id, nameof(step.PostAction), nameof(step.AsyncPostAction)));
             }
 #endif
 

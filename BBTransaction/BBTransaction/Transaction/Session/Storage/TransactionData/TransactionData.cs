@@ -31,7 +31,7 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         {
             get
             {
-                return this.session.State.CurrentStepIndex;
+                return this.session.StepEnumerator.CurrentStepIndex;
             }
         }
 

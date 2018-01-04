@@ -33,7 +33,7 @@ namespace BBTransaction.Transaction.Operations
             {
                 string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", session.TransactionContext.Info.Name);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
-                session.State.Decrement();
+                session.StepEnumerator.Decrement();
 #if NET35
                 ProcessUndoOperation.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
 #else
@@ -45,15 +45,15 @@ namespace BBTransaction.Transaction.Operations
                 });
 
 #if NET35
-                SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
-                await SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #endif
                 {
                     Session = session,
-                    RunPostActions = false,
-                    CaughtException = e
-                });
+                    RunPostActions = false
+                }
+                .AddError(e));
             }
         }
     }

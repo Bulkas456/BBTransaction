@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Context;
-using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
@@ -38,14 +38,19 @@ namespace BBTransaction.Transaction.Session
         private ITransactionResult<TData> result;
 
         /// <summary>
-        /// Gets the transaction state.
+        /// Gets the current step id.
         /// </summary>
-        public ITransactionState<TStepId, TData> State => this.StateInstance;
+        public TStepId CurrentStepId => this.StepEnumerator.CurrentStep.Step.Id;
 
         /// <summary>
         /// Gets the transaction state.
         /// </summary>
-        public TransactionState<TStepId, TData> StateInstance
+        public IStepEnumerator<TStepId, TData> StepEnumerator => this.StepEnumeratorInstance;
+
+        /// <summary>
+        /// Gets the transaction state.
+        /// </summary>
+        public StepEnumerator<TStepId, TData> StepEnumeratorInstance
         {
             get;
             set;
@@ -160,8 +165,8 @@ namespace BBTransaction.Transaction.Session
         {
             this.started = true;
             this.Recovered = true;
-            this.StateInstance.CurrentStepIndex = recoveredData.CurrentStepIndex;
-            this.StateInstance.Data = recoveredData.Data;
+            this.StepEnumeratorInstance.CurrentStepIndex = recoveredData.CurrentStepIndex;
+            this.StepEnumeratorInstance.Data = recoveredData.Data;
             this.SessionId = recoveredData.SessionId;
             this.StartTimestamp = recoveredData.StartTimestamp;
         }

@@ -5,25 +5,30 @@ using BBTransaction.Definition;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Settings;
 
-namespace BBTransaction.Transaction.Session.State
+namespace BBTransaction.Transaction.Session.StepEnumerator
 {
     /// <summary>
     /// The state for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    internal class TransactionState<TStepId, TData> : ITransactionState<TStepId, TData>
+    internal class StepEnumerator<TStepId, TData> : IStepEnumerator<TStepId, TData>
     {
+        /// <summary>
+        /// The minimum step index.
+        /// </summary>
+        private const int MinStepIndex = 0;
+
         /// <summary>
         /// The transaction session.
         /// </summary>
         private readonly ITransactionSession<TStepId, TData> session;
 
         /// <summary>
-        /// Initilalizes a new instance of the <see cref="TransactionState<TStepId, TData>"/> class.
+        /// Initilalizes a new instance of the <see cref="StepEnumerator<TStepId, TData>"/> class.
         /// </summary>
         /// <param name="session">The session.</param>
-        public TransactionState(ITransactionSession<TStepId, TData> session)
+        public StepEnumerator(ITransactionSession<TStepId, TData> session)
         {
             this.session = session;
         }
@@ -69,7 +74,16 @@ namespace BBTransaction.Transaction.Session.State
         /// </summary>
         public void Decrement()
         {
-            this.CurrentStepIndex = Math.Max(0, this.CurrentStepIndex - 1);
+            this.CurrentStepIndex = Math.Max(MinStepIndex, this.CurrentStepIndex - 1);
+            this.FillStep();
+        }
+
+        /// <summary>
+        /// Restarts the enumerator.
+        /// </summary>
+        public void Restart()
+        {
+            this.CurrentStepIndex = MinStepIndex;
             this.FillStep();
         }
 

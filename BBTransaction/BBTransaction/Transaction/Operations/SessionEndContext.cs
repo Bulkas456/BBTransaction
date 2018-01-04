@@ -10,8 +10,13 @@ namespace BBTransaction.Transaction.Operations
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    internal struct SessionEndContext<TStepId, TData>
+    internal class SessionEndContext<TStepId, TData>
     {
+        /// <summary>
+        /// The collection of caught exceptions.
+        /// </summary>
+        private readonly List<Exception> caughtExceptions = new List<Exception>();
+
         /// <summary>
         /// Gets or sets the sesison to end.
         /// </summary>
@@ -31,13 +36,9 @@ namespace BBTransaction.Transaction.Operations
         }
 
         /// <summary>
-        /// Gets or sets the caught exception.
+        /// Gets the list of caught exceptions.
         /// </summary>
-        public Exception CaughtException
-        {
-            get;
-            set;
-        }
+        public IEnumerable<Exception> CaughtExceptions => this.caughtExceptions;
 
         /// <summary>
         /// Gets or sets the additional info.
@@ -46,6 +47,12 @@ namespace BBTransaction.Transaction.Operations
         {
             get;
             set;
+        }
+
+        public SessionEndContext<TStepId, TData> AddError(Exception error)
+        {
+            this.caughtExceptions.Add(error);
+            return this;
         }
     }
 }

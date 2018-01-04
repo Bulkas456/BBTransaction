@@ -5,7 +5,7 @@ using BBTransaction.Step;
 using BBTransaction.Step.Validator;
 using System.Linq;
 using BBTransaction.Definition.Standard.Context;
-using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.StepEnumerator;
 
 namespace BBTransaction.Definition.Standard
 {
@@ -55,16 +55,6 @@ namespace BBTransaction.Definition.Standard
             return stepIndex < this.steps.Count
                      ? this.steps[stepIndex]
                      : null;
-        }
-
-        /// <summary>
-        /// Returns a step details for a step id.
-        /// </summary>
-        /// <param name="id">The step id.</param>
-        /// <returns>The step details for the step id.</returns>
-        public IStepDetails<TStepId, TData> GetById(TStepId id)
-        {
-            return this.steps.FirstOrDefault(step => this.context.Info.StepIdComparer.Equals(step.Step.Id, id));
         }
 
         /// <summary>

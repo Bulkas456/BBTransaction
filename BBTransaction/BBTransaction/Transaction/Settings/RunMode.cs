@@ -15,11 +15,6 @@ namespace BBTransaction.Transaction.Settings
         Run,
 
         /// <summary>
-        /// Runs all steps from the specific step (set in settings) to the last one.
-        /// </summary>
-        RunFromStep,
-
-        /// <summary>
         /// Recovers the transaction, runs undo operations for completed steps and then starts the transaction from the first step to the last one.
         /// If there is no session to recover the transaction is ended without run.
         /// </summary>

@@ -6,7 +6,7 @@ using BBTransaction.Transaction.Session.Info;
 #if !NET35
 using System.Threading.Tasks;
 #endif
-using BBTransaction.Transaction.Session.State;
+using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
 
@@ -22,7 +22,7 @@ namespace BBTransaction.Transaction.Session
         /// <summary>
         /// Gets the transaction state.
         /// </summary>
-        ITransactionState<TStepId, TData> State
+        IStepEnumerator<TStepId, TData> StepEnumerator
         {
             get;
         }

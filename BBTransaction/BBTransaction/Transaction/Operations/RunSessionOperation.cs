@@ -24,14 +24,14 @@ namespace BBTransaction.Transaction.Operations
         {
             while (true)
             {
-                IStepDetails<TStepId, TData> step = session.State.CurrentStep;
+                IStepDetails<TStepId, TData> step = session.StepEnumerator.CurrentStep;
 
                 if (step == null)
                 {
 #if NET35
-                    SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                    SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
-                    await SessionEndOperation.EndSession(new SessionEndContext<TStepId, TData>()
+                    await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #endif
                     {
                         Session = session,
@@ -59,9 +59,9 @@ namespace BBTransaction.Transaction.Operations
                            .DebugFormat(
                               "Transaction '{0}': ignoring step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.",
                               session.TransactionContext.Info.Name,
-                              session.State.CurrentStepIndex,
-                              session.State.CurrentStep.Step.Id);
-                    session.State.Increment();
+                              session.StepEnumerator.CurrentStepIndex,
+                              session.StepEnumerator.CurrentStep.Step.Id);
+                    session.StepEnumerator.Increment();
                     continue;
                 }
 
@@ -70,10 +70,10 @@ namespace BBTransaction.Transaction.Operations
                            .DebugFormat(
                               "Transaction '{0}: running step '{1}' with id '{2}'.", 
                               session.TransactionContext.Info.Name,
-                              session.State.CurrentStepIndex,
-                              session.State.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStepIndex,
+                              session.StepEnumerator.CurrentStep.Step.Id);
 
-                IStepExecutor executor = session.State.CurrentStep.Step.StepActionExecutor;
+                IStepExecutor executor = session.StepEnumerator.CurrentStep.Step.StepActionExecutor;
 
                 if (executor != null
                     && executor.ShouldRun)
@@ -85,7 +85,7 @@ namespace BBTransaction.Transaction.Operations
 
                         if (!session.Ended)
                         {
-                            session.State.Increment();
+                            session.StepEnumerator.Increment();
                             session.RunSession();
                         }
                     });
@@ -96,7 +96,7 @@ namespace BBTransaction.Transaction.Operations
 
                         if (!session.Ended)
                         {
-                            session.State.Increment();
+                            session.StepEnumerator.Increment();
                             await session.RunSession();
                         }
                     });
@@ -116,7 +116,7 @@ namespace BBTransaction.Transaction.Operations
                         return;
                     }
 
-                    session.State.Increment();
+                    session.StepEnumerator.Increment();
                 }
             }
         }

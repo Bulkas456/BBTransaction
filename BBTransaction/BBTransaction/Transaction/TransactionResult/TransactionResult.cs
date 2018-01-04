@@ -23,16 +23,32 @@ namespace BBTransaction.Transaction.TransactionResult
         /// Initializes a new instance of the <see cref="TransactionResult<TStepId, TData>"/> class.
         /// </summary>
         /// <param name="session">The state.</param>
-        /// <param name="error">The error.</param>
-        public TransactionResult(ITransactionSession<TStepId, TData> session, Exception error = null)
+        /// <param name="errors">The collection of errors.</param>
+        public TransactionResult(ITransactionSession<TStepId, TData> session, IEnumerable<Exception> errors = null)
         {
             this.session = session;
-            this.Add(error);
+
+            if (errors != null)
+            {
+                foreach (Exception error in errors)
+                {
+                    this.Add(error);
+                }
+            }
 
             if (!this.Success)
             {
                 this.Info = "An error occurred.";
             }
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public object Result
+        {
+            get;
+            set;
         }
 
         /// <summary>

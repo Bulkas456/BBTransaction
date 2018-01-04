@@ -105,6 +105,14 @@ namespace BBTransaction.Step
 #endif
 
         /// <summary>
+        /// Gets an executor for the post action (optional).
+        /// </summary>
+        IStepExecutor PostActionExecutor
+        {
+            get;
+        }
+
+        /// <summary>
         /// Gets the settings for the step.
         /// </summary>
         StepSettings Settings

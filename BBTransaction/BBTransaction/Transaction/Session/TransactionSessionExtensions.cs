@@ -21,7 +21,7 @@ namespace BBTransaction.Transaction.Session
         public static bool ShouldLogStepExecution<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
         {
             return session.RunSettings.LogTimeExecutionForAllSteps()
-                   || session.State.CurrentStep.Step.Settings.LogExecutionTime();
+                   || session.StepEnumerator.CurrentStep.Step.Settings.LogExecutionTime();
         }
     }
 }

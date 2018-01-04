@@ -4,14 +4,14 @@ using System.Text;
 using BBTransaction.Definition;
 using BBTransaction.Transaction.Settings;
 
-namespace BBTransaction.Transaction.Session.State
+namespace BBTransaction.Transaction.Session.StepEnumerator
 {
     /// <summary>
     /// The state for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    public interface ITransactionState<TStepId, TData>
+    public interface IStepEnumerator<TStepId, TData>
     {
         /// <summary>
         /// Gets the index in the definition for the current step.
@@ -47,5 +47,10 @@ namespace BBTransaction.Transaction.Session.State
         /// Decrements the state.
         /// </summary>
         void Decrement();
+
+        /// <summary>
+        /// Restarts the enumerator.
+        /// </summary>
+        void Restart();
     }
 }
