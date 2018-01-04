@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransaction", "BBTransact
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransactionTestsNetCore", "BBTransactionTests\BBTransactionTestsNetCore.csproj", "{912879C5-5496-4EB0-9151-97A49030D9C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{1C7F6039-FDEC-4301-A169-2D8622E8F5E3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBTransactionTestsNetFramework", "BBTransactionTestsNetFramework\BBTransactionTestsNetFramework.csproj", "{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{912879C5-5496-4EB0-9151-97A49030D9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1C7F6039-FDEC-4301-A169-2D8622E8F5E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C7F6039-FDEC-4301-A169-2D8622E8F5E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1C7F6039-FDEC-4301-A169-2D8622E8F5E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C7F6039-FDEC-4301-A169-2D8622E8F5E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
