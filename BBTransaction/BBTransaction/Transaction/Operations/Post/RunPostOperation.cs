@@ -9,8 +9,9 @@ using BBTransaction.Step;
 using BBTransaction.Definition;
 using BBTransaction.Step.Executor;
 using BBTransaction.Step.Settings;
+using BBTransaction.Transaction.Operations.SessionEnd;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.Post
 {
     /// <summary>
     /// The run post actions operation.

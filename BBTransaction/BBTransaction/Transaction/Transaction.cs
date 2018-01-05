@@ -20,6 +20,8 @@ using BBTransaction.Transaction.Session.Storage;
 using BBTransaction.Step.Executor;
 using BBTransaction.Step;
 using BBTransaction.Transaction.Operations;
+using BBTransaction.Transaction.Operations.StepAction;
+using BBTransaction.Transaction.Operations.SessionEnd;
 
 namespace BBTransaction.Transaction
 {
@@ -116,9 +118,9 @@ namespace BBTransaction.Transaction
             }
 
 #if NET35
-            session.RunSession();
+            RunSessionOperation.RunSession(session);
 #else
-            await session.RunSession();
+            await RunSessionOperation.RunSession(session);
 #endif
         }
 

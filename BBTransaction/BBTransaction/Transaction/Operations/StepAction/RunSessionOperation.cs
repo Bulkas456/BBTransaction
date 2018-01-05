@@ -8,8 +8,9 @@ using BBTransaction.Definition;
 using BBTransaction.Step.Executor;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
+using BBTransaction.Transaction.Operations.SessionEnd;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.StepAction
 {
     /// <summary>
     /// The run session operation.
@@ -19,7 +20,7 @@ namespace BBTransaction.Transaction.Operations
 #if NET35
         public static void RunSession<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
 #else
-        public static async Task RunSession<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
+        public static async Task RunSession<TStepId, TData>(ITransactionSession<TStepId, TData> session)
 #endif
         {
             while (true)
@@ -86,7 +87,7 @@ namespace BBTransaction.Transaction.Operations
                         if (!session.Ended)
                         {
                             session.StepEnumerator.Increment();
-                            session.RunSession();
+                            RunSessionOperation.RunSession(session);
                         }
                     });
 #else
@@ -97,7 +98,7 @@ namespace BBTransaction.Transaction.Operations
                         if (!session.Ended)
                         {
                             session.StepEnumerator.Increment();
-                            await session.RunSession();
+                            await RunSessionOperation.RunSession(session);
                         }
                     });
 #endif

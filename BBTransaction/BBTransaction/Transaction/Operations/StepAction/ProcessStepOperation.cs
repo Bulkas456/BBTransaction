@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.Text;
 using BBTransaction.Step;
 using BBTransaction.Transaction.Operations;
+using BBTransaction.Transaction.Operations.Undo;
+using BBTransaction.Transaction.Operations.SessionEnd;
 #if !NET35
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.StepAction
 {
     /// <summary>
     /// The step processing operation.
@@ -60,16 +62,15 @@ namespace BBTransaction.Transaction.Operations
                 string info = string.Format("Transaction '{0}': an error occurred during processing step '{1}' with id '{2}', execution time '{3}'.", session.TransactionContext.Info.Name, session.StepEnumerator.CurrentStepIndex, currentStep.Id, watch.Elapsed);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
 #if NET35
-                ProcessUndoOperation.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+                RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #else
-                await ProcessUndoOperation.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+                await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #endif
                 {
                     Session = session,
                     CaughtException = e
                 });
 
-                session.StepEnumerator.Decrement();
 #if NET35
                 SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
@@ -77,7 +78,7 @@ namespace BBTransaction.Transaction.Operations
 #endif
                 {
                     Session = session,
-                    RunPostActions = true
+                    RunPostActions = false
                 }
                 .AddError(e));
             }

@@ -99,6 +99,14 @@ namespace BBTransactionTestsNetCore
             }
             ITransactionResult<object> transactionCallbackResult = null;
 
+            /*
+             0:
+             1: 
+             2:  
+             3:
+             4:
+             */
+
             // Act
             ITransactionResult<object> result = await target.Run(settings => 
             {

@@ -6,9 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Step;
+using BBTransaction.Transaction.Operations.SessionEnd;
 using BBTransaction.Transaction.Session;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.Post
 {
     internal static class ProcessPostOperation
     {

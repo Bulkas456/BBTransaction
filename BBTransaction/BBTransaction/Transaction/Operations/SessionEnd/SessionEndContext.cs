@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Session;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.SessionEnd
 {
     /// <summary>
     /// The context for the session end operation.

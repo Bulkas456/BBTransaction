@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Transaction.Operations.Post;
 using BBTransaction.Transaction.TransactionResult;
 #if !NET35
 using System.Threading.Tasks;
 #endif
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.SessionEnd
 {
     /// <summary>
     /// The session end operation.

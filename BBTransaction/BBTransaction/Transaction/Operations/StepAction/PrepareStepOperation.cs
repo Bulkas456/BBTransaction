@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Context;
+using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Transaction.Operations.Undo;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.Session.Storage;
 
-namespace BBTransaction.Transaction.Operations
+namespace BBTransaction.Transaction.Operations.StepAction
 {
     /// <summary>
     /// The prepare step operation.
@@ -35,9 +37,9 @@ namespace BBTransaction.Transaction.Operations
                 session.TransactionContext.Logger.ErrorFormat(e, info);
                 session.StepEnumerator.Decrement();
 #if NET35
-                ProcessUndoOperation.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+                RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #else
-                await ProcessUndoOperation.ProcessUndo(new ProcessUndoContext<TStepId, TData>()
+                await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #endif
                 {
                     Session = session,
