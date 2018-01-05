@@ -52,7 +52,8 @@ namespace BBTransaction.Definition.Standard
         /// <returns>The step details for the step index.</returns>
         public IStepDetails<TStepId, TData> GetByIndex(int stepIndex)
         {
-            return stepIndex < this.steps.Count
+            return stepIndex > -1 
+                   && stepIndex < this.steps.Count
                      ? this.steps[stepIndex]
                      : null;
         }

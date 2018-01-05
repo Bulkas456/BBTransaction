@@ -15,11 +15,6 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
     internal class StepEnumerator<TStepId, TData> : IStepEnumerator<TStepId, TData>
     {
         /// <summary>
-        /// The minimum step index.
-        /// </summary>
-        private const int MinStepIndex = 0;
-
-        /// <summary>
         /// The transaction session.
         /// </summary>
         private readonly ITransactionSession<TStepId, TData> session;
@@ -74,7 +69,7 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         /// </summary>
         public void Decrement()
         {
-            this.CurrentStepIndex = Math.Max(MinStepIndex, this.CurrentStepIndex - 1);
+            this.CurrentStepIndex = Math.Max(-1, this.CurrentStepIndex - 1);
             this.FillStep();
         }
 
@@ -83,7 +78,7 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         /// </summary>
         public void Restart()
         {
-            this.CurrentStepIndex = MinStepIndex;
+            this.CurrentStepIndex = 0;
             this.FillStep();
         }
 

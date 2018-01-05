@@ -129,7 +129,7 @@ namespace BBTransactionTestsNetCore
             result.Recovered.Should().BeFalse();
             result.Success.Should().BeFalse();
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
-            runUndoActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
+            runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
         }
 
@@ -248,7 +248,7 @@ namespace BBTransactionTestsNetCore
             result.Recovered.Should().BeFalse();
             result.Success.Should().BeFalse();
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
-            runUndoActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
+            runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
         }
     }
