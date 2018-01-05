@@ -9,6 +9,7 @@ using BBTransaction.Step.Executor;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Step;
 
 namespace BBTransaction.Transaction.Operations.StepAction
 {
@@ -25,7 +26,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
         {
             while (true)
             {
-                IStepDetails<TStepId, TData> step = session.StepEnumerator.CurrentStep;
+                ITransactionStep<TStepId, TData> step = session.StepEnumerator.CurrentStep;
 
                 if (step == null)
                 {
@@ -53,7 +54,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 }
 
                 if (session.Recovered
-                    && !step.Step.Settings.RunOnRecovered())
+                    && !step.Settings.RunOnRecovered())
                 {
                     session.TransactionContext
                            .Logger
@@ -61,7 +62,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                               "Transaction '{0}': ignoring step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.",
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
                     session.StepEnumerator.Increment();
                     continue;
                 }
@@ -72,9 +73,9 @@ namespace BBTransaction.Transaction.Operations.StepAction
                               "Transaction '{0}: running step '{1}' with id '{2}'.", 
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
 
-                IStepExecutor executor = session.StepEnumerator.CurrentStep.Step.StepActionExecutor;
+                IStepExecutor executor = session.StepEnumerator.CurrentStep.StepActionExecutor;
 
                 if (executor != null
                     && executor.ShouldRun)

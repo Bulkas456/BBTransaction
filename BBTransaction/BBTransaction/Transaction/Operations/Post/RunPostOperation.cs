@@ -26,15 +26,14 @@ namespace BBTransaction.Transaction.Operations.Post
         {
             while (true)
             {
-                IStepDetails<TStepId, TData> stepDetails = context.Session.StepEnumerator.CurrentStep;
+                ITransactionStep<TStepId, TData> step = context.Session.StepEnumerator.CurrentStep;
 
-                if (stepDetails == null)
+                if (step == null)
                 {
                     SessionEndOperation.EndSession(context);
                     return;
                 }
 
-                ITransactionStep<TStepId, TData> step = stepDetails.Step;
                 ITransactionSession<TStepId, TData> session = context.Session;
 
                 if (session.Recovered
@@ -46,7 +45,7 @@ namespace BBTransaction.Transaction.Operations.Post
                               "Transaction '{0}': ignoring the post step action for step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.",
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
                     session.StepEnumerator.Increment();
                     continue;
                 }
@@ -63,7 +62,7 @@ namespace BBTransaction.Transaction.Operations.Post
                               "Transaction '{0}': no post step action for step '{1}' with id '{2}'.",
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
                     session.StepEnumerator.Increment();
                     continue;
                 }

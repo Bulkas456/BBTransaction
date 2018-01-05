@@ -19,7 +19,7 @@ namespace BBTransaction.Transaction.Operations.Post
         public static async Task ProcessPost<TStepId, TData>(SessionEndContext<TStepId, TData> context)
 #endif
         {
-            ITransactionStep<TStepId, TData> currentStep = context.Session.StepEnumerator.CurrentStep.Step;
+            ITransactionStep<TStepId, TData> currentStep = context.Session.StepEnumerator.CurrentStep;
             ITransactionSession<TStepId, TData> session = context.Session;
             Stopwatch watch = new Stopwatch();
 

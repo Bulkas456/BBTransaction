@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Definition;
+using BBTransaction.Step;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Settings;
 
@@ -49,7 +50,7 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         /// <summary>
         /// Gets or sets the current step.
         /// </summary>
-        public IStepDetails<TStepId, TData> CurrentStep
+        public ITransactionStep<TStepId, TData> CurrentStep
         {
             get;
             set;

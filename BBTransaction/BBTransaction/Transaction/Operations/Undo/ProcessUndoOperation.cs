@@ -22,7 +22,7 @@ namespace BBTransaction.Transaction.Operations.Undo
         public static async Task ProcessUndo<TStepId, TData>(RunUndoContext<TStepId, TData> context)
 #endif
         {
-            ITransactionStep<TStepId, TData> currentStep = context.Session.StepEnumerator.CurrentStep.Step;
+            ITransactionStep<TStepId, TData> currentStep = context.Session.StepEnumerator.CurrentStep;
             ITransactionSession<TStepId, TData> session = context.Session;
             Stopwatch watch = new Stopwatch();
 

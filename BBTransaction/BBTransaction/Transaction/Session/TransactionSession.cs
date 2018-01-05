@@ -40,7 +40,7 @@ namespace BBTransaction.Transaction.Session
         /// <summary>
         /// Gets the current step id.
         /// </summary>
-        public TStepId CurrentStepId => this.StepEnumerator.CurrentStep.Step.Id;
+        public TStepId CurrentStepId => this.StepEnumerator.CurrentStep.Id;
 
         /// <summary>
         /// Gets the transaction state.

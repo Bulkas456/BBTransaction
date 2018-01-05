@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Step;
 
 namespace BBTransaction.Definition
 {
@@ -16,7 +17,7 @@ namespace BBTransaction.Definition
         /// </summary>
         /// <param name="stepIndex">The step index.</param>
         /// <returns>The step details for the step index.</returns>
-        IStepDetails<TStepId, TData> GetByIndex(int stepIndex);
+        ITransactionStep<TStepId, TData> GetByIndex(int stepIndex);
 
         /// <summary>
         /// Notifies the definition that a transaction was started.

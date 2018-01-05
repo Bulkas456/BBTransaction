@@ -18,12 +18,5 @@ namespace BBTransaction.Definition
         /// <param name="step">The step to add.</param>
         /// <returns>The definition.</returns>
         ITransactionDefinition<TStepId, TData> Add(ITransactionStep<TStepId, TData> step);
-
-        /// <summary>
-        /// Adds a collection of steps.
-        /// </summary>
-        /// <param name="steps">The collection of steps to add.</param>
-        /// <returns>The definition.</returns>
-        ITransactionDefinition<TStepId, TData> Add(IEnumerable<ITransactionStep<TStepId, TData>> steps);
     }
 }

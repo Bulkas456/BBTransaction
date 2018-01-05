@@ -24,7 +24,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
         public static async Task ProcessStep<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
 #endif
         {
-            ITransactionStep<TStepId, TData> currentStep = session.StepEnumerator.CurrentStep.Step;
+            ITransactionStep<TStepId, TData> currentStep = session.StepEnumerator.CurrentStep;
             Stopwatch watch = new Stopwatch();
 
             try

@@ -15,5 +15,15 @@ namespace BBTransaction
         {
             return definition.Add(step);
         }
+
+        public static ITransactionDefinition<TStepId, TData> Add<TStepId, TData>(this ITransactionDefinition<TStepId, TData> definition, IEnumerable<ITransactionStep<TStepId, TData>> steps)
+        {
+            foreach (ITransactionStep<TStepId, TData> step in steps)
+            {
+                definition.Add(step);
+            }
+
+            return definition;
+        }
     }
 }

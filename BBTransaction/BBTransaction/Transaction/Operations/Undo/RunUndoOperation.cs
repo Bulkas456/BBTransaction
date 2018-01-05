@@ -26,9 +26,9 @@ namespace BBTransaction.Transaction.Operations.Undo
         {
             while (true)
             {
-                IStepDetails<TStepId, TData> stepDetails = context.Session.StepEnumerator.CurrentStep;
+                ITransactionStep<TStepId, TData> step = context.Session.StepEnumerator.CurrentStep;
 
-                if (stepDetails == null)
+                if (step == null)
                 {
 #if NET35
                     SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
@@ -43,7 +43,6 @@ namespace BBTransaction.Transaction.Operations.Undo
                     return;
                 }
 
-                ITransactionStep<TStepId, TData> step = stepDetails.Step;
                 ITransactionSession<TStepId, TData> session = context.Session;
 
                 if (session.Recovered
@@ -55,7 +54,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                               "Transaction '{0}': ignoring the undo step action for step '{1}' with id '{2}' as the step cannot be executed on a recovered transaction.",
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
                     session.StepEnumerator.Decrement();
                     continue;
                 }
@@ -72,7 +71,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                               "Transaction '{0}': no undo step action for step '{1}' with id '{2}'.",
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
-                              session.StepEnumerator.CurrentStep.Step.Id);
+                              session.StepEnumerator.CurrentStep.Id);
                     session.StepEnumerator.Decrement();
                     continue;
                 }

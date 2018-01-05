@@ -24,7 +24,7 @@ namespace BBTransaction.Definition.Default
         /// <summary>
         /// The collection of steps.
         /// </summary>
-        private readonly List<StepDetails<TStepId, TData>> steps = new List<StepDetails<TStepId, TData>>();
+        private readonly List<ITransactionStep<TStepId, TData>> steps = new List<ITransactionStep<TStepId, TData>>();
 
         /// <summary>
         /// The info.
@@ -50,7 +50,7 @@ namespace BBTransaction.Definition.Default
         /// </summary>
         /// <param name="stepIndex">The step index.</param>
         /// <returns>The step details for the step index.</returns>
-        public IStepDetails<TStepId, TData> GetByIndex(int stepIndex)
+        public ITransactionStep<TStepId, TData> GetByIndex(int stepIndex)
         {
             return stepIndex > -1 
                    && stepIndex < this.steps.Count
@@ -68,24 +68,7 @@ namespace BBTransaction.Definition.Default
             lock (this.syncLock)
             {
                 this.AssertCanAddStep();
-                this.steps.Add(new StepDetails<TStepId, TData>(this.steps.Count, step.Validate()));
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a collection of steps.
-        /// </summary>
-        /// <param name="steps">The collection of steps to add.</param>
-        /// <returns>The definition.</returns>
-        public ITransactionDefinition<TStepId, TData> Add(IEnumerable<ITransactionStep<TStepId, TData>> steps)
-        {
-            lock(this.syncLock)
-            {
-                this.AssertCanAddStep();
-                int startIndex = this.steps.Count;
-                this.steps.AddRange(steps.Select((step, index) => new StepDetails<TStepId, TData>(startIndex + index, step.Validate())));
+                this.steps.Add(step.Validate());
             }
 
             return this;
