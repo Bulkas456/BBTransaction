@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session.Info;
@@ -19,7 +19,7 @@ namespace BBTransaction.Transaction.Session.Storage.Default
     {
         public static readonly ITransactionStorage<TData> Instance = new EmptyTransactionStorage<TData>();
 
-#if NET35
+#if NET35 || NOASYNC
         public void SessionStarted(ITransactionData<TData> data)
         {
         }
@@ -27,7 +27,7 @@ namespace BBTransaction.Transaction.Session.Storage.Default
         public Task SessionStarted(ITransactionData<TData> data) => Task.FromResult<object>(null);
 #endif
 
-#if NET35
+#if NET35 || NOASYNC
         public void StepPrepared(ITransactionData<TData> info)
         {
         }
@@ -36,7 +36,7 @@ namespace BBTransaction.Transaction.Session.Storage.Default
 #endif
 
 
-#if NET35
+#if NET35 || NOASYNC
         public ITransactionData<TData> RecoverTransaction()
         {
             return null;
@@ -46,7 +46,7 @@ namespace BBTransaction.Transaction.Session.Storage.Default
 #endif
 
 
-#if NET35
+#if NET35 || NOASYNC
         public void RemoveSession(ITransactionData<TData> data)
         {
         }

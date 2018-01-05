@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 
@@ -24,7 +24,7 @@ namespace BBTransaction.Step.Executor
         /// Runs the step processing action.
         /// </summary>
         /// <param name="action">The action.</param>
-#if NET35
+#if NET35 || NOASYNC
         void Run(Action action);
 #else
         void Run(Func<Task> action);

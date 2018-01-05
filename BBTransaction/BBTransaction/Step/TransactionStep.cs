@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35 
+#if !NET35 && !NOASYNC 
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Info;
@@ -45,7 +45,7 @@ namespace BBTransaction.Step
             set;
         }
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// Gets or sets the action which will be invoked for the step.
         /// </summary>
@@ -74,7 +74,7 @@ namespace BBTransaction.Step
             set;
         }
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// Gets or sets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
@@ -102,7 +102,7 @@ namespace BBTransaction.Step
             set;
         }
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// Gets or sets the action which will be invoked after transaction success (optional).
         /// </summary>

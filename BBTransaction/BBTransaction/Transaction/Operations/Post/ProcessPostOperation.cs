@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Step;
@@ -13,7 +13,7 @@ namespace BBTransaction.Transaction.Operations.Post
 {
     internal static class ProcessPostOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void ProcessPost<TStepId, TData>(SessionEndContext<TStepId, TData> context)
 #else
         public static async Task ProcessPost<TStepId, TData>(SessionEndContext<TStepId, TData> context)
@@ -26,7 +26,7 @@ namespace BBTransaction.Transaction.Operations.Post
             try
             {
                 watch.Start();
-#if NET35
+#if NET35 || NOASYNC
                 currentStep.PostAction(session.StepEnumerator.Data);
 #else
                 if (currentStep.PostAction != null)

@@ -28,7 +28,7 @@ namespace BBTransaction.Step.Validator
             }
 
             if (step.StepAction == null
-#if !NET35
+#if !NET35 && !NOASYNC
                 && step.AsyncStepAction == null
 #endif
                 )
@@ -36,7 +36,7 @@ namespace BBTransaction.Step.Validator
                 throw new NotSupportedException(string.Format("Improper step data for id '{0}': No step action.", step.Id));
             }
 
-#if !NET35
+#if !NET35 && !NOASYNC
             if (step.StepAction != null
                 && step.AsyncStepAction != null)
             {

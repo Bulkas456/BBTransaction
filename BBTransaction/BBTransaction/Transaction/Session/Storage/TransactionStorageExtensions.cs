@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session.Storage.TransactionData;
@@ -20,7 +20,7 @@ namespace BBTransaction.Transaction.Session.Storage
         /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="storage">The storage.</param>
         /// <param name="session">the session.</param>
-#if NET35
+#if NET35 || NOASYNC
         public static void SessionStarted<TStepId, TData>(this ITransactionStorage<TData> storage, ITransactionSession<TStepId, TData> session)
         {
             storage.SessionStarted(new TransactionData<TStepId, TData>(session));
@@ -39,7 +39,7 @@ namespace BBTransaction.Transaction.Session.Storage
         /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="storage">The storage.</param>
         /// <param name="session">the session.</param>
-#if NET35
+#if NET35 || NOASYNC
         public static void StepPrepared<TStepId, TData>(this ITransactionStorage<TData> storage, ITransactionSession<TStepId, TData> session)
         {
             storage.StepPrepared(new TransactionData<TStepId, TData>(session));
@@ -58,7 +58,7 @@ namespace BBTransaction.Transaction.Session.Storage
         /// <typeparam name="TData">The type of the transaction data.</typeparam>
         /// <param name="storage">The storage.</param>
         /// <param name="session">the session.</param>
-#if NET35
+#if NET35 || NOASYNC
         public static void RemoveSession<TStepId, TData>(this ITransactionStorage<TData> storage, ITransactionSession<TStepId, TData> session)
         {
             storage.RemoveSession(new TransactionData<TStepId, TData>(session));

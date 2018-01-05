@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session;
@@ -18,7 +18,7 @@ namespace BBTransaction.Transaction.Operations.Post
     /// </summary>
     internal static class RunPostOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void RunPost<TStepId, TData>(SessionEndContext<TStepId, TData> context)
 #else
         public static async Task RunPost<TStepId, TData>(SessionEndContext<TStepId, TData> context)
@@ -49,7 +49,7 @@ namespace BBTransaction.Transaction.Operations.Post
                     session.StepEnumerator.Increment();
                     continue;
                 }
-#if NET35
+#if NET35 || NOASYNC
                 if (step.PostAction == null)
 #else
                 if (step.PostAction == null
@@ -76,7 +76,7 @@ namespace BBTransaction.Transaction.Operations.Post
                 if (executor != null
                     && executor.ShouldRun)
                 {
-#if NET35
+#if NET35 || NOASYNC
                     executor.Run(() =>
                     {
                         ProcessPostOperation.ProcessPost(context);
@@ -103,7 +103,7 @@ namespace BBTransaction.Transaction.Operations.Post
                 }
                 else
                 { 
-#if NET35
+#if NET35 || NOASYNC
                     ProcessPostOperation.ProcessPost(context);
 #else
                     await ProcessPostOperation.ProcessPost(context);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
@@ -18,7 +18,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
     /// </summary>
     internal static class RunSessionOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void RunSession<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
 #else
         public static async Task RunSession<TStepId, TData>(ITransactionSession<TStepId, TData> session)
@@ -30,7 +30,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
 
                 if (step == null)
                 {
-#if NET35
+#if NET35 || NOASYNC
                     SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                     await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
@@ -42,7 +42,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                     return;
                 }
 
-#if NET35
+#if NET35 || NOASYNC
                 session.PrepareStep();
 #else
                 await session.PrepareStep();
@@ -80,7 +80,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 if (executor != null
                     && executor.ShouldRun)
                 {
-#if NET35
+#if NET35 || NOASYNC
                     executor.Run(() =>
                     {
                         session.ProcessStep();
@@ -107,7 +107,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 }
                 else
                 {
-#if NET35
+#if NET35 || NOASYNC
                     session.ProcessStep();
 #else
                     await session.ProcessStep();

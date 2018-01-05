@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Session.Info;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session.StepEnumerator;
@@ -75,7 +75,7 @@ namespace BBTransaction.Transaction.Session
             get;
         }
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// Waits for a transaction result.
         /// </summary>

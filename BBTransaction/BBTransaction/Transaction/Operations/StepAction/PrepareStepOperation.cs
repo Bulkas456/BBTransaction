@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Context;
@@ -17,7 +17,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
     /// </summary>
     internal static class PrepareStepOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void PrepareStep<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
 #else
         public static async Task PrepareStep<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
@@ -25,7 +25,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
         {
             try
             {
-#if NET35
+#if NET35 || NOASYNC
                 session.TransactionContext.SessionStorage.StepPrepared(session);
 #else
                 await session.TransactionContext.SessionStorage.StepPrepared(session);
@@ -36,7 +36,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", session.TransactionContext.Info.Name);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
                 session.StepEnumerator.Decrement();
-#if NET35
+#if NET35 || NOASYNC
                 RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #else
                 await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
@@ -46,7 +46,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                     CaughtException = e
                 });
 
-#if NET35
+#if NET35 || NOASYNC
                 SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                 await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()

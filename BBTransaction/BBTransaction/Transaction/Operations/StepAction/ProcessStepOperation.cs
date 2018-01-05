@@ -6,7 +6,7 @@ using BBTransaction.Step;
 using BBTransaction.Transaction.Operations;
 using BBTransaction.Transaction.Operations.Undo;
 using BBTransaction.Transaction.Operations.SessionEnd;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session;
@@ -18,7 +18,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
     /// </summary>
     internal static class ProcessStepOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void ProcessStep<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
 #else
         public static async Task ProcessStep<TStepId, TData>(this ITransactionSession<TStepId, TData> session)
@@ -30,7 +30,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
             try
             {
                 watch.Start();
-#if NET35
+#if NET35 || NOASYNC
                 currentStep.StepAction(session.StepEnumerator.Data, session);
 #else
                 if (currentStep.StepAction != null)
@@ -61,7 +61,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 watch.Stop();
                 string info = string.Format("Transaction '{0}': an error occurred during processing step '{1}' with id '{2}', execution time '{3}'.", session.TransactionContext.Info.Name, session.StepEnumerator.CurrentStepIndex, currentStep.Id, watch.Elapsed);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
-#if NET35
+#if NET35 || NOASYNC
                 RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #else
                 await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
@@ -71,7 +71,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                     CaughtException = e
                 });
 
-#if NET35
+#if NET35 || NOASYNC
                 SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                 await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()

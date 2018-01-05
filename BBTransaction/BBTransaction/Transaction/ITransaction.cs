@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
@@ -26,7 +26,7 @@ namespace BBTransaction.Transaction
         /// <returns>The transaction.</returns>
         ITransaction<TStepId, TData> Add(ITransactionStep<TStepId, TData> step);
 
-#if NET35
+#if NET35 || NOASYNC
         /// <summary>
         /// Runs the transaction.
         /// </summary>

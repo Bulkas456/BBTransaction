@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading;
 using System.Threading.Tasks;
 #endif
@@ -25,7 +25,7 @@ namespace BBTransaction.Transaction.Session
         /// </summary>
         private bool started;
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// The wait for result semaphore.
         /// </summary>
@@ -110,7 +110,7 @@ namespace BBTransaction.Transaction.Session
             private set;
         }
 
-#if !NET35
+#if !NET35 && !NOASYNC
         /// <summary>
         /// Waits for a transaction result.
         /// </summary>
@@ -152,7 +152,7 @@ namespace BBTransaction.Transaction.Session
             this.Ended = true;
             this.result = result;
             this.RunSettings.TransactionResultCallback?.Invoke(this.result);
-#if !NET35
+#if !NET35 && !NOASYNC
             this.waitForResultSemaphor.Release();
 #endif
         }

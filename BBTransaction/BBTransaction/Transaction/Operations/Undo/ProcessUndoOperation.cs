@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-#if !NET35
+#if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Step;
@@ -16,7 +16,7 @@ namespace BBTransaction.Transaction.Operations.Undo
     /// </summary>
     internal static class ProcessUndoOperation
     {
-#if NET35
+#if NET35 || NOASYNC
         public static void ProcessUndo<TStepId, TData>(RunUndoContext<TStepId, TData> context)
 #else
         public static async Task ProcessUndo<TStepId, TData>(RunUndoContext<TStepId, TData> context)
@@ -29,7 +29,7 @@ namespace BBTransaction.Transaction.Operations.Undo
             try
             {
                 watch.Start();
-#if NET35
+#if NET35 || NOASYNC
                 currentStep.UndoAction(session.StepEnumerator.Data, session);
 #else
                 if (currentStep.UndoAction != null)
@@ -65,7 +65,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                     currentStep.Id,
                     watch.Elapsed);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
-#if NET35
+#if NET35 || NOASYNC
                 SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                 await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()

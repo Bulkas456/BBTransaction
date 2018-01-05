@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-#if !NET35 
+#if !NET35 && !NOASYNC 
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
@@ -57,7 +57,7 @@ namespace BBTransaction.Transaction
             return this;
         }
 
-#if NET35
+#if NET35 || NOASYNC
         /// <summary>
         /// Runs the transaction.
         /// </summary>
@@ -81,7 +81,7 @@ namespace BBTransaction.Transaction
             settings(runSettings);
             runSettings.Validate(this.context);
 
-#if NET35
+#if NET35 || NOASYNC
             ITransactionSession<TStepId, TData> session = this.CreateSession(runSettings);
             this.Run(session);
 #else
@@ -96,7 +96,7 @@ namespace BBTransaction.Transaction
 #endif
         }
 
-#if NET35
+#if NET35 || NOASYNC
         /// <summary>
         /// Runs the session.
         /// </summary>
@@ -112,7 +112,7 @@ namespace BBTransaction.Transaction
 #endif
         {
             session.Start();
-#if NET35
+#if NET35 || NOASYNC
             this.StartSession(session);
 #else
             await this.StartSession(session);
@@ -123,14 +123,14 @@ namespace BBTransaction.Transaction
                 return;
             }
 
-#if NET35
+#if NET35 || NOASYNC
             RunSessionOperation.RunSession(session);
 #else
             await RunSessionOperation.RunSession(session);
 #endif
         }
 
-#if NET35
+#if NET35 || NOASYNC
         /// <summary>
         /// Starts the session. 
         /// </summary>
@@ -147,7 +147,7 @@ namespace BBTransaction.Transaction
             try
             {
                 this.context.Definition.NotifyTransactionStarted();
-#if NET35
+#if NET35 || NOASYNC
                 this.context.SessionStorage.SessionStarted(session);
 #else
                 await this.context.SessionStorage.SessionStarted(session);
@@ -156,7 +156,7 @@ namespace BBTransaction.Transaction
             catch (Exception e)
             {
                 this.context.Logger.ErrorFormat(e, "An error occurred during starting a session for transaction '{0}'.", this.context.Info.Name);
-#if NET35
+#if NET35 || NOASYNC
                 SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                 await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
@@ -169,7 +169,7 @@ namespace BBTransaction.Transaction
             }
         }
 
-#if NET35
+#if NET35 || NOASYNC
          /// <summary>
         /// Creates a session.
         /// </summary>
@@ -207,7 +207,7 @@ namespace BBTransaction.Transaction
 
                     try
                     {
-#if NET35
+#if NET35 || NOASYNC
                         recoveredData = this.context.SessionStorage.RecoverTransaction();
 #else
                         recoveredData = await this.context.SessionStorage.RecoverTransaction();
@@ -216,7 +216,7 @@ namespace BBTransaction.Transaction
                     catch (Exception e)
                     {
                         this.context.Logger.ErrorFormat(e, "An error occurred during recovering the transaction '{0}'.", this.context.Info.Name);
-#if NET35
+#if NET35 || NOASYNC
                         SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                         await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
@@ -232,7 +232,7 @@ namespace BBTransaction.Transaction
                     if (recoveredData == null)
                     {
                         this.context.Logger.InfoFormat("Transaction '{0}': no session to recover.", this.context.Info.Name);
-#if NET35
+#if NET35 || NOASYNC
                         SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
                         await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
