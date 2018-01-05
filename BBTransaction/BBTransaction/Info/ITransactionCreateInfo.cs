@@ -27,14 +27,6 @@ namespace BBTransaction.Info
         }
 
         /// <summary>
-        /// Gets the step id equality comparer (optional).
-        /// </summary>
-        IEqualityComparer<TStepId> StepIdComparer
-        {
-            get;
-        }
-
-        /// <summary>
         /// Gets the session id creator (optional).
         /// </summary>
         Func<Guid> SessionIdCreator

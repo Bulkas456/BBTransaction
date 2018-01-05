@@ -65,7 +65,6 @@ namespace BBTransaction.Factory
             {
                 Name = context.TransactionInfo.Name,
                 GetCurrentTimeFunction = context.TransactionInfo.GetCurrentTimeFunction ?? new Func<DateTime>(() => DateTime.Now),
-                StepIdComparer = context.TransactionInfo.StepIdComparer ?? EqualityComparer<TStepId>.Default,
                 SessionIdCreator = context.TransactionInfo.SessionIdCreator
             };
         }

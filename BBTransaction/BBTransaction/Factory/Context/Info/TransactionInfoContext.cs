@@ -29,15 +29,6 @@ namespace BBTransaction.Factory.Context.Info
         }
 
         /// <summary>
-        /// Gets or sets the step id equality comparer.
-        /// </summary>
-        public IEqualityComparer<TStepId> StepIdComparer
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the session id creator.
         /// </summary>
         public Func<Guid> SessionIdCreator
