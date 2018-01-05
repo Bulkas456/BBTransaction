@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
 using BBTransaction.Result;
+using BBTransaction.Step;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
 
@@ -19,12 +20,11 @@ namespace BBTransaction.Transaction
     public interface ITransaction<TStepId, TData>
     {
         /// <summary>
-        /// Gets the definition for the transaction.
+        /// Adds a step.
         /// </summary>
-        ITransactionDefinition<TStepId, TData> Definition
-        {
-            get;
-        }
+        /// <param name="step">The step to add.</param>
+        /// <returns>The transaction.</returns>
+        ITransaction<TStepId, TData> Add(ITransactionStep<TStepId, TData> step);
 
 #if NET35
         /// <summary>

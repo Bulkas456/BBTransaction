@@ -95,7 +95,7 @@ namespace BBTransactionTestsNetCore
                     };
                 }
 
-                target.Definition.Add(step);
+                target.Add(step);
             }
             ITransactionResult<object> transactionCallbackResult = null;
 

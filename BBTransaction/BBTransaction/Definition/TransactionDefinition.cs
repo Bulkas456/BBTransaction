@@ -7,14 +7,14 @@ using System.Linq;
 using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Info;
 
-namespace BBTransaction.Definition.Default
+namespace BBTransaction.Definition
 {
     /// <summary>
     /// The standard definition storage for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    internal class DefaultTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinitionStorage<TStepId, TData>
+    internal class TransactionDefinition<TStepId, TData> : ITransactionDefinition<TStepId, TData>
     {
         /// <summary>
         /// The synchronization lock.
@@ -37,10 +37,10 @@ namespace BBTransaction.Definition.Default
         private bool canAddStep = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultTransactionDefinitionStorage"/> class.
+        /// Initializes a new instance of the <see cref="TransactionDefinition<TStepId, TData>"/> class.
         /// </summary>
         /// <param name="info">The info.</param>
-        public DefaultTransactionDefinitionStorage(ITransactionCreateInfo<TStepId> info)
+        public TransactionDefinition(ITransactionCreateInfo<TStepId> info)
         {
             this.info = info;
         }
@@ -63,15 +63,13 @@ namespace BBTransaction.Definition.Default
         /// </summary>
         /// <param name="step">The step to add.</param>
         /// <returns>The definition.</returns>
-        public ITransactionDefinition<TStepId, TData> Add(ITransactionStep<TStepId, TData> step)
+        public void Add(ITransactionStep<TStepId, TData> step)
         {
             lock (this.syncLock)
             {
                 this.AssertCanAddStep();
                 this.steps.Add(step.Validate());
             }
-
-            return this;
         }
 
         /// <summary>

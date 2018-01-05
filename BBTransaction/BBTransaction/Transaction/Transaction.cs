@@ -47,9 +47,15 @@ namespace BBTransaction.Transaction
         }
 
         /// <summary>
-        /// Gets the definition for the transaction.
+        /// Adds a step.
         /// </summary>
-        public ITransactionDefinition<TStepId, TData> Definition => this.context.Definition;
+        /// <param name="step">The step to add.</param>
+        /// <returns>The transaction.</returns>
+        public ITransaction<TStepId, TData> Add(ITransactionStep<TStepId, TData> step)
+        {
+            this.context.Definition.Add(step);
+            return this;
+        }
 
 #if NET35
         /// <summary>

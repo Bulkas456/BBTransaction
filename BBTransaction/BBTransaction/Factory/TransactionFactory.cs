@@ -8,7 +8,6 @@ using BBTransaction.Transaction;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Info.Validator;
 using BBTransaction.Definition;
-using BBTransaction.Definition.Default;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Transaction.Session.Storage;
 using BBTransaction.Transaction.Session.Storage.Default;
@@ -41,7 +40,7 @@ namespace BBTransaction.Factory
                 Logger = logger,
                 Info = info
             };
-            ITransactionDefinitionStorage<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(partContext);
+            ITransactionDefinition<TStepId, TData> definition = this.CreateDefinition<TStepId, TData>(partContext);
             ITransactionStorage<TData> stateStorage = this.CreateStateStorage<TStepId, TData>(partContext);
 
             TransactionContext<TStepId, TData> transactionContext = new TransactionContext<TStepId, TData>()
@@ -71,9 +70,9 @@ namespace BBTransaction.Factory
             };
         }
 
-        protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
+        protected virtual ITransactionDefinition<TStepId, TData> CreateDefinition<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            return new DefaultTransactionDefinitionStorage<TStepId, TData>(context.Info);
+            return new TransactionDefinition<TStepId, TData>(context.Info);
         }
 
         protected virtual ITransactionStorage<TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)

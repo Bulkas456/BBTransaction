@@ -16,7 +16,18 @@ namespace BBTransaction.Definition
         /// Adds a step.
         /// </summary>
         /// <param name="step">The step to add.</param>
-        /// <returns>The definition.</returns>
-        ITransactionDefinition<TStepId, TData> Add(ITransactionStep<TStepId, TData> step);
+        void Add(ITransactionStep<TStepId, TData> step);
+
+        /// <summary>
+        /// Returns a step details for a step index.
+        /// </summary>
+        /// <param name="stepIndex">The step index.</param>
+        /// <returns>The step details for the step index.</returns>
+        ITransactionStep<TStepId, TData> GetByIndex(int stepIndex);
+
+        /// <summary>
+        /// Notifies the definition that a transaction was started.
+        /// </summary>
+        void NotifyTransactionStarted();
     }
 }

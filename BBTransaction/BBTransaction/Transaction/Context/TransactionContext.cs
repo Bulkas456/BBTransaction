@@ -18,7 +18,7 @@ namespace BBTransaction.Transaction.Context
         /// <summary>
         /// Gets the definition for the transaction.
         /// </summary>
-        public ITransactionDefinitionStorage<TStepId, TData> Definition
+        public ITransactionDefinition<TStepId, TData> Definition
         {
             get;
             set;
