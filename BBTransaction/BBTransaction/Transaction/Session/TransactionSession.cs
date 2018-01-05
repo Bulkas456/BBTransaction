@@ -166,7 +166,9 @@ namespace BBTransaction.Transaction.Session
             this.started = true;
             this.Recovered = true;
             this.StepEnumeratorInstance.CurrentStepIndex = recoveredData.CurrentStepIndex;
-            this.StepEnumeratorInstance.Data = recoveredData.Data;
+            this.StepEnumeratorInstance.Data = this.RunSettings.DontRecoverTransactionData()
+                                                 ? this.RunSettings.Data
+                                                 : recoveredData.Data;
             this.SessionId = recoveredData.SessionId;
             this.StartTimestamp = recoveredData.StartTimestamp;
         }

@@ -18,6 +18,11 @@ namespace BBTransaction.Transaction.Settings
         /// <summary>
         /// Time execution for each step method will be written to log.
         /// </summary>
-        LogTimeExecutionForAllSteps = 1
+        LogTimeExecutionForAllSteps = 1,
+
+        /// <summary>
+        /// A transaction data wouldn't be recovered and will be taken from the run settings.
+        /// </summary>
+        DontRecoverTransactionData = 2
     }
 }
