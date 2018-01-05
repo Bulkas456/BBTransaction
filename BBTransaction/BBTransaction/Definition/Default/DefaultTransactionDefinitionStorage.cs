@@ -4,17 +4,17 @@ using System.Text;
 using BBTransaction.Step;
 using BBTransaction.Step.Validator;
 using System.Linq;
-using BBTransaction.Definition.Standard.Context;
 using BBTransaction.Transaction.Session.StepEnumerator;
+using BBTransaction.Info;
 
-namespace BBTransaction.Definition.Standard
+namespace BBTransaction.Definition.Default
 {
     /// <summary>
     /// The standard definition storage for the transaction.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    internal class StandardTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinitionStorage<TStepId, TData>
+    internal class DefaultTransactionDefinitionStorage<TStepId, TData> : ITransactionDefinitionStorage<TStepId, TData>
     {
         /// <summary>
         /// The synchronization lock.
@@ -27,9 +27,9 @@ namespace BBTransaction.Definition.Standard
         private readonly List<StepDetails<TStepId, TData>> steps = new List<StepDetails<TStepId, TData>>();
 
         /// <summary>
-        /// The context.
+        /// The info.
         /// </summary>
-        private readonly ITransactionDefinitionContext<TStepId> context;
+        private readonly ITransactionCreateInfo<TStepId> info;
 
         /// <summary>
         /// A value indicating whether a new steps can be added.
@@ -37,12 +37,12 @@ namespace BBTransaction.Definition.Standard
         private bool canAddStep = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref=""/>class.
+        /// Initializes a new instance of the <see cref="DefaultTransactionDefinitionStorage"/> class.
         /// </summary>
-        /// <param name="context">The context.</param>
-        public StandardTransactionDefinitionStorage(ITransactionDefinitionContext<TStepId> context)
+        /// <param name="info">The info.</param>
+        public DefaultTransactionDefinitionStorage(ITransactionCreateInfo<TStepId> info)
         {
-            this.context = context;
+            this.info = info;
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace BBTransaction.Definition.Standard
         {
             if (!this.canAddStep)
             {
-                throw new InvalidOperationException(string.Format("Transaction '{0}': cannot add a step when a transaction was started.", this.context.Info.Name));
+                throw new InvalidOperationException(string.Format("Transaction '{0}': cannot add a step when a transaction was started.", this.info.Name));
             }
         }
     }

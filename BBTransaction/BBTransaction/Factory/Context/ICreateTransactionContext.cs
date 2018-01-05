@@ -19,15 +19,6 @@ namespace BBTransaction.Factory.Context
     public interface ICreateTransactionContext<TStepId, TData>
     {
         /// <summary>
-        /// Gets or sets the definition creator for the transaction (optional).
-        /// </summary>
-        Func<ICreatePartContext<TStepId, TData>, ITransactionDefinitionStorage<TStepId, TData>> DefinitionCreator
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the transaction storage creator (optional).
         /// </summary>
         Func<ICreatePartContext<TStepId, TData>, ITransactionStorage<TData>> TransactionStorageCreator

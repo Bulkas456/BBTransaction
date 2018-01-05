@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Step;
 
-namespace BBTransaction.Definition.Standard
+namespace BBTransaction.Definition.Default
 {
     /// <summary>
     /// The details for a transaction step.

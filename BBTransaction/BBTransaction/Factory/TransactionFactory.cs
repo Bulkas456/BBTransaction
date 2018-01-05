@@ -8,8 +8,7 @@ using BBTransaction.Transaction;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Info.Validator;
 using BBTransaction.Definition;
-using BBTransaction.Definition.Standard;
-using BBTransaction.Definition.Standard.Context;
+using BBTransaction.Definition.Default;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Transaction.Session.Storage;
 using BBTransaction.Transaction.Session.Storage.Default;
@@ -74,19 +73,7 @@ namespace BBTransaction.Factory
 
         protected virtual ITransactionDefinitionStorage<TStepId, TData> CreateDefinition<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            ITransactionDefinitionStorage<TStepId, TData> definition = context.Context.DefinitionCreator == null
-                    ? new StandardTransactionDefinitionStorage<TStepId, TData>(new TransactionDefinitionContext<TStepId>()
-                    {
-                        Info = context.Info
-                    })
-                    : context.Context.DefinitionCreator(context);
-
-            if (definition == null)
-            {
-                throw new InvalidOperationException(string.Format("Transaction '{0}': no definiton created from definition creator.", context.Info.Name));
-            }
-
-            return definition;
+            return new DefaultTransactionDefinitionStorage<TStepId, TData>(context.Info);
         }
 
         protected virtual ITransactionStorage<TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
