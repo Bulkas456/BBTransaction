@@ -46,7 +46,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                 ITransactionSession<TStepId, TData> session = context.Session;
 
                 if (session.Recovered
-                    && !step.Settings.RunOnRecovered())
+                    && step.Settings.NotRunOnRecovered())
                 {
                     session.TransactionContext
                            .Logger

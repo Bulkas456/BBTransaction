@@ -10,13 +10,13 @@ namespace BBTransaction.Step.Settings
     public static class StepSettingsExtensions
     {
         /// <summary>
-        /// Checks if the settings contain the 'RunOnRecovered' setting.
+        /// Checks if the settings contain the 'NotRunOnRecovered' setting.
         /// </summary>
         /// <param name="settings">The settings.</param>
-        /// <returns><c>True</c> if the settings contain the 'RunOnRecovered' setting, otherwise <c>false</c>.</returns>
-        public static bool RunOnRecovered(this StepSettings settings)
+        /// <returns><c>True</c> if the settings contain the 'NotRunOnRecovered' setting, otherwise <c>false</c>.</returns>
+        public static bool NotRunOnRecovered(this StepSettings settings)
         {
-            return (settings & StepSettings.RunOnRecovered) != 0;
+            return (settings & StepSettings.NotRunOnRecovered) != 0;
         }
 
         /// <summary>

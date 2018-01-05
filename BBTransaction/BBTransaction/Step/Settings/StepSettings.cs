@@ -16,9 +16,9 @@ namespace BBTransaction.Step.Settings
         None = 0,
 
         /// <summary>
-        /// The step should be invoked when the transaction was recovered. 
+        /// The step should not be invoked when the transaction was recovered. 
         /// </summary>
-        RunOnRecovered = 1,
+        NotRunOnRecovered = 1,
 
         /// <summary>
         /// The undo method for the step should be invoked when the step was recovered and is the first step to run.
@@ -31,7 +31,7 @@ namespace BBTransaction.Step.Settings
         LogExecutionTime = 4,
 
         /// <summary>
-        /// A step executor for the step action will be used for the undo and post actions.
+        /// A step executor for the step action will be used for the undo and post actions if no executor was defined for the actions.
         /// </summary>
         SameExecutorForAllActions = 8
     }

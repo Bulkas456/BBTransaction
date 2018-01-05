@@ -54,7 +54,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                 }
 
                 if (session.Recovered
-                    && !step.Settings.RunOnRecovered())
+                    && step.Settings.NotRunOnRecovered())
                 {
                     session.TransactionContext
                            .Logger
