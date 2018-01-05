@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransaction", "BBTransaction\BBTransaction.csproj", "{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransactionTestsNetCore", "BBTransactionTests\BBTransactionTestsNetCore.csproj", "{912879C5-5496-4EB0-9151-97A49030D9C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTransactionTestsWithAsync", "BBTransactionTestsWithAsync\BBTransactionTestsWithAsync.csproj", "{5EDF5652-0D18-454E-9F36-5EF25036B2E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBTransactionTestsNetFramework", "BBTransactionTestsNetFramework\BBTransactionTestsNetFramework.csproj", "{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBTransactionTestsWithoutAsync", "BBTransactionTestsWithoutAsync\BBTransactionTestsWithoutAsync.csproj", "{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +19,10 @@ Global
 		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D1BA481-9ACF-4EBD-B9F5-ADCB51087A1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{912879C5-5496-4EB0-9151-97A49030D9C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{912879C5-5496-4EB0-9151-97A49030D9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{912879C5-5496-4EB0-9151-97A49030D9C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EDF5652-0D18-454E-9F36-5EF25036B2E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EDF5652-0D18-454E-9F36-5EF25036B2E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EDF5652-0D18-454E-9F36-5EF25036B2E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EDF5652-0D18-454E-9F36-5EF25036B2E6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CC870F6-94A9-4E82-8B30-003CD4EABD9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
