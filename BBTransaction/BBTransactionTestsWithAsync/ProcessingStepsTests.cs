@@ -14,6 +14,7 @@ using Moq;
 using BBTransaction.Step.Executor;
 using System.Threading;
 using System.Linq;
+using BBTransactionTestsWithAsync;
 
 namespace BBTransactionTestsNetCore
 {
@@ -135,12 +136,6 @@ namespace BBTransactionTestsNetCore
         public async Task WhenRunTransactionWithStepExecutors_ShouldRunAllStepsProperly()
         {
             // Arrange
-            int transactionRunThreadId = Thread.CurrentThread.ManagedThreadId;
-            int step1StepActionThreadId = 0;
-            int step2PostActionThreadId = 0;
-            int step3StepActionThreadId = 0;
-            int step3PostActionThreadId = 0;
-            int step4StepActionThreadId = 0;
             object transactionData = new object();
             List<string> runStepActions = new List<string>();
             List<string> runUndoActions = new List<string>();
@@ -148,26 +143,32 @@ namespace BBTransactionTestsNetCore
             List<int> stepActionThreadId = new List<int>();
             List<int> postActionThreadId = new List<int>();
             int transactionCallbackThreadId = 0;
-            Dictionary<int, Mock<IStepExecutor>> stepExecutors = new Dictionary<int, Mock<IStepExecutor>>()
+            Dictionary<int, TestExecutor> stepExecutors = new Dictionary<int, TestExecutor>()
             {
                 { 0, null },
-                { 1, this.CreateStepExecutorMock(id => step1StepActionThreadId = id) },
+                { 1, new TestExecutor() { ShouldRun = true } },
                 { 2, null },
-                { 3, this.CreateStepExecutorMock(id => step3StepActionThreadId = id) },
-                { 4, this.CreateStepExecutorMock(id => step4StepActionThreadId = id) },
+                { 3, new TestExecutor() { ShouldRun = true } },
+                { 4, new TestExecutor() { ShouldRun = true }},
                 { 5, null },
                 { 6, null }
             };
-            Dictionary<int, Mock<IStepExecutor>> postExecutors = new Dictionary<int, Mock<IStepExecutor>>()
+            Dictionary<int, TestExecutor> postExecutors = new Dictionary<int, TestExecutor>()
             {
                 { 0, null },
                 { 1, null },
-                { 2, this.CreateStepExecutorMock(id => step2PostActionThreadId = id) },
-                { 3, this.CreateStepExecutorMock(id => step3PostActionThreadId = id) },
+                { 2, new TestExecutor() { ShouldRun = true } },
+                { 3, new TestExecutor() { ShouldRun = true } },
                 { 4, null },
                 { 5, null },
                 { 6, null }
             };
+            int transactionRunThreadId = Thread.CurrentThread.ManagedThreadId;
+            int step1StepActionThreadId = stepExecutors[1].ThreadId;
+            int step2PostActionThreadId = postExecutors[2].ThreadId;
+            int step3StepActionThreadId = stepExecutors[3].ThreadId;
+            int step3PostActionThreadId = postExecutors[3].ThreadId;
+            int step4StepActionThreadId = stepExecutors[4].ThreadId;
             ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
             {
                 options.TransactionInfo.Name = "test transaction";
@@ -181,10 +182,10 @@ namespace BBTransactionTestsNetCore
                     Id = index,
                     StepActionExecutor = stepExecutors[i] == null
                                            ? null
-                                           : stepExecutors[i].Object,
+                                           : stepExecutors[i],
                     PostActionExecutor = postExecutors[i] == null
                                            ? null
-                                           : postExecutors[i].Object
+                                           : postExecutors[i]
                 };
 
                 if (i == 3 
@@ -278,6 +279,11 @@ namespace BBTransactionTestsNetCore
             });
 
             // Assert
+            foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
+            {
+                executor.Dispose();
+            }
+
             result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
@@ -285,10 +291,10 @@ namespace BBTransactionTestsNetCore
             result.Recovered.Should().BeFalse();
             result.Success.Should().BeTrue();
 
-            foreach (Mock<IStepExecutor> executors in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
+            foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
             {
-                executors.VerifyGet(x => x.ShouldRun, Times.Once);
-                executors.Verify(x => x.Run(It.IsNotNull<Func<Task>>()), Times.Once);
+                executor.Mock.VerifyGet(x => x.ShouldRun, Times.Once);
+                executor.Mock.Verify(x => x.Run(It.IsNotNull<Func<Task>>()), Times.Once);
             }
 
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5", "6" });
