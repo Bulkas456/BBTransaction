@@ -57,6 +57,76 @@ namespace BBTransaction.Transaction
             return this;
         }
 
+        /// <summary>
+        /// Inserts a step at an index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="step">The step.</param>
+        public ITransaction<TStepId, TData> InsertAtIndex(int index, ITransactionStep<TStepId, TData> step)
+        {
+            this.context.Definition.InsertAtIndex(index, step);
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a collection of steps at an index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="steps">The collection of step.</param>
+        public ITransaction<TStepId, TData> InsertAtIndex(int index, IEnumerable<ITransactionStep<TStepId, TData>> steps)
+        {
+            this.context.Definition.InsertAtIndex(index, steps);
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a step before a specific step id.
+        /// </summary>
+        /// <param name="id">The step id.</param>
+        /// <param name="step">The step.</param>
+        /// <param name="idComparer">The step id comparer.</param>
+        public ITransaction<TStepId, TData> InsertBefore(TStepId id, ITransactionStep<TStepId, TData> step, IEqualityComparer<TStepId> idComparer = null)
+        {
+            this.context.Definition.InsertBefore(id, step, idComparer);
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a collection of steps before a specific step id.
+        /// </summary>
+        /// <param name="id">The step id.</param>
+        /// <param name="steps">The collection of steps.</param>
+        /// <param name="idComparer">The step id comparer.</param>
+        public ITransaction<TStepId, TData> InsertBefore(TStepId id, IEnumerable<ITransactionStep<TStepId, TData>> steps, IEqualityComparer<TStepId> idComparer = null)
+        {
+            this.context.Definition.InsertBefore(id, steps, idComparer);
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a step after a specific step id.
+        /// </summary>
+        /// <param name="id">The step id.</param>
+        /// <param name="step">The comparer.</param>
+        /// <param name="idComparer">The step id comparer.</param>
+        public ITransaction<TStepId, TData> InsertAfter(TStepId id, ITransactionStep<TStepId, TData> step, IEqualityComparer<TStepId> idComparer = null)
+        {
+            this.context.Definition.InsertAfter(id, step, idComparer);
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a collection of steps after a specific step id.
+        /// </summary>
+        /// <param name="id">The step id.</param>
+        /// <param name="step">The collection of steps.</param>
+        /// <param name="idComparer">The step id comparer.</param>
+        public ITransaction<TStepId, TData> InsertAfter(TStepId id, IEnumerable<ITransactionStep<TStepId, TData>> steps, IEqualityComparer<TStepId> idComparer = null)
+        {
+            this.context.Definition.InsertAfter(id, steps, idComparer);
+            return this;
+        }
+
 #if NET35 || NOASYNC
         /// <summary>
         /// Runs the transaction.
