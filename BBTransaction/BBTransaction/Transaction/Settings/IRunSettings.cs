@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BBTransaction.Executor;
 using BBTransaction.Result;
 using BBTransaction.Transaction.TransactionResult;
 
@@ -40,7 +41,14 @@ namespace BBTransaction.Transaction.Settings
             set;
         }
 
-
+        /// <summary>
+        /// Gets or sets the executor for the callback for the transaction result (optional).
+        /// </summary>
+        IExecutor TransactionResultCallbackExecutor
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the additional settings.

@@ -10,6 +10,7 @@ using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
+using BBTransaction.Executor;
 
 namespace BBTransaction.Transaction.Session
 {
@@ -151,10 +152,32 @@ namespace BBTransaction.Transaction.Session
 
             this.Ended = true;
             this.result = result;
-            this.RunSettings.TransactionResultCallback?.Invoke(this.result);
-#if !NET35 && !NOASYNC
-            this.waitForResultSemaphor.Release();
+            IExecutor callbackExecutor = this.RunSettings.TransactionResultCallbackExecutor;
+
+            if (callbackExecutor != null
+                && callbackExecutor.ShouldRun)
+            {
+#if NET35 || NOASYNC
+                callbackExecutor.Run(() => 
+#else
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+                callbackExecutor.Run(async () =>
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 #endif
+                {
+                    this.RunSettings.TransactionResultCallback?.Invoke(this.result);
+#if !NET35 && !NOASYNC
+                    this.waitForResultSemaphor.Release();
+#endif
+                });
+            }
+            else
+            {
+                this.RunSettings.TransactionResultCallback?.Invoke(this.result);
+#if !NET35 && !NOASYNC
+                this.waitForResultSemaphor.Release();
+#endif
+            }
         }
 
         /// <summary>
