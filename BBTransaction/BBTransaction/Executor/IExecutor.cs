@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 
-namespace BBTransaction.Step.Executor
+namespace BBTransaction.Executor
 {
     /// <summary>
-    /// The step executor.
+    /// The executor.
     /// </summary>
-    public interface IStepExecutor
+    public interface IExecutor
     {
         /// <summary>
-        /// Gets a value indicating whether the step processing action should be invoked on the executor.
+        /// Gets a value indicating whether the action should be invoked on the executor.
         /// </summary>
         bool ShouldRun
         {
@@ -21,7 +21,7 @@ namespace BBTransaction.Step.Executor
         }
 
         /// <summary>
-        /// Runs the step processing action.
+        /// Runs the action.
         /// </summary>
         /// <param name="action">The action.</param>
 #if NET35 || NOASYNC

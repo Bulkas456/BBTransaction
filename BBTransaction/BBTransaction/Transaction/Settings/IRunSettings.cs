@@ -32,15 +32,6 @@ namespace BBTransaction.Transaction.Settings
         }
 
         /// <summary>
-        /// Gets or sets the first step id to run (optional, ignored if mode not set to RunFromStep).
-        /// </summary>
-        TStepId FirstStepId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the callback for the transaction result (optional).
         /// </summary>
         Action<ITransactionResult<TData>> TransactionResultCallback
@@ -48,6 +39,8 @@ namespace BBTransaction.Transaction.Settings
             get;
             set;
         }
+
+
 
         /// <summary>
         /// Gets or sets the additional settings.

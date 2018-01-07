@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step;
 using BBTransaction.Definition;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Operations.SessionEnd;
 
@@ -67,7 +67,7 @@ namespace BBTransaction.Transaction.Operations.Post
                     continue;
                 }
 
-                IStepExecutor executor = step.PostActionExecutor != null
+                IExecutor executor = step.PostActionExecutor != null
                                             ? step.PostActionExecutor
                                             : step.Settings.SameExecutorForAllActions()
                                                 ? step.StepActionExecutor

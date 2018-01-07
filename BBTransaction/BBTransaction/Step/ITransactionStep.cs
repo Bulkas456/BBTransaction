@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Info;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Session.Info;
 
@@ -55,7 +55,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets an executor for the step action (optional).
         /// </summary>
-        IStepExecutor StepActionExecutor
+        IExecutor StepActionExecutor
         {
             get;
         }
@@ -81,7 +81,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets an executor for the undo action (optional).
         /// </summary>
-        IStepExecutor UndoActionExecutor
+        IExecutor UndoActionExecutor
         {
             get;
         }
@@ -107,7 +107,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets an executor for the post action (optional).
         /// </summary>
-        IStepExecutor PostActionExecutor
+        IExecutor PostActionExecutor
         {
             get;
         }

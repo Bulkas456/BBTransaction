@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 using Moq;
 
 namespace BBTransactionTestsWithoutAsync
 {
-    internal class TestExecutor : IStepExecutor,
+    internal class TestExecutor : IExecutor,
                                   IDisposable
     {
         private readonly BlockingCollection<Action> actions = new BlockingCollection<Action>();
@@ -56,10 +56,10 @@ namespace BBTransactionTestsWithoutAsync
             private set;
         }
 
-        public Mock<IStepExecutor> Mock
+        public Mock<IExecutor> Mock
         {
             get;
-        } = new Mock<IStepExecutor>();
+        } = new Mock<IExecutor>();
 
         public bool ShouldRun
         {

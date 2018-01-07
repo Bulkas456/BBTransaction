@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Operations.SessionEnd;
@@ -75,7 +75,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
 
-                IStepExecutor executor = session.StepEnumerator.CurrentStep.StepActionExecutor;
+                IExecutor executor = session.StepEnumerator.CurrentStep.StepActionExecutor;
 
                 if (executor != null
                     && executor.ShouldRun)

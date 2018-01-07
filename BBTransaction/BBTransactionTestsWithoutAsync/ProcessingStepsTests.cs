@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using BBTransaction.Transaction.Settings;
 using Moq;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 using System.Threading;
 using System.Linq;
 using BBTransaction.Step.Settings;

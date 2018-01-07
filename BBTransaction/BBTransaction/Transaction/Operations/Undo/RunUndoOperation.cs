@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 #endif
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
-using BBTransaction.Step.Executor;
+using BBTransaction.Executor;
 
 namespace BBTransaction.Transaction.Operations.Undo
 {
@@ -76,7 +76,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                     continue;
                 }
 
-                IStepExecutor executor = step.UndoActionExecutor != null
+                IExecutor executor = step.UndoActionExecutor != null
                                             ? step.UndoActionExecutor
                                             : step.Settings.SameExecutorForAllActions()
                                                 ? step.StepActionExecutor
