@@ -10,7 +10,7 @@ using BBTransaction.Step;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Transaction.Settings;
 
-namespace BBTransactionTestsNetCore
+namespace BBTransactionTestsWithAsync
 {
     [TestClass]
     public class ProcessingUndoTests
