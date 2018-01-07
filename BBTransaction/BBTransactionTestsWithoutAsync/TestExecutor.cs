@@ -81,6 +81,17 @@ namespace BBTransactionTestsWithoutAsync
             this.actions.Add(action);
         }
 
+        public void Verify(Func<Times> shouldRunTimes, Func<Times> runTimes)
+        {
+            this.Verify(shouldRunTimes(), runTimes());
+        }
+
+        public void Verify(Times shouldRunTimes, Times runTimes)
+        {
+            this.Mock.VerifyGet(x => x.ShouldRun, shouldRunTimes);
+            this.Mock.Verify(x => x.Run(It.IsNotNull<Action>()), runTimes);
+        }
+
         public void Dispose()
         {
             this.Dispose(true);

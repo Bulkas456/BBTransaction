@@ -216,8 +216,7 @@ namespace BBTransactionTestsWithoutAsync
 
             foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
             {
-                executor.Mock.VerifyGet(x => x.ShouldRun, Times.Once);
-                executor.Mock.Verify(x => x.Run(It.IsNotNull<Action>()), Times.Once);
+                executor.Verify(Times.Once, Times.Once);
             }
 
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5", "6" });
@@ -283,6 +282,7 @@ namespace BBTransactionTestsWithoutAsync
             int step3StepActionThreadId = stepExecutors[3].ThreadId;
             int step3PostActionThreadId = postExecutors[3].ThreadId;
             int step4StepActionThreadId = stepExecutors[4].ThreadId;
+            TestExecutor callbackExecutor = new TestExecutor() { ShouldRun = true };
             ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
             {
                 options.TransactionInfo.Name = "test transaction";
@@ -354,12 +354,15 @@ namespace BBTransactionTestsWithoutAsync
                         result = callbackResult;
                         transactionEndResetEvent.Set();
                     };
+                    settings.TransactionResultCallbackExecutor = callbackExecutor;
                 });
                 transactionEndResetEvent.WaitOne();
             }
 
             // Assert
-                foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
+            callbackExecutor.Dispose();
+
+            foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
             {
                 executor.Dispose();
             }
@@ -372,11 +375,11 @@ namespace BBTransactionTestsWithoutAsync
             TestExecutor sharedExecutor = stepExecutors[1];
             sharedExecutor.Mock.VerifyGet(x => x.ShouldRun, Times.Exactly(2));
             sharedExecutor.Mock.Verify(x => x.Run(It.IsNotNull<Action>()), Times.Exactly(2));
+            callbackExecutor.Verify(Times.Once, Times.Once);
 
             foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null && x != sharedExecutor))
             {
-                executor.Mock.VerifyGet(x => x.ShouldRun, Times.Once);
-                executor.Mock.Verify(x => x.Run(It.IsNotNull<Action>()), Times.Once);
+                executor.Verify(Times.Once, Times.Once);
             }
 
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5", "6" });
@@ -402,7 +405,7 @@ namespace BBTransactionTestsWithoutAsync
                 /*step 5*/ step3PostActionThreadId,
                 /*step 6*/ step3PostActionThreadId
             });
-            transactionCallbackThreadId.Should().Be(step3PostActionThreadId);
+            transactionCallbackThreadId.Should().Be(callbackExecutor.ThreadId);
         }
     }
 }
