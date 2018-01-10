@@ -71,6 +71,13 @@ namespace BBTransaction.Step.Adapter
         private readonly Func<TDataTo, Task> asyncPostAction;
 #endif
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionStepAdapter<TStepIdTo, TDataTo, TStepIdFrom, TDataFrom>"/>class.
+        /// </summary>
+        /// <param name="original">The original step.</param>
+        /// <param name="stepConverter">The step converter.</param>
+        /// <param name="reverseStepConverter">The reversed step converter.</param>
+        /// <param name="dataConverter">The data converter.</param>
         public TransactionStepAdapter(
             ITransactionStep<TStepIdFrom, TDataFrom> original,
             Func<TStepIdFrom, TStepIdTo> stepConverter,
