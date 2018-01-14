@@ -17,7 +17,12 @@ namespace BBTransaction.Transaction.Operations.SessionEnd
                 return;
             }
 
-            TransactionResult<TStepId, TData> result = new TransactionResult<TStepId, TData>(context.Session, context.CaughtExceptions);
+            TransactionResult<TStepId, TData> result = new TransactionResult<TStepId, TData>()
+            {
+                Session = context.Session,
+                Result = context.Result,
+                Errors = context.CaughtExceptions
+            };
             context.Session.TransactionContext.Logger.InfoFormat(
                 "Transaction '{0}' ended with result '{1}'",
                 context.Session.TransactionContext.Info.Name,

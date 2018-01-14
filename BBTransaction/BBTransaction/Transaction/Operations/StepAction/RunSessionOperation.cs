@@ -10,6 +10,7 @@ using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Operations.SessionEnd;
 using BBTransaction.Step;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Operations.StepAction
 {
@@ -37,7 +38,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
 #endif
                     {
                         Session = session,
-                        RunPostActions = true
+                        RunPostActions = true,
+                        Result = ResultType.Success
                     });
                     return;
                 }

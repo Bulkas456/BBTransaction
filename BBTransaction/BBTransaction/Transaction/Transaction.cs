@@ -232,7 +232,8 @@ namespace BBTransaction.Transaction
 #endif
                 {
                     Session = session,
-                    RunPostActions = false
+                    RunPostActions = false,
+                    Result = ResultType.Failed
                 }
                 .AddError(e));
             }
@@ -293,6 +294,7 @@ namespace BBTransaction.Transaction
                         {
                             Session = session,
                             RunPostActions = false,
+                            Result = ResultType.Failed
                         }
                         .AddError(e));
                         return session;
@@ -308,7 +310,7 @@ namespace BBTransaction.Transaction
 #endif
                         {
                             Session = session,
-                            AdditionalInfo = "No session to recover.",
+                            Result = ResultType.NoTransactionToRecover,
                             RunPostActions = false
                         });
                         return session;

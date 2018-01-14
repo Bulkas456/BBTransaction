@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Step.Settings;
 using BBTransaction.Executor;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Operations.Undo
 {
@@ -37,7 +38,8 @@ namespace BBTransaction.Transaction.Operations.Undo
 #endif
                     {
                         RunPostActions = false,
-                        Session = context.Session
+                        Session = context.Session,
+                        Result = ResultType.Failed
                     }
                     .AddError(context.CaughtException));
                     return;

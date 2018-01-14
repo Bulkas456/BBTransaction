@@ -9,6 +9,7 @@ using BBTransaction.Transaction.Operations.SessionEnd;
 using BBTransaction.Transaction.Operations.Undo;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.Session.Storage;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Operations.StepAction
 {
@@ -53,7 +54,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
 #endif
                 {
                     Session = session,
-                    RunPostActions = false
+                    RunPostActions = false,
+                    Result = ResultType.Failed
                 }
                 .AddError(e));
             }

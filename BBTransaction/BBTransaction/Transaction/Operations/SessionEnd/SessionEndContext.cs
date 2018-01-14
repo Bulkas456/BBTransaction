@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Session;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Operations.SessionEnd
 {
@@ -41,9 +42,9 @@ namespace BBTransaction.Transaction.Operations.SessionEnd
         public IEnumerable<Exception> CaughtExceptions => this.caughtExceptions;
 
         /// <summary>
-        /// Gets or sets the additional info.
+        /// Gets or sets the transaction result.
         /// </summary>
-        public string AdditionalInfo
+        public ResultType Result
         {
             get;
             set;

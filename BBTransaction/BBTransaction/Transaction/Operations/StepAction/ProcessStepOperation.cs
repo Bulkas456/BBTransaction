@@ -6,6 +6,7 @@ using BBTransaction.Step;
 using BBTransaction.Transaction.Operations;
 using BBTransaction.Transaction.Operations.Undo;
 using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Transaction.TransactionResult;
 #if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
@@ -78,7 +79,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
 #endif
                 {
                     Session = session,
-                    RunPostActions = false
+                    RunPostActions = false,
+                    Result = ResultType.Failed
                 }
                 .AddError(e));
             }

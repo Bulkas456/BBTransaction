@@ -126,7 +126,7 @@ namespace BBTransactionTestsWithAsync
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[] { testException });
             result.Recovered.Should().BeFalse();
-            result.Result.Should().Be(ResultType.Success);
+            result.Result.Should().Be(ResultType.Failed);
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
@@ -244,7 +244,7 @@ namespace BBTransactionTestsWithAsync
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[] { testException });
             result.Recovered.Should().BeFalse();
-            result.Result.Should().Be(ResultType.Success);
+            result.Result.Should().Be(ResultType.Failed);
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
