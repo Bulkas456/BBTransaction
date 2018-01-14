@@ -86,9 +86,8 @@ namespace BBTransactionTestsWithoutAsync
             // Assert
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[] { testException });
-            result.Info.Should().Be("An error occurred.");
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeFalse();
+            result.Result.Should().Be(ResultType.Success);
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);

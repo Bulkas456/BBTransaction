@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
-using BBTransaction.Result;
 using BBTransaction.Transaction.Context;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.Settings.Validator;

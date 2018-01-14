@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 using BBTransaction.Definition;
-using BBTransaction.Result;
 using BBTransaction.Step;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;

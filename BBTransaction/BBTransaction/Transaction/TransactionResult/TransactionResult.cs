@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BBTransaction.Result;
 using BBTransaction.Transaction.Session;
 
 namespace BBTransaction.Transaction.TransactionResult
@@ -11,9 +10,13 @@ namespace BBTransaction.Transaction.TransactionResult
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    internal class TransactionResult<TStepId, TData> : OperationResult,
-                                                       ITransactionResult<TData>
+    internal class TransactionResult<TStepId, TData> : ITransactionResult<TData>
     {
+        /// <summary>
+        /// The collecion of errors for the operation result.
+        /// </summary>
+        private readonly List<Exception> errors = new List<Exception>();
+
         /// <summary>
         /// The transaction state.
         /// </summary>
@@ -35,17 +38,23 @@ namespace BBTransaction.Transaction.TransactionResult
                     this.Add(error);
                 }
             }
+        }
 
-            if (!this.Success)
+        /// <summary>
+        /// Gets the collection of exceptions for the operation.
+        /// </summary>
+        public IEnumerable<Exception> Errors
+        {
+            get
             {
-                this.Info = "An error occurred.";
+                return this.errors;
             }
         }
 
         /// <summary>
-        /// TODO
+        /// Gets a transaction result.
         /// </summary>
-        public object Result
+        public ResultType Result
         {
             get;
             set;
@@ -89,15 +98,6 @@ namespace BBTransaction.Transaction.TransactionResult
         }
 
         /// <summary>
-        /// Gets an additional info about the result.
-        /// </summary>
-        public string Info
-        {
-            get;
-            set;
-        } = string.Empty;
-
-        /// <summary>
         /// Gets a value indicating whether the transaction result has a transaction state.
         /// </summary>
         public bool HasState
@@ -106,6 +106,37 @@ namespace BBTransaction.Transaction.TransactionResult
             {
                 return this.session != null;
             }
+        }
+
+        /// <summary>
+        /// Adds an error to the operation result.
+        /// </summary>
+        /// <param name="error">The error to add.</param>
+        /// <returns>The operation result.</returns>
+        public TransactionResult<TStepId, TData> Add(Exception error)
+        {
+            if (error != null)
+            {
+                this.errors.Add(error);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Merges the instance of the operation result with the other instance of an operation result.
+        /// </summary>
+        /// <param name="result">The operation result to merge.</param>
+        /// <returns>The instance of the operation result.</returns>
+        public TransactionResult<TStepId, TData> Add(ITransactionResult<TData> result)
+        {
+            if (result != null
+                && result.Errors != null)
+            {
+                this.errors.AddRange(result.Errors);
+            }
+
+            return this;
         }
     }
 }

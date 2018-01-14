@@ -85,9 +85,8 @@ namespace BBTransactionTestsWithoutAsync
             // Assert
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[0]);
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
@@ -210,9 +209,8 @@ namespace BBTransactionTestsWithoutAsync
 
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
 
             foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
             {
@@ -369,9 +367,8 @@ namespace BBTransactionTestsWithoutAsync
 
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
             TestExecutor sharedExecutor = stepExecutors[1];
             sharedExecutor.Mock.VerifyGet(x => x.ShouldRun, Times.Exactly(2));
             sharedExecutor.Mock.Verify(x => x.Run(It.IsNotNull<Action>()), Times.Exactly(2));

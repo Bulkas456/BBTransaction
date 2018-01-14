@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BBTransaction.Result;
 
 namespace BBTransaction.Transaction.TransactionResult
 {
@@ -9,8 +8,24 @@ namespace BBTransaction.Transaction.TransactionResult
     /// The transaction result.
     /// </summary>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    public interface ITransactionResult<TData> : IOperationResult
+    public interface ITransactionResult<TData>
     {
+        /// <summary>
+        /// Gets a transaction result.
+        /// </summary>
+        ResultType Result
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the collection of exceptions for the operation.
+        /// </summary>
+        IEnumerable<Exception> Errors
+        {
+            get;
+        }
+
         /// <summary>
         /// Gets the transaction data.
         /// </summary>
@@ -23,14 +38,6 @@ namespace BBTransaction.Transaction.TransactionResult
         /// Gets a value indicating whether the transaction was recovered.
         /// </summary>
         bool Recovered
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets an additional info about the result.
-        /// </summary>
-        string Info
         {
             get;
         }

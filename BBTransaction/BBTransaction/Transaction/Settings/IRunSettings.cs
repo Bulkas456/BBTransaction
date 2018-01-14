@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Executor;
-using BBTransaction.Result;
 using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Settings

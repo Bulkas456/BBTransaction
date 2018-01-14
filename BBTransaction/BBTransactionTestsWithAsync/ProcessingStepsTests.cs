@@ -124,9 +124,8 @@ namespace BBTransactionTestsWithAsync
             result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[0]);
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
@@ -291,9 +290,8 @@ namespace BBTransactionTestsWithAsync
             result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
             callBackExecutor.Verify(Times.Once, Times.Once);
 
             foreach (TestExecutor executor in stepExecutors.Values.Concat(postExecutors.Values).Where(x => x != null))
@@ -485,9 +483,8 @@ namespace BBTransactionTestsWithAsync
             result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
-            result.Info.Should().Be(string.Empty);
             result.Recovered.Should().BeFalse();
-            result.Success.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
             TestExecutor sharedExecutor = stepExecutors[1];
             sharedExecutor.Verify(Times.Exactly(2), Times.Exactly(2));
 
