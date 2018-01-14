@@ -17,5 +17,29 @@ namespace BBTransaction.Transaction.Session.Info
         {
             get;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the transaction was recovered.
+        /// </summary>
+        bool Recovered
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the session start timestamp.
+        /// </summary>
+        DateTime StartTimestamp
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the session id.
+        /// </summary>
+        Guid SessionId
+        {
+            get;
+        }
     }
 }

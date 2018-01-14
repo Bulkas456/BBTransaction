@@ -44,30 +44,6 @@ namespace BBTransaction.Transaction.Session
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the transaction was recovered.
-        /// </summary>
-        bool Recovered
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the session start timestamp.
-        /// </summary>
-        DateTime StartTimestamp
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the session id.
-        /// </summary>
-        Guid SessionId
-        {
-            get;
-        }
-
-        /// <summary>
         /// Gets a value indicating whether the session is ended.
         /// </summary>
         bool Ended

@@ -39,5 +39,20 @@ namespace BBTransaction.Step.Adapter
         /// Gets the current step id.
         /// </summary>
         public TStepIdTo CurrentStepId => this.stepConverter(this.original.CurrentStepId);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the transaction was recovered.
+        /// </summary>
+        public bool Recovered => this.original.Recovered;
+
+        /// <summary>
+        /// Gets the session start timestamp.
+        /// </summary>
+        public DateTime StartTimestamp => this.original.StartTimestamp;
+
+        /// <summary>
+        /// Gets the session id.
+        /// </summary>
+        public Guid SessionId => this.SessionId;
     }
 }
