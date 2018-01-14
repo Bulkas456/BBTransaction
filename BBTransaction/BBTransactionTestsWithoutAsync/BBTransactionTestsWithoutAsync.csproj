@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StepAdapterTests.cs" />
     <Compile Include="TestExecutor.cs" />
+    <Compile Include="TransactionCancelTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

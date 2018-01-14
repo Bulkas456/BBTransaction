@@ -42,7 +42,7 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// The step action for the adapter.
         /// </summary>
-        private readonly Action<TDataTo, ITransactionSessionInfo<TStepIdTo>> stepAction;
+        private readonly Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>> stepAction;
 
         /// <summary>
         /// The undo action for the adapter.
@@ -58,7 +58,7 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// The async step action for the adapter.
         /// </summary>
-        private readonly Func<TDataTo, ITransactionSessionInfo<TStepIdTo>, Task> asyncStepAction;
+        private readonly Func<TDataTo, IStepTransactionSessionInfo<TStepIdTo>, Task> asyncStepAction;
 
         /// <summary>
         /// The async undo action for the adapter.
@@ -90,20 +90,20 @@ namespace BBTransaction.Step.Adapter
             this.dataConverter = dataConverter ?? throw new ArgumentNullException(nameof(dataConverter));
             this.stepAction = this.original.StepAction == null
                                ? null
-                               : new Action<TDataTo, ITransactionSessionInfo<TStepIdTo>>((data, info) => this.original.StepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, this.reverseStepConverter)));
+                               : new Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.StepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, info, this.reverseStepConverter)));
             this.undoAction = this.original.UndoAction == null
                                ? null
-                               : new Action<TDataTo, ITransactionSessionInfo<TStepIdTo>>((data, info) => this.original.UndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, this.reverseStepConverter)));
+                               : new Action<TDataTo, ITransactionSessionInfo<TStepIdTo>>((data, info) => this.original.UndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, this.reverseStepConverter)));
             this.postAction = this.original.PostAction == null
                               ? null
                               : new Action<TDataTo>(data => this.original.PostAction(this.dataConverter(data)));
 #if !NET35 && !NOASYNC
             this.asyncStepAction = this.original.AsyncStepAction == null
                                      ? null
-                                     : new Func<TDataTo, ITransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncStepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, this.reverseStepConverter)));
+                                     : new Func<TDataTo, IStepTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncStepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, info, this.reverseStepConverter)));
             this.asyncUndoAction = this.original.AsyncUndoAction == null
                                      ? null
-                                     : new Func<TDataTo, ITransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncUndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, this.reverseStepConverter)));
+                                     : new Func<TDataTo, ITransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncUndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, this.reverseStepConverter)));
             this.asyncPostAction = this.original.AsyncPostAction == null
                                      ? null
                                      : new  Func<TDataTo, Task>(async data => await this.original.AsyncPostAction(this.dataConverter(data)));
@@ -123,13 +123,13 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// Gets the action which will be invoked for the step.
         /// </summary>
-        public Action<TDataTo, ITransactionSessionInfo<TStepIdTo>> StepAction => this.stepAction;
+        public Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>> StepAction => this.stepAction;
 
 #if !NET35 && !NOASYNC
         /// <summary>
         /// Gets the action which will be invoked for the step.
         /// </summary>
-        public Func<TDataTo, ITransactionSessionInfo<TStepIdTo>, Task> AsyncStepAction => this.asyncStepAction;
+        public Func<TDataTo, IStepTransactionSessionInfo<TStepIdTo>, Task> AsyncStepAction => this.asyncStepAction;
 #endif
 
         /// <summary>

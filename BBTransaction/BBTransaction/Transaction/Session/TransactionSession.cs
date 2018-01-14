@@ -111,6 +111,15 @@ namespace BBTransaction.Transaction.Session
             private set;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the transaction is cancelled.
+        /// </summary>
+        public bool Cancelled
+        {
+            get;
+            private set;
+        }
+
 #if !NET35 && !NOASYNC
         /// <summary>
         /// Waits for a transaction result.
@@ -194,6 +203,14 @@ namespace BBTransaction.Transaction.Session
                                                  : recoveredData.Data;
             this.SessionId = recoveredData.SessionId;
             this.StartTimestamp = recoveredData.StartTimestamp;
+        }
+
+        /// <summary>
+        /// Cancels the transaction.
+        /// </summary>
+        public void Cancel()
+        {
+            this.Cancelled = true;
         }
     }
 }

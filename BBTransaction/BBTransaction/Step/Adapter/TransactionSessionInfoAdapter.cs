@@ -10,12 +10,17 @@ namespace BBTransaction.Step.Adapter
     /// </summary>
     /// <typeparam name="TStepIdFrom">The type of the original step id.</typeparam>
     /// <typeparam name="TStepIdTo">The type of the destination step id.</typeparam>
-    internal struct TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo> : ITransactionSessionInfo<TStepIdTo>
+    internal struct TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo> : IStepTransactionSessionInfo<TStepIdTo>
     {
         /// <summary>
         /// The original session info.
         /// </summary>
         private readonly ITransactionSessionInfo<TStepIdFrom> original;
+
+        /// <summary>
+        /// The original session info for step.
+        /// </summary>
+        private readonly IStepTransactionSessionInfo<TStepIdFrom> originalForStep;
 
         /// <summary>
         /// The step converter.
@@ -26,12 +31,15 @@ namespace BBTransaction.Step.Adapter
         /// Initializes a new instance of the <see cref="TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo>"/> class.
         /// </summary>
         /// <param name="original">The original session info.</param>
+        /// <param name="originalForStep">The original session info for step.</param>
         /// <param name="stepConverter">The step converter.</param>
         public TransactionSessionInfoAdapter(
             ITransactionSessionInfo<TStepIdFrom> original,
+            IStepTransactionSessionInfo<TStepIdFrom> originalForStep,
             Func<TStepIdFrom, TStepIdTo> stepConverter)
         {
             this.original = original ?? throw new ArgumentNullException(nameof(original));
+            this.originalForStep = originalForStep;
             this.stepConverter = stepConverter ?? throw new ArgumentNullException(nameof(stepConverter));
         }
 
@@ -54,5 +62,13 @@ namespace BBTransaction.Step.Adapter
         /// Gets the session id.
         /// </summary>
         public Guid SessionId => this.SessionId;
+
+        /// <summary>
+        /// Cancels the transaction.
+        /// </summary>
+        public void Cancel()
+        {
+            this.originalForStep.Cancel();
+        }
     }
 }

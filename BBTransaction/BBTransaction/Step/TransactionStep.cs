@@ -39,7 +39,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the action which will be invoked for the step.
         /// </summary>
-        public Action<TData, ITransactionSessionInfo<TStepId>> StepAction
+        public Action<TData, IStepTransactionSessionInfo<TStepId>> StepAction
         {
             get;
             set;
@@ -49,7 +49,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the action which will be invoked for the step.
         /// </summary>
-        public Func<TData, ITransactionSessionInfo<TStepId>, Task> AsyncStepAction
+        public Func<TData, IStepTransactionSessionInfo<TStepId>, Task> AsyncStepAction
         {
             get;
             set;

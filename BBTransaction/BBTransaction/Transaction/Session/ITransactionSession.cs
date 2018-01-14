@@ -17,7 +17,7 @@ namespace BBTransaction.Transaction.Session
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    public interface ITransactionSession<TStepId, TData> : ITransactionSessionInfo<TStepId>
+    public interface ITransactionSession<TStepId, TData> : IStepTransactionSessionInfo<TStepId>
     {
         /// <summary>
         /// Gets the transaction state.
@@ -47,6 +47,14 @@ namespace BBTransaction.Transaction.Session
         /// Gets a value indicating whether the session is ended.
         /// </summary>
         bool Ended
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the transaction is cancelled.
+        /// </summary>
+        bool Cancelled
         {
             get;
         }

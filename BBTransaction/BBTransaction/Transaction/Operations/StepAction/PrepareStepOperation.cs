@@ -44,7 +44,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
 #endif
                 {
                     Session = session,
-                    CaughtException = e
+                    CaughtException = e,
+                    Result = ResultType.Failed
                 });
 
 #if NET35 || NOASYNC

@@ -50,9 +50,18 @@ namespace BBTransaction.Transaction.Operations.SessionEnd
             set;
         }
 
+        /// <summary>
+        /// Adds an error to the context.
+        /// </summary>
+        /// <param name="error">The error to add.</param>
+        /// <returns>The context.</returns>
         public SessionEndContext<TStepId, TData> AddError(Exception error)
         {
-            this.caughtExceptions.Add(error);
+            if (error != null)
+            {
+                this.caughtExceptions.Add(error);
+            }
+
             return this;
         }
     }

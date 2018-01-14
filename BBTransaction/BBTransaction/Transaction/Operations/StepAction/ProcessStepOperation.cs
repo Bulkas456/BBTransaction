@@ -56,6 +56,22 @@ namespace BBTransaction.Transaction.Operations.StepAction
                                session.StepEnumerator.CurrentStepIndex, 
                                currentStep.Id);
                 }
+
+                if (session.Cancelled)
+                {
+                    session.TransactionContext
+                           .Logger
+                           .InfoFormat("Transaction '{0}' cancelled.", session.TransactionContext.Info.Name);
+#if NET35 || NOASYNC
+                    RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#else
+                    await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#endif
+                    {
+                        Session = session,
+                        Result = ResultType.Cancelled
+                    });
+                }
             }
             catch (Exception e)
             {
@@ -69,7 +85,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
 #endif
                 {
                     Session = session,
-                    CaughtException = e
+                    CaughtException = e,
+                    Result = ResultType.Failed
                 });
 
 #if NET35 || NOASYNC

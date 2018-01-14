@@ -43,7 +43,7 @@ namespace BBTransactionTestsWithAsync
                     await Task.CompletedTask;
                 });
             step.SetupGet(x => x.AsyncStepAction)
-                .Returns(async (byte data, ITransactionSessionInfo<int> sessionInfo) =>
+                .Returns(async (byte data, IStepTransactionSessionInfo<int> sessionInfo) =>
                 {
                     asyncStepActionExecuted = true;
                     data.Should().Be(expectedData);
@@ -65,7 +65,7 @@ namespace BBTransactionTestsWithAsync
                      data.Should().Be(expectedData);
                  });
             step.SetupGet(x => x.StepAction)
-                .Returns((byte data, ITransactionSessionInfo<int> sessionInfo) =>
+                .Returns((byte data, IStepTransactionSessionInfo<int> sessionInfo) =>
                 {
                     stepActionExecuted = true;
                     data.Should().Be(expectedData);
@@ -84,7 +84,7 @@ namespace BBTransactionTestsWithAsync
                 .Returns(new Mock<IExecutor>().Object);
             step.SetupGet(x => x.UndoActionExecutor)
                 .Returns(new Mock<IExecutor>().Object);
-            Mock<ITransactionSessionInfo<string>> info = new Mock<ITransactionSessionInfo<string>>();
+            Mock<IStepTransactionSessionInfo<string>> info = new Mock<IStepTransactionSessionInfo<string>>();
             info.SetupGet(x => x.CurrentStepId)
                 .Returns(step.Object.Id.ToString(CultureInfo.InvariantCulture));
             ITransactionStep<string, string> adapter = step.Object.Adapter<string, string, int, byte>(id => id.ToString(), idString => int.Parse(idString), data => byte.Parse(data));

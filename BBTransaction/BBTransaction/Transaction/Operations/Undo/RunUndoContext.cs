@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BBTransaction.Transaction.Session;
+using BBTransaction.Transaction.TransactionResult;
 
 namespace BBTransaction.Transaction.Operations.Undo
 {
@@ -25,6 +26,15 @@ namespace BBTransaction.Transaction.Operations.Undo
         /// Gets or sets the caught exception before undo.
         /// </summary>
         public Exception CaughtException
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the transaction result.
+        /// </summary>
+        public ResultType Result
         {
             get;
             set;

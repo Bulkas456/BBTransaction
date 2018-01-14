@@ -39,7 +39,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                     {
                         RunPostActions = false,
                         Session = context.Session,
-                        Result = ResultType.Failed
+                        Result = context.Result
                     }
                     .AddError(context.CaughtException));
                     return;
