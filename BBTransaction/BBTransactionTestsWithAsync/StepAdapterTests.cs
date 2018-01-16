@@ -87,6 +87,14 @@ namespace BBTransactionTestsWithAsync
             Mock<IStepTransactionSessionInfo<string>> info = new Mock<IStepTransactionSessionInfo<string>>();
             info.SetupGet(x => x.CurrentStepId)
                 .Returns(step.Object.Id.ToString(CultureInfo.InvariantCulture));
+            info.SetupGet(x => x.Cancelled)
+                .Returns(true);
+            info.SetupGet(x => x.Recovered)
+                .Returns(true);
+            info.SetupGet(x => x.SessionId)
+                .Returns(Guid.NewGuid());
+            info.SetupGet(x => x.StartTimestamp)
+                .Returns(DateTime.Now);
             ITransactionStep<string, string> adapter = step.Object.Adapter<string, string, int, byte>(id => id.ToString(), idString => int.Parse(idString), data => byte.Parse(data));
 
             // Act

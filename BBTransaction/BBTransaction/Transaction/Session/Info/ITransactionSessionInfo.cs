@@ -41,5 +41,13 @@ namespace BBTransaction.Transaction.Session.Info
         {
             get;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the transaction is cancelled.
+        /// </summary>
+        bool Cancelled
+        {
+            get;
+        }
     }
 }

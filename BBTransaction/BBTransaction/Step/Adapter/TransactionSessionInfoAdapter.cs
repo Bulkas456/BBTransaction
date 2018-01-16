@@ -64,6 +64,11 @@ namespace BBTransaction.Step.Adapter
         public Guid SessionId => this.SessionId;
 
         /// <summary>
+        /// Gets a value indicating whether the transaction is cancelled.
+        /// </summary>
+        public bool Cancelled => this.original.Cancelled;
+
+        /// <summary>
         /// Cancels the transaction.
         /// </summary>
         public void Cancel()

@@ -51,14 +51,6 @@ namespace BBTransaction.Transaction.Session
             get;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the transaction is cancelled.
-        /// </summary>
-        bool Cancelled
-        {
-            get;
-        }
-
 #if !NET35 && !NOASYNC
         /// <summary>
         /// Waits for a transaction result.
