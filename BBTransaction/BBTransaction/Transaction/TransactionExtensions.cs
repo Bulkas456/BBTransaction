@@ -27,7 +27,7 @@ namespace BBTransaction.Transaction
         }
 
         /// <summary>
-        /// Adds an adapter for the step to the transaciton.
+        /// Adds an adapter for the step to the transaction.
         /// </summary>
         /// <typeparam name="TStepIdTo">The type of the destination step id.</typeparam>
         /// <typeparam name="TDataTo">The type of the destination data.</typeparam>
@@ -49,7 +49,7 @@ namespace BBTransaction.Transaction
         }
 
         /// <summary>
-        /// Adds adapters for a collection of steps to the transaciton.
+        /// Adds adapters for a collection of steps to the transaction.
         /// </summary>
         /// <typeparam name="TStepIdTo">The type of the destination step id.</typeparam>
         /// <typeparam name="TDataTo">The type of the destination data.</typeparam>

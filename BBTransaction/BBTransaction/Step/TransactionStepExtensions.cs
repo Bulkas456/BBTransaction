@@ -6,7 +6,7 @@ using BBTransaction.Step.Adapter;
 namespace BBTransaction.Step
 {
     /// <summary>
-    /// Extensions for the transaciton step.
+    /// Extensions for the transaction step.
     /// </summary>
     public static class TransactionStepExtensions
     {

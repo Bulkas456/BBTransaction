@@ -33,7 +33,7 @@ namespace BBTransactionTestsWithoutAsync
             step.SetupGet(x => x.Settings)
                 .Returns((StepSettings)int.MaxValue);
             step.SetupGet(x => x.PostAction)
-                 .Returns((byte data) =>
+                 .Returns((byte data, IPostTransactionSessionInfo<int> sessionInfo) =>
                  {
                      postActionExecuted = true;
                      data.Should().Be(expectedData);
@@ -46,7 +46,7 @@ namespace BBTransactionTestsWithoutAsync
                     sessionInfo.CurrentStepId.Should().Be(step.Object.Id);
                 });
             step.SetupGet(x => x.UndoAction)
-                .Returns((byte data, ITransactionSessionInfo<int> sessionInfo) =>
+                .Returns((byte data, IUndoTransactionSessionInfo<int> sessionInfo) =>
                 {
                     undoActionExecuted = true;
                     data.Should().Be(expectedData);
@@ -58,25 +58,35 @@ namespace BBTransactionTestsWithoutAsync
                 .Returns(new Mock<IExecutor>().Object);
             step.SetupGet(x => x.UndoActionExecutor)
                 .Returns(new Mock<IExecutor>().Object);
-            Mock<IStepTransactionSessionInfo<string>> info = new Mock<IStepTransactionSessionInfo<string>>();
-            info.SetupGet(x => x.CurrentStepId)
+            Mock<IStepTransactionSessionInfo<string>> stepInfo = new Mock<IStepTransactionSessionInfo<string>>();
+            stepInfo.SetupGet(x => x.CurrentStepId)
                 .Returns(step.Object.Id.ToString(CultureInfo.InvariantCulture));
+            stepInfo.SetupGet(x => x.Cancelled)
+                .Returns(true);
+            stepInfo.SetupGet(x => x.Recovered)
+                .Returns(true);
+            stepInfo.SetupGet(x => x.SessionId)
+                .Returns(Guid.NewGuid());
+            stepInfo.SetupGet(x => x.StartTimestamp)
+                .Returns(DateTime.Now);
+            Mock<IUndoTransactionSessionInfo<string>> undoInfo = stepInfo.As<IUndoTransactionSessionInfo<string>>();
+            Mock<IPostTransactionSessionInfo<string>> postInfo = undoInfo.As<IPostTransactionSessionInfo<string>>();
             ITransactionStep<string, string> adapter = step.Object.Adapter<string, string, int, byte>(id => id.ToString(), idString => int.Parse(idString), data => byte.Parse(data));
 
             // Act
-            adapter.PostAction(adapterExpectedData);
+            adapter.PostAction(adapterExpectedData, postInfo.Object);
 
             // Assert
             postActionExecuted.Should().BeTrue();
 
             // Act
-            adapter.StepAction(adapterExpectedData, info.Object);
+            adapter.StepAction(adapterExpectedData, stepInfo.Object);
 
             // Assert
             stepActionExecuted.Should().BeTrue();
 
             // Act
-            adapter.UndoAction(adapterExpectedData, info.Object);
+            adapter.UndoAction(adapterExpectedData, undoInfo.Object);
 
             // Assert
             undoActionExecuted.Should().BeTrue();

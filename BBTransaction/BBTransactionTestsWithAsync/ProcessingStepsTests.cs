@@ -84,18 +84,20 @@ namespace BBTransactionTestsWithAsync
 
                 if (i % 2 == 0)
                 {
-                    step.AsyncPostAction = async (data) =>
+                    step.AsyncPostAction = async (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
+                        info.CurrentStepId.Should().Be(index);
                         await Task.CompletedTask;
                     };
                 }
                 else
                 {
-                    step.PostAction = (data) =>
+                    step.PostAction = (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
+                        info.CurrentStepId.Should().Be(index);
                         runPostActions.Add(index);
                     };
                 }
@@ -234,21 +236,23 @@ namespace BBTransactionTestsWithAsync
                 if (i == 1
                     || i == 2)
                 {
-                    step.AsyncPostAction = async (data) =>
+                    step.AsyncPostAction = async (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
                         postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                        info.CurrentStepId.Should().Be(index);
                         await Task.CompletedTask;
                     };
                 }
                 else
                 {
-                    step.PostAction = (data) =>
+                    step.PostAction = (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
                         postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                        info.CurrentStepId.Should().Be(index);
                     };
                 }
 
@@ -430,21 +434,23 @@ namespace BBTransactionTestsWithAsync
                 if (i == 1
                     || i == 2)
                 {
-                    step.AsyncPostAction = async (data) =>
+                    step.AsyncPostAction = async (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
                         postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                        info.CurrentStepId.Should().Be(index);
                         await Task.CompletedTask;
                     };
                 }
                 else
                 {
-                    step.PostAction = (data) =>
+                    step.PostAction = (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
                         postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                        info.CurrentStepId.Should().Be(index);
                     };
                 }
 

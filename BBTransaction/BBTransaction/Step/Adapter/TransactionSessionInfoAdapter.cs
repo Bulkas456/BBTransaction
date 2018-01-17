@@ -10,17 +10,29 @@ namespace BBTransaction.Step.Adapter
     /// </summary>
     /// <typeparam name="TStepIdFrom">The type of the original step id.</typeparam>
     /// <typeparam name="TStepIdTo">The type of the destination step id.</typeparam>
-    internal struct TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo> : IStepTransactionSessionInfo<TStepIdTo>
+    internal struct TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo> : IStepTransactionSessionInfo<TStepIdTo>,
+                                                                            IUndoTransactionSessionInfo<TStepIdTo>,
+                                                                            IPostTransactionSessionInfo<TStepIdTo>
     {
         /// <summary>
-        /// The original session info.
+        /// The main session info.
         /// </summary>
-        private readonly ITransactionSessionInfo<TStepIdFrom> original;
+        private readonly ITransactionSessionInfo<TStepIdFrom> main;
 
         /// <summary>
-        /// The original session info for step.
+        /// The session info for a step action.
         /// </summary>
-        private readonly IStepTransactionSessionInfo<TStepIdFrom> originalForStep;
+        private readonly IStepTransactionSessionInfo<TStepIdFrom> infoForStep;
+
+        /// <summary>
+        /// The session info for an undo action.
+        /// </summary>
+        private readonly IUndoTransactionSessionInfo<TStepIdFrom> infoForUndo;
+
+        /// <summary>
+        /// The session info for a post action.
+        /// </summary>
+        private readonly IPostTransactionSessionInfo<TStepIdFrom> infoForPost;
 
         /// <summary>
         /// The step converter.
@@ -30,33 +42,54 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo>"/> class.
         /// </summary>
-        /// <param name="original">The original session info.</param>
-        /// <param name="originalForStep">The original session info for step.</param>
+        /// <param name="infoForStep">The session info for a step action.</param>
+        /// <param name="infoForUndo">The session info for an undo action.</param>
+        /// <param name="infoForPost">The session info for a post action.</param>
         /// <param name="stepConverter">The step converter.</param>
         public TransactionSessionInfoAdapter(
-            ITransactionSessionInfo<TStepIdFrom> original,
-            IStepTransactionSessionInfo<TStepIdFrom> originalForStep,
+            IStepTransactionSessionInfo<TStepIdFrom> infoForStep,
+            IUndoTransactionSessionInfo<TStepIdFrom> infoForUndo,
+            IPostTransactionSessionInfo<TStepIdFrom> infoForPost,
             Func<TStepIdFrom, TStepIdTo> stepConverter)
         {
-            this.original = original ?? throw new ArgumentNullException(nameof(original));
-            this.originalForStep = originalForStep;
+            this.infoForStep = infoForStep;
+            this.infoForUndo = infoForUndo;
+            this.infoForPost = infoForPost;
+
+            if (infoForStep != null)
+            {
+                this.main = infoForStep;
+            }
+            else if (infoForUndo != null)
+            {
+                this.main = infoForUndo;
+            }
+            else if (infoForPost != null)
+            {
+                this.main = infoForPost;
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("At least one of values '{0}, '{1}', '{2}' should be not null.", nameof(infoForStep), nameof(infoForUndo), nameof(infoForPost)));
+            }
+
             this.stepConverter = stepConverter ?? throw new ArgumentNullException(nameof(stepConverter));
         }
 
         /// <summary>
         /// Gets the current step id.
         /// </summary>
-        public TStepIdTo CurrentStepId => this.stepConverter(this.original.CurrentStepId);
+        public TStepIdTo CurrentStepId => this.stepConverter(this.main.CurrentStepId);
 
         /// <summary>
         /// Gets or sets a value indicating whether the transaction was recovered.
         /// </summary>
-        public bool Recovered => this.original.Recovered;
+        public bool Recovered => this.main.Recovered;
 
         /// <summary>
         /// Gets the session start timestamp.
         /// </summary>
-        public DateTime StartTimestamp => this.original.StartTimestamp;
+        public DateTime StartTimestamp => this.main.StartTimestamp;
 
         /// <summary>
         /// Gets the session id.
@@ -66,14 +99,14 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// Gets a value indicating whether the transaction is cancelled.
         /// </summary>
-        public bool Cancelled => this.original.Cancelled;
+        public bool Cancelled => this.main.Cancelled;
 
         /// <summary>
         /// Cancels the transaction.
         /// </summary>
         public void Cancel()
         {
-            this.originalForStep.Cancel();
+            this.infoForStep.Cancel();
         }
     }
 }

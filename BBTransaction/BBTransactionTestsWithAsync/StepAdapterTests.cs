@@ -36,10 +36,11 @@ namespace BBTransactionTestsWithAsync
             step.SetupGet(x => x.Settings)
                 .Returns((StepSettings)int.MaxValue);
             step.SetupGet(x => x.AsyncPostAction)
-                .Returns(async (byte data) =>
+                .Returns(async (byte data, IPostTransactionSessionInfo<int> sessionInfo) =>
                 {
                     asyncPostActionExecuted = true;
                     data.Should().Be(expectedData);
+                    sessionInfo.CurrentStepId.Should().Be(step.Object.Id);
                     await Task.CompletedTask;
                 });
             step.SetupGet(x => x.AsyncStepAction)
@@ -51,7 +52,7 @@ namespace BBTransactionTestsWithAsync
                     await Task.CompletedTask;
                 });
             step.SetupGet(x => x.AsyncUndoAction)
-                .Returns(async (byte data, ITransactionSessionInfo<int> sessionInfo) =>
+                .Returns(async (byte data, IUndoTransactionSessionInfo<int> sessionInfo) =>
                 {
                     asyncUndoActionExecuted = true;
                     data.Should().Be(expectedData);
@@ -59,10 +60,11 @@ namespace BBTransactionTestsWithAsync
                     await Task.CompletedTask;
                 });
             step.SetupGet(x => x.PostAction)
-                 .Returns((byte data) =>
+                 .Returns((byte data, IPostTransactionSessionInfo<int> sessionInfo) =>
                  {
                      postActionExecuted = true;
                      data.Should().Be(expectedData);
+                     sessionInfo.CurrentStepId.Should().Be(step.Object.Id);
                  });
             step.SetupGet(x => x.StepAction)
                 .Returns((byte data, IStepTransactionSessionInfo<int> sessionInfo) =>
@@ -72,7 +74,7 @@ namespace BBTransactionTestsWithAsync
                     sessionInfo.CurrentStepId.Should().Be(step.Object.Id);
                 });
             step.SetupGet(x => x.UndoAction)
-                .Returns((byte data, ITransactionSessionInfo<int> sessionInfo) =>
+                .Returns((byte data, IUndoTransactionSessionInfo<int> sessionInfo) =>
                 {
                     undoActionExecuted = true;
                     data.Should().Be(expectedData);
@@ -84,51 +86,53 @@ namespace BBTransactionTestsWithAsync
                 .Returns(new Mock<IExecutor>().Object);
             step.SetupGet(x => x.UndoActionExecutor)
                 .Returns(new Mock<IExecutor>().Object);
-            Mock<IStepTransactionSessionInfo<string>> info = new Mock<IStepTransactionSessionInfo<string>>();
-            info.SetupGet(x => x.CurrentStepId)
+            Mock<IStepTransactionSessionInfo<string>> stepInfo = new Mock<IStepTransactionSessionInfo<string>>();
+            stepInfo.SetupGet(x => x.CurrentStepId)
                 .Returns(step.Object.Id.ToString(CultureInfo.InvariantCulture));
-            info.SetupGet(x => x.Cancelled)
+            stepInfo.SetupGet(x => x.Cancelled)
                 .Returns(true);
-            info.SetupGet(x => x.Recovered)
+            stepInfo.SetupGet(x => x.Recovered)
                 .Returns(true);
-            info.SetupGet(x => x.SessionId)
+            stepInfo.SetupGet(x => x.SessionId)
                 .Returns(Guid.NewGuid());
-            info.SetupGet(x => x.StartTimestamp)
+            stepInfo.SetupGet(x => x.StartTimestamp)
                 .Returns(DateTime.Now);
+            Mock<IUndoTransactionSessionInfo<string>> undoInfo = stepInfo.As<IUndoTransactionSessionInfo<string>>();
+            Mock<IPostTransactionSessionInfo<string>> postInfo = undoInfo.As<IPostTransactionSessionInfo<string>>();
             ITransactionStep<string, string> adapter = step.Object.Adapter<string, string, int, byte>(id => id.ToString(), idString => int.Parse(idString), data => byte.Parse(data));
 
             // Act
-            await adapter.AsyncPostAction(adapterExpectedData);
+            await adapter.AsyncPostAction(adapterExpectedData, postInfo.Object);
 
             // Assert
             asyncPostActionExecuted.Should().BeTrue();
 
             // Act
-            await adapter.AsyncStepAction(adapterExpectedData, info.Object);
+            await adapter.AsyncStepAction(adapterExpectedData, stepInfo.Object);
 
             // Assert
             asyncStepActionExecuted.Should().BeTrue();
 
             // Act
-            await adapter.AsyncUndoAction(adapterExpectedData, info.Object);
+            await adapter.AsyncUndoAction(adapterExpectedData, undoInfo.Object);
 
             // Assert
             asyncUndoActionExecuted.Should().BeTrue();
 
             // Act
-            adapter.PostAction(adapterExpectedData);
+            adapter.PostAction(adapterExpectedData, postInfo.Object);
 
             // Assert
             postActionExecuted.Should().BeTrue();
 
             // Act
-            adapter.StepAction(adapterExpectedData, info.Object);
+            adapter.StepAction(adapterExpectedData, stepInfo.Object);
 
             // Assert
             stepActionExecuted.Should().BeTrue();
 
             // Act
-            adapter.UndoAction(adapterExpectedData, info.Object);
+            adapter.UndoAction(adapterExpectedData, undoInfo.Object);
 
             // Assert
             undoActionExecuted.Should().BeTrue();

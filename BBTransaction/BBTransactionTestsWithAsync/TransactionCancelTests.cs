@@ -84,19 +84,21 @@ namespace BBTransactionTestsWithAsync
 
                 if (i % 2 == 0)
                 {
-                    step.AsyncPostAction = async (data) =>
+                    step.AsyncPostAction = async (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
+                        info.CurrentStepId.Should().Be(index);
                         await Task.CompletedTask;
                     };
                 }
                 else
                 {
-                    step.PostAction = (data) =>
+                    step.PostAction = (data, info) =>
                     {
                         data.Should().BeSameAs(transactionData);
                         runPostActions.Add(index);
+                        info.CurrentStepId.Should().Be(index);
                     };
                 }
 

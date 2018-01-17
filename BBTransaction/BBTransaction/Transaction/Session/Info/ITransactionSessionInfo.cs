@@ -5,7 +5,7 @@ using System.Text;
 namespace BBTransaction.Transaction.Session.Info
 {
     /// <summary>
-    /// The transaciton session info.
+    /// The transaction session info.
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     public interface ITransactionSessionInfo<TStepId>

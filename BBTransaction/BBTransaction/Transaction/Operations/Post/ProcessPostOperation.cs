@@ -27,15 +27,15 @@ namespace BBTransaction.Transaction.Operations.Post
             {
                 watch.Start();
 #if NET35 || NOASYNC
-                currentStep.PostAction(session.StepEnumerator.Data);
+                currentStep.PostAction(session.StepEnumerator.Data, context.Session);
 #else
                 if (currentStep.PostAction != null)
                 {
-                    currentStep.PostAction(session.StepEnumerator.Data);
+                    currentStep.PostAction(session.StepEnumerator.Data, context.Session);
                 }
                 else
                 {
-                    await currentStep.AsyncPostAction(session.StepEnumerator.Data);
+                    await currentStep.AsyncPostAction(session.StepEnumerator.Data, context.Session);
                 }
 #endif
                 watch.Stop();

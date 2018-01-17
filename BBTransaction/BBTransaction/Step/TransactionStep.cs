@@ -68,7 +68,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
-        public Action<TData, ITransactionSessionInfo<TStepId>> UndoAction
+        public Action<TData, IUndoTransactionSessionInfo<TStepId>> UndoAction
         {
             get;
             set;
@@ -78,7 +78,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the undo action for the step which will be invoked during transaction rollback (optional).
         /// </summary>
-        public Func<TData, ITransactionSessionInfo<TStepId>, Task> AsyncUndoAction
+        public Func<TData, IUndoTransactionSessionInfo<TStepId>, Task> AsyncUndoAction
         {
             get;
             set;
@@ -96,7 +96,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the action which will be invoked after transaction success (optional).
         /// </summary>
-        public Action<TData> PostAction
+        public Action<TData, IPostTransactionSessionInfo<TStepId>> PostAction
         {
             get;
             set;
@@ -106,7 +106,7 @@ namespace BBTransaction.Step
         /// <summary>
         /// Gets or sets the action which will be invoked after transaction success (optional).
         /// </summary>
-        public Func<TData, Task> AsyncPostAction
+        public Func<TData, IPostTransactionSessionInfo<TStepId>, Task> AsyncPostAction
         {
             get;
             set;

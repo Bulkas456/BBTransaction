@@ -56,10 +56,11 @@ namespace BBTransactionTestsWithoutAsync
                     runUndoActions.Add(index);
                 };
 
-                step.PostAction = (data) =>
+                step.PostAction = (data, info) =>
                 {
                     data.Should().BeSameAs(transactionData);
                     runPostActions.Add(index);
+                    info.CurrentStepId.Should().Be(index);
                 };
 
                 target.Add(step);
@@ -163,11 +164,12 @@ namespace BBTransactionTestsWithoutAsync
                     runUndoActions.Add(index);
                 };
 
-                step.PostAction = (data) =>
+                step.PostAction = (data, info) =>
                 {
                     data.Should().BeSameAs(transactionData);
                     runPostActions.Add(index);
                     postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    info.CurrentStepId.Should().Be(index);
                 };
 
                 target.Add(step);
@@ -318,11 +320,12 @@ namespace BBTransactionTestsWithoutAsync
                     runUndoActions.Add(index);
                 };
 
-                step.PostAction = (data) =>
+                step.PostAction = (data, info) =>
                 {
                     data.Should().BeSameAs(transactionData);
                     runPostActions.Add(index);
                     postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    info.CurrentStepId.Should().Be(index);
                 };
 
                 target.Add(step);

@@ -17,7 +17,9 @@ namespace BBTransaction.Transaction.Session
     /// </summary>
     /// <typeparam name="TStepId">The type of the step id.</typeparam>
     /// <typeparam name="TData">The type of the transaction data.</typeparam>
-    public interface ITransactionSession<TStepId, TData> : IStepTransactionSessionInfo<TStepId>
+    public interface ITransactionSession<TStepId, TData> : IStepTransactionSessionInfo<TStepId>,
+                                                           IUndoTransactionSessionInfo<TStepId>,
+                                                           IPostTransactionSessionInfo<TStepId>
     {
         /// <summary>
         /// Gets the transaction state.

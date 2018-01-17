@@ -15,7 +15,7 @@ namespace BBTransaction.Transaction.TransactionResult
         Success,
 
         /// <summary>
-        /// The transaciton was cancelled.
+        /// The transaction was cancelled.
         /// </summary>
         Cancelled,
 
