@@ -36,7 +36,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
             {
                 string info = string.Format("Transaction '{0}': an error occurred during notifying ste prepared.", session.TransactionContext.Info.Name);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
-                session.StepEnumerator.Decrement();
+                session.StepEnumerator.MovePrevious();
 #if NET35 || NOASYNC
                 RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
 #else

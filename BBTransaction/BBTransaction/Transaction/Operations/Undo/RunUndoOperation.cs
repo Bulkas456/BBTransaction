@@ -57,7 +57,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
-                    session.StepEnumerator.Decrement();
+                    session.StepEnumerator.MovePrevious();
                     continue;
                 }
 #if NET35 || NOASYNC
@@ -74,7 +74,7 @@ namespace BBTransaction.Transaction.Operations.Undo
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
-                    session.StepEnumerator.Decrement();
+                    session.StepEnumerator.MovePrevious();
                     continue;
                 }
 
@@ -94,7 +94,7 @@ namespace BBTransaction.Transaction.Operations.Undo
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Decrement();
+                            session.StepEnumerator.MovePrevious();
                             RunUndoOperation.RunUndo(context);
                         }
                     });
@@ -105,7 +105,7 @@ namespace BBTransaction.Transaction.Operations.Undo
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Decrement();
+                            session.StepEnumerator.MovePrevious();
                             await RunUndoOperation.RunUndo(context);
                         }
                     });
@@ -119,7 +119,7 @@ namespace BBTransaction.Transaction.Operations.Undo
 #else
                     await ProcessUndoOperation.ProcessUndo(context);
 #endif
-                    session.StepEnumerator.Decrement();
+                    session.StepEnumerator.MovePrevious();
                 }
             }
         }

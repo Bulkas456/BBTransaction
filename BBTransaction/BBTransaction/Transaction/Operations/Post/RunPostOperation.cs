@@ -46,7 +46,7 @@ namespace BBTransaction.Transaction.Operations.Post
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
-                    session.StepEnumerator.Increment();
+                    session.StepEnumerator.MoveNext();
                     continue;
                 }
 #if NET35 || NOASYNC
@@ -63,7 +63,7 @@ namespace BBTransaction.Transaction.Operations.Post
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
-                    session.StepEnumerator.Increment();
+                    session.StepEnumerator.MoveNext();
                     continue;
                 }
 
@@ -83,7 +83,7 @@ namespace BBTransaction.Transaction.Operations.Post
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Increment();
+                            session.StepEnumerator.MoveNext();
                             RunPostOperation.RunPost(context);
                         }
                     });
@@ -94,7 +94,7 @@ namespace BBTransaction.Transaction.Operations.Post
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Increment();
+                            session.StepEnumerator.MoveNext();
                             await RunPostOperation.RunPost(context);
                         }
                     });
@@ -108,7 +108,7 @@ namespace BBTransaction.Transaction.Operations.Post
 #else
                     await ProcessPostOperation.ProcessPost(context);
 #endif
-                    session.StepEnumerator.Increment();
+                    session.StepEnumerator.MoveNext();
                 }
             }
         }

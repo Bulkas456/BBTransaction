@@ -57,18 +57,18 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         }
 
         /// <summary>
-        /// Increments the state.
+        /// Moves to the next step.
         /// </summary>
-        public void Increment()
+        public void MoveNext()
         {
             ++this.CurrentStepIndex;
             this.FillStep(); 
         }
 
         /// <summary>
-        /// Decrements the state.
+        /// Moves to the previous step.
         /// </summary>
-        public void Decrement()
+        public void MovePrevious()
         {
             this.CurrentStepIndex = Math.Max(-1, this.CurrentStepIndex - 1);
             this.FillStep();

@@ -39,14 +39,14 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         }
 
         /// <summary>
-        /// Increments the state.
+        /// Moves to the next step.
         /// </summary>
-        void Increment();
+        void MoveNext();
 
         /// <summary>
-        /// Decrements the state.
+        /// Moves to the previous step.
         /// </summary>
-        void Decrement();
+        void MovePrevious();
 
         /// <summary>
         /// Restarts the enumerator.

@@ -65,7 +65,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                               session.TransactionContext.Info.Name,
                               session.StepEnumerator.CurrentStepIndex,
                               session.StepEnumerator.CurrentStep.Id);
-                    session.StepEnumerator.Increment();
+                    session.StepEnumerator.MoveNext();
                     continue;
                 }
 
@@ -89,7 +89,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Increment();
+                            session.StepEnumerator.MoveNext();
                             RunSessionOperation.RunSession(session);
                         }
                     });
@@ -100,7 +100,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.Increment();
+                            session.StepEnumerator.MoveNext();
                             await RunSessionOperation.RunSession(session);
                         }
                     });
@@ -120,7 +120,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
                         return;
                     }
 
-                    session.StepEnumerator.Increment();
+                    session.StepEnumerator.MoveNext();
                 }
             }
         }
