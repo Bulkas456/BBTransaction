@@ -21,6 +21,7 @@ using BBTransaction.Step;
 using BBTransaction.Transaction.Operations;
 using BBTransaction.Transaction.Operations.StepAction;
 using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Transaction.Operations.SessionPreparation;
 
 namespace BBTransaction.Transaction
 {
@@ -182,9 +183,9 @@ namespace BBTransaction.Transaction
         {
             session.Start();
 #if NET35 || NOASYNC
-            this.StartSession(session);
+            RunSessionPreparationOperation.RunSessionPreparation(session);
 #else
-            await this.StartSession(session);
+            await RunSessionPreparationOperation.RunSessionPreparation(session);
 #endif
 
             if (session.Ended)
@@ -197,46 +198,6 @@ namespace BBTransaction.Transaction
 #else
             await RunSessionOperation.RunSession(session);
 #endif
-        }
-
-#if NET35 || NOASYNC
-        /// <summary>
-        /// Starts the session. 
-        /// </summary>
-        /// <param name="session">The session.</param>
-        private void StartSession(ITransactionSession<TStepId, TData> session)
-#else
-        /// <summary>
-        /// Starts the session. 
-        /// </summary>
-        /// <param name="session">The session.</param>
-        private async Task StartSession(ITransactionSession<TStepId, TData> session)
-#endif
-        {
-            try
-            {
-                this.context.Definition.NotifyTransactionStarted();
-#if NET35 || NOASYNC
-                this.context.SessionStorage.SessionStarted(session);
-#else
-                await this.context.SessionStorage.SessionStarted(session);
-#endif
-            }
-            catch (Exception e)
-            {
-                this.context.Logger.ErrorFormat(e, "An error occurred during starting a session for transaction '{0}'.", this.context.Info.Name);
-#if NET35 || NOASYNC
-                SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
-#else
-                await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
-#endif
-                {
-                    Session = session,
-                    RunPostActions = false,
-                    Result = ResultType.Failed
-                }
-                .AddError(e));
-            }
         }
 
 #if NET35 || NOASYNC

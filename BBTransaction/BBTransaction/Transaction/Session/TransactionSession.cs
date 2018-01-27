@@ -141,6 +141,7 @@ namespace BBTransaction.Transaction.Session
         {
             if (!this.started)
             {
+                this.started = true;
                 this.StartTimestamp = this.TransactionContext.Info.Now;
                 this.SessionId = this.TransactionContext.Info.SessionIdCreator == null
                                    ? Guid.NewGuid()
