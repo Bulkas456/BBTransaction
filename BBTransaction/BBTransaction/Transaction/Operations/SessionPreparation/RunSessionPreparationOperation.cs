@@ -109,7 +109,7 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
 
                 {
                     NoSessionEnd = true,
-                    ProcessStepPredicate = step => step != null 
+                    ProcessStepPredicate = step => step != null
                                                    && step.Settings.UndoOnRecover(),
                     Session = session,
 #if NET35 || NOASYNC
@@ -119,13 +119,21 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
                         RunSessionPreparationOperation.StartRun(session);
                     }
 #else
-                    UndoFinishAction = async () => 
+                    UndoFinishAction = async () =>
                     {
                         session.StepEnumerator.MoveNext();
                         await RunSessionPreparationOperation.StartRun(session);
                     }
 #endif
                 });
+            }
+            else
+            {
+#if NET35 || NOASYNC
+            RunSessionPreparationOperation.StartRun(session);
+#else
+            await RunSessionPreparationOperation.StartRun(session);
+#endif
             }
         }
 
