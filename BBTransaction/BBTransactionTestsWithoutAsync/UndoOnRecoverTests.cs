@@ -109,6 +109,93 @@ namespace BBTransactionTestsWithoutAsync
         }
 
         [TestMethod]
+        public void WhenRunRecoveredTransactionWithCurrentStepWithUndoOnRecoverAndNotRunOnRecoverySettings_ShouldNotUndoTheStep()
+        {
+            // Arrange
+            object transactionData = new object();
+            List<string> runStepActions = new List<string>();
+            List<string> runUndoActions = new List<string>();
+            List<string> runPostActions = new List<string>();
+            Mock<ITransactionStorage<object>> storageMock = new Mock<ITransactionStorage<object>>();
+            Mock<ITransactionData<object>> recoveredData = new Mock<ITransactionData<object>>();
+            recoveredData.SetupGet(x => x.CurrentStepIndex)
+                         .Returns(2);
+            recoveredData.SetupGet(x => x.Data)
+                         .Returns(transactionData);
+            recoveredData.SetupGet(x => x.SessionId)
+                         .Returns(Guid.NewGuid());
+            recoveredData.SetupGet(x => x.StartTimestamp)
+                         .Returns(DateTime.Now);
+            storageMock.Setup(x => x.RecoverTransaction())
+                       .Returns(recoveredData.Object);
+            ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
+            {
+                options.TransactionInfo.Name = "test transaction";
+                options.TransactionStorageCreator = context => storageMock.Object;
+            });
+
+            for (int i = 0; i < 6; ++i)
+            {
+                string index = i.ToString();
+                TransactionStep<string, object> step = new TransactionStep<string, object>()
+                {
+                    Id = index,
+                    Settings = i == 2 ? StepSettings.UndoOnRecover | StepSettings.NotRunOnRecovered : StepSettings.None
+                };
+
+                step.StepAction = (data, info) =>
+                {
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
+
+                step.UndoAction = (data, info) =>
+                {
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
+
+                step.PostAction = (data, info) =>
+                {
+                    data.Should().BeSameAs(transactionData);
+                    runPostActions.Add(index);
+                    info.CurrentStepId.Should().Be(index);
+                };
+
+                target.Add(step);
+            }
+            ITransactionResult<object> result = null;
+
+            /*
+             0:
+             1: 
+             2: recovered step, undo on recover, not run on recover
+             3:  
+             4:
+             5:
+             */
+
+            // Act
+            target.Run(settings =>
+            {
+                settings.Data = transactionData;
+                settings.Mode = RunMode.RecoverAndContinue;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
+            });
+
+            // Assert
+            result.Data.Should().BeSameAs(transactionData);
+            result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
+            result.Recovered.Should().BeTrue();
+            result.Result.Should().Be(ResultType.Success);
+            runStepActions.ShouldAllBeEquivalentTo(new string[] { "3", "4", "5" });
+            runUndoActions.ShouldAllBeEquivalentTo(new string[0]);
+            runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "3", "4", "5" });
+        }
+
+        [TestMethod]
         public void WhenRunRecoveredTransactionWittCurrentStepWithUndoOnRecoverSettingWhichIsTheFirstStep_ShouldUndoTheStep()
         {
             // Arrange
