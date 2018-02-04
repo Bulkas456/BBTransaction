@@ -91,6 +91,7 @@ namespace BBTransaction.Step
         public IExecutor UndoActionExecutor
         {
             get;
+            set;
         }
 
         /// <summary>

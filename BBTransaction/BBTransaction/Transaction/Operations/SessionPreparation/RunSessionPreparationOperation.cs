@@ -4,13 +4,22 @@ using System.Text;
 #if !NET35 && !NOASYNC
 using System.Threading.Tasks;
 #endif
+using BBTransaction.Step;
+using BBTransaction.Step.Settings;
 using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Transaction.Operations.StepAction;
+using BBTransaction.Transaction.Operations.Undo;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.Session.Storage.TransactionData;
+using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
+using BBTransaction.Transaction.Session.StepEnumerator;
 
 namespace BBTransaction.Transaction.Operations.SessionPreparation
 {
+    /// <summary>
+    /// The run session preparation operation.
+    /// </summary>
     internal static class RunSessionPreparationOperation
     {
 #if NET35 || NOASYNC
@@ -19,17 +28,29 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
         public static async Task RunSessionPreparation<TStepId, TData>(ITransactionSession<TStepId, TData> session)
 #endif
         {
-            if (session.Recovered)
+            switch (session.RunSettings.Mode)
             {
-            }
-            else
-            {
+                case RunMode.Run:
 #if NET35 || NOASYNC
-                StartSession(session);
+                    RunSessionPreparationOperation.StartRun(session);
 #else
-                await StartSession(session);
+                    await RunSessionPreparationOperation.StartRun(session);
 #endif
+                    break;
 
+                case RunMode.RecoverAndUndoAndRun:
+                    break;
+
+                case RunMode.RecoverAndContinue:
+#if NET35 || NOASYNC
+                    RunSessionPreparationOperation.PrepareToContinue(session);
+#else
+                    await RunSessionPreparationOperation.PrepareToContinue(session);
+#endif
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format("RunMode '{0}' is not supported.", session.RunSettings.Mode));
             }
         }
 
@@ -67,6 +88,73 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
                 }
                 .AddError(e));
             }
+        }
+
+#if NET35 || NOASYNC
+        private static void PrepareToContinue<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#else
+        private static async Task PrepareToContinue<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            ITransactionStep<TStepId, TData> currentStep = session.StepEnumerator.CurrentStep;
+
+            if (currentStep != null
+                && currentStep.Settings.UndoOnRecover())
+            {
+#if NET35 || NOASYNC
+                RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#else
+                await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#endif
+
+                {
+                    NoSessionEnd = true,
+                    ProcessStepPredicate = step => step != null 
+                                                   && step.Settings.UndoOnRecover(),
+                    Session = session,
+#if NET35 || NOASYNC
+                    UndoFinishAction = () => 
+                    {
+                        session.StepEnumerator.MoveNext();
+                        RunSessionPreparationOperation.StartRun(session);
+                    }
+#else
+                    UndoFinishAction = async () => 
+                    {
+                        session.StepEnumerator.MoveNext();
+                        await RunSessionPreparationOperation.StartRun(session);
+                    }
+#endif
+                });
+            }
+        }
+
+#if NET35 || NOASYNC
+        private static void StartRun<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#else
+        private static async Task StartRun<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+            if (session.Ended)
+            {
+                return;
+            }
+
+            if (session.StepEnumerator.IsFirstStep())
+            {
+#if NET35 || NOASYNC
+                RunSessionPreparationOperation.StartSession(session);
+#else
+                await RunSessionPreparationOperation.StartSession(session);
+#endif
+            }
+
+#if NET35 || NOASYNC
+            RunSessionOperation.RunSession(session);
+#else
+            await RunSessionOperation.RunSession(session);
+#endif
+            
         }
     }
 }

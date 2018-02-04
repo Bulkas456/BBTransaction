@@ -153,50 +153,15 @@ namespace BBTransaction.Transaction
 
 #if NET35 || NOASYNC
             ITransactionSession<TStepId, TData> session = this.CreateSession(runSettings);
-            this.Run(session);
 #else
             ITransactionSession<TStepId, TData> session = await this.CreateSession(runSettings);
-
-            if (!session.Ended)
-            {
-                await this.Run(session);
-            }
-
-            return await session.WaitForResultAsync();
 #endif
-        }
-
-#if NET35 || NOASYNC
-        /// <summary>
-        /// Runs the session.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        private void Run(ITransactionSession<TStepId, TData> session)
-#else
-        /// <summary>
-        /// Runs the session.
-        /// </summary>
-        /// <param name="session">The session.</param>
-        /// <returns>The task.</returns>
-        private async Task Run(ITransactionSession<TStepId, TData> session)
-#endif
-        {
             session.Start();
 #if NET35 || NOASYNC
             RunSessionPreparationOperation.RunSessionPreparation(session);
 #else
             await RunSessionPreparationOperation.RunSessionPreparation(session);
-#endif
-
-            if (session.Ended)
-            {
-                return;
-            }
-
-#if NET35 || NOASYNC
-            RunSessionOperation.RunSession(session);
-#else
-            await RunSessionOperation.RunSession(session);
+            return await session.WaitForResultAsync();
 #endif
         }
 

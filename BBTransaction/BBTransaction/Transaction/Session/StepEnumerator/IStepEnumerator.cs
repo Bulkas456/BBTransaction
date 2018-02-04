@@ -31,7 +31,7 @@ namespace BBTransaction.Transaction.Session.StepEnumerator
         }
 
         /// <summary>
-        /// Gets or sets the current step.
+        /// Gets the current step.
         /// </summary>
         ITransactionStep<TStepId, TData> CurrentStep
         {

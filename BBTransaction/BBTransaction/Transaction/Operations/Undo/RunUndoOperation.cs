@@ -25,12 +25,22 @@ namespace BBTransaction.Transaction.Operations.Undo
         public static async Task RunUndo<TStepId, TData>(RunUndoContext<TStepId, TData> context)
 #endif
         {
-            while (true)
+            while (context.ProcessStepPredicate(context.Session.StepEnumerator.CurrentStep))
             {
                 ITransactionStep<TStepId, TData> step = context.Session.StepEnumerator.CurrentStep;
 
                 if (step == null)
                 {
+                    if (context.NoSessionEnd)
+                    {
+#if NET35 || NOASYNC
+                        context.UndoFinishAction();
+#else
+                        await context.UndoFinishAction();
+#endif
+                        return;
+                    }
+
 #if NET35 || NOASYNC
                     SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
 #else
@@ -122,6 +132,12 @@ namespace BBTransaction.Transaction.Operations.Undo
                     session.StepEnumerator.MovePrevious();
                 }
             }
+
+#if NET35 || NOASYNC
+            context.UndoFinishAction();
+#else
+            await context.UndoFinishAction();
+#endif
         }
     }
 }
