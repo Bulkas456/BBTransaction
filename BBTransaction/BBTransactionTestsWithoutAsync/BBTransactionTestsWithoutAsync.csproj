@@ -74,6 +74,7 @@
     <Compile Include="ProcessingUndoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecoverAndContinueTests.cs" />
+    <Compile Include="RecoverAndUndoAndRunTests.cs" />
     <Compile Include="StepAdapterTests.cs" />
     <Compile Include="TestExecutor.cs" />
     <Compile Include="TransactionCancelTests.cs" />

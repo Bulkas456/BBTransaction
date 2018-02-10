@@ -39,6 +39,11 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
                     break;
 
                 case RunMode.RecoverAndUndoAndRun:
+#if NET35 || NOASYNC
+                    RunSessionPreparationOperation.PrepareToRunFromScratch(session);
+#else
+                    await RunSessionPreparationOperation.PrepareToRunFromScratch(session);
+#endif
                     break;
 
                 case RunMode.RecoverAndContinue:
@@ -88,6 +93,36 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
                 }
                 .AddError(e));
             }
+        }
+
+#if NET35 || NOASYNC
+        private static void PrepareToRunFromScratch<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#else
+        private static async Task PrepareToRunFromScratch<TStepId, TData>(ITransactionSession<TStepId, TData> session)
+#endif
+        {
+#if NET35 || NOASYNC
+            RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#else
+            await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#endif
+            {
+                NoSessionEnd = true,
+                Session = session,
+#if NET35 || NOASYNC
+                UndoFinishAction = () => 
+                {
+                    session.StepEnumerator.MoveNext();
+                    RunSessionOperation.RunSession(session);
+                }
+#else
+                UndoFinishAction = async () =>
+                {
+                    session.StepEnumerator.MoveNext();
+                    await RunSessionOperation.RunSession(session);
+                }
+#endif
+            });
         }
 
 #if NET35 || NOASYNC
