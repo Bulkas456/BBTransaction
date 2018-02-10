@@ -52,6 +52,25 @@ namespace BBTransaction.Transaction.Session.Storage
 #endif
 
         /// <summary>
+        /// Notifies that that a step was receding.
+        /// </summary>
+        /// <typeparam name="TStepId">The type of the step id.</typeparam>
+        /// <typeparam name="TData">The type of the transaction data.</typeparam>
+        /// <param name="storage">The storage.</param>
+        /// <param name="session">the session.</param>
+#if NET35 || NOASYNC
+        public static void StepReceding<TStepId, TData>(this ITransactionStorage<TData> storage, ITransactionSession<TStepId, TData> session)
+        {
+            storage.StepReceding(new TransactionData<TStepId, TData>(session));
+        }
+#else
+        public static async Task StepReceding<TStepId, TData>(this ITransactionStorage<TData> storage, ITransactionSession<TStepId, TData> session)
+        {
+            await storage.StepReceding(new TransactionData<TStepId, TData>(session));
+        }
+#endif
+
+        /// <summary>
         /// Removes the transaction session.
         /// </summary>
         /// <typeparam name="TStepId">The type of the step id.</typeparam>

@@ -35,6 +35,14 @@ namespace BBTransaction.Transaction.Session.Storage.Default
         public Task StepPrepared(ITransactionData<TData> data) => Task.FromResult<object>(null);
 #endif
 
+#if NET35 || NOASYNC
+        public void StepReceding(ITransactionData<TData> data)
+        {
+        }
+#else
+        public Task StepReceding(ITransactionData<TData> data) => Task.FromResult<object>(null);
+#endif
+
 
 #if NET35 || NOASYNC
         public ITransactionData<TData> RecoverTransaction()

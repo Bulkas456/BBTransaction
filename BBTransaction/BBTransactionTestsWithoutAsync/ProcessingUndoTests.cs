@@ -9,6 +9,9 @@ using BBTransaction.Factory;
 using BBTransaction.Step;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Transaction.Settings;
+using BBTransaction.Transaction.Session.Storage;
+using Moq;
+using BBTransaction.Transaction.Session.Storage.TransactionData;
 
 namespace BBTransactionTestsWithoutAsync
 {
@@ -24,9 +27,11 @@ namespace BBTransactionTestsWithoutAsync
             List<string> runUndoActions = new List<string>();
             List<string> runPostActions = new List<string>();
             Exception testException = new Exception("test exception");
+            Mock<ITransactionStorage<object>> storageMock = new Mock<ITransactionStorage<object>>();
             ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
             {
                 options.TransactionInfo.Name = "test transaction";
+                options.TransactionStorageCreator = partContext => storageMock.Object;
             });
 
             for (int i = 0; i < 6; ++i)
@@ -92,6 +97,10 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
+            storageMock.Verify(x => x.SessionStarted(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
+            storageMock.Verify(x => x.StepPrepared(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(4));
+            storageMock.Verify(x => x.StepReceding(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(4));
+            storageMock.Verify(x => x.RemoveSession(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
         }
     }
 }

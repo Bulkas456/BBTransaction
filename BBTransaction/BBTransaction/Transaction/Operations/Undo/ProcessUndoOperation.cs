@@ -9,6 +9,7 @@ using BBTransaction.Step;
 using BBTransaction.Transaction.Operations.SessionEnd;
 using BBTransaction.Transaction.Session;
 using BBTransaction.Transaction.TransactionResult;
+using BBTransaction.Transaction.Session.Storage;
 
 namespace BBTransaction.Transaction.Operations.Undo
 {
@@ -43,6 +44,12 @@ namespace BBTransaction.Transaction.Operations.Undo
                 }
 #endif
                 watch.Stop();
+
+#if NET35 || NOASYNC
+                context.Session.TransactionContext.SessionStorage.StepReceding(session);
+#else
+                await context.Session.TransactionContext.SessionStorage.StepReceding(session);
+#endif
 
                 if (session.ShouldLogStepExecution())
                 {

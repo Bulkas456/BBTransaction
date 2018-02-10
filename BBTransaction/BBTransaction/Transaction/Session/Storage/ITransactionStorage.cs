@@ -36,6 +36,16 @@ namespace BBTransaction.Transaction.Session.Storage
 #endif
 
         /// <summary>
+        /// Notifies that that a step was receding.
+        /// </summary>
+        /// <param name="data">The transaction session data.</param>
+#if NET35 || NOASYNC
+        void StepReceding(ITransactionData<TData> data);
+#else
+        Task StepReceding(ITransactionData<TData> data);
+#endif
+
+        /// <summary>
         /// Recovers the transaction session data.
         /// </summary>
         /// <returns>The transaction session data.</returns>
