@@ -36,7 +36,11 @@ namespace BBTransaction.Transaction.Operations.SessionEnd
             }
             else
             {
+#if NET35 || NOASYNC
                 SessionEndOperation.EndSession(context);
+#else
+                await SessionEndOperation.EndSession(context);
+#endif
             }
         }
     }

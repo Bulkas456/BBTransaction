@@ -30,7 +30,11 @@ namespace BBTransaction.Transaction.Operations.Post
 
                 if (step == null)
                 {
+#if NET35 || NOASYNC
                     SessionEndOperation.EndSession(context);
+#else
+                    await SessionEndOperation.EndSession(context);
+#endif
                     return;
                 }
 

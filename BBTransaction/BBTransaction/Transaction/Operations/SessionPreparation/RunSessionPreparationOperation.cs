@@ -14,6 +14,7 @@ using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Transaction.Session.StepEnumerator;
+using BBTransaction.Transaction.Session.Storage;
 
 namespace BBTransaction.Transaction.Operations.SessionPreparation
 {
@@ -73,9 +74,9 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
             {
                 session.TransactionContext.Definition.NotifyTransactionStarted();
 #if NET35 || NOASYNC
-                session.TransactionContext.SessionStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+                session.TransactionContext.SessionStorage.SessionStarted(session);
 #else
-                await session.TransactionContext.SessionStorage.SessionStarted(new TransactionData<TStepId, TData>(session));
+                await session.TransactionContext.SessionStorage.SessionStarted(session);
 #endif
             }
             catch (Exception e)

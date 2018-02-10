@@ -62,7 +62,11 @@ namespace BBTransaction.Transaction.Operations.Post
                     currentStep.Id, 
                     watch.Elapsed);
                 session.TransactionContext.Logger.ErrorFormat(e, info);
+#if NET35 || NOASYNC
                 SessionEndOperation.EndSession(context.AddError(e));
+#else
+                await SessionEndOperation.EndSession(context.AddError(e));
+#endif
             }
         }
     }
