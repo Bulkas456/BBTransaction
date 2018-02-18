@@ -11,6 +11,7 @@ using BBTransaction.Transaction.Session.Storage.TransactionData;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Executor;
+using BBTransaction.Transaction.Session.StepEnumerator.StepMove;
 
 namespace BBTransaction.Transaction.Session
 {
@@ -120,6 +121,15 @@ namespace BBTransaction.Transaction.Session
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets the move info.
+        /// </summary>
+        public IMoveInfo<TStepId> MoveInfo
+        {
+            get;
+            set;
+        }
+
 #if !NET35 && !NOASYNC
         /// <summary>
         /// Waits for a transaction result.
@@ -212,6 +222,36 @@ namespace BBTransaction.Transaction.Session
         public void Cancel()
         {
             this.Cancelled = true;
+        }
+
+        /// <summary>
+        /// Moves the transaction forward to a specific step. 
+        /// </summary>
+        /// <param name="id">The step id to move.</param>
+        /// <param name="comparer">The equality comparer.</param>
+        public void GoForward(TStepId id, IEqualityComparer<TStepId> comparer)
+        {
+            this.MoveInfo = new MoveInfo<TStepId>()
+            {
+                Id = id,
+                Comparer = comparer ?? EqualityComparer<TStepId>.Default,
+                MoveType = MoveType.Forward
+            };
+        }
+
+        /// <summary>
+        /// Moves the transaction back to a specific step (all undo functions for the back steps will be executed). 
+        /// </summary>
+        /// <param name="id">The step id to move.</param>
+        /// <param name="comparer">The equality comparer.</param>
+        public void GoBack(TStepId id, IEqualityComparer<TStepId> comparer)
+        {
+            this.MoveInfo = new MoveInfo<TStepId>()
+            {
+                Id = id,
+                Comparer = comparer ?? EqualityComparer<TStepId>.Default,
+                MoveType = MoveType.Back
+            };
         }
     }
 }

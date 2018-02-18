@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Settings;
 using BBTransaction.Transaction.TransactionResult;
+using BBTransaction.Transaction.Session.StepEnumerator.StepMove;
 
 namespace BBTransaction.Transaction.Session
 {
@@ -51,6 +52,15 @@ namespace BBTransaction.Transaction.Session
         bool Ended
         {
             get;
+        }
+
+        /// <summary>
+        /// Gets or sets the move info.
+        /// </summary>
+        IMoveInfo<TStepId> MoveInfo
+        {
+            get;
+            set;
         }
 
 #if !NET35 && !NOASYNC

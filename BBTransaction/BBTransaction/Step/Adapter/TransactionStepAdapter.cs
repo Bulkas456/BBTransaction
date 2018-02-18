@@ -90,23 +90,23 @@ namespace BBTransaction.Step.Adapter
             this.dataConverter = dataConverter ?? throw new ArgumentNullException(nameof(dataConverter));
             this.stepAction = this.original.StepAction == null
                                ? null
-                               : new Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.StepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, null, this.reverseStepConverter)));
+                               : new Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.StepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, null, this.stepConverter, this.reverseStepConverter)));
             this.undoAction = this.original.UndoAction == null
                                ? null
-                               : new Action<TDataTo, IUndoTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.UndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, info, null, this.reverseStepConverter)));
+                               : new Action<TDataTo, IUndoTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.UndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, info, null, this.stepConverter, this.reverseStepConverter)));
             this.postAction = this.original.PostAction == null
                               ? null
-                              : new Action<TDataTo, IPostTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.PostAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, null, info, this.reverseStepConverter)));
+                              : new Action<TDataTo, IPostTransactionSessionInfo<TStepIdTo>>((data, info) => this.original.PostAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, null, info, this.stepConverter, this.reverseStepConverter)));
 #if !NET35 && !NOASYNC
             this.asyncStepAction = this.original.AsyncStepAction == null
                                      ? null
-                                     : new Func<TDataTo, IStepTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncStepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, null, this.reverseStepConverter)));
+                                     : new Func<TDataTo, IStepTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncStepAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(info, null, null, this.stepConverter, this.reverseStepConverter)));
             this.asyncUndoAction = this.original.AsyncUndoAction == null
                                      ? null
-                                     : new Func<TDataTo, IUndoTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncUndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, info, null, this.reverseStepConverter)));
+                                     : new Func<TDataTo, IUndoTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncUndoAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, info, null, this.stepConverter, this.reverseStepConverter)));
             this.asyncPostAction = this.original.AsyncPostAction == null
                                      ? null
-                                     : new  Func<TDataTo, IPostTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncPostAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, null, info, this.reverseStepConverter)));
+                                     : new  Func<TDataTo, IPostTransactionSessionInfo<TStepIdTo>, Task>(async (data, info) => await this.original.AsyncPostAction(this.dataConverter(data), new TransactionSessionInfoAdapter<TStepIdTo, TStepIdFrom>(null, null, info, this.stepConverter, this.reverseStepConverter)));
 #endif
         }
 

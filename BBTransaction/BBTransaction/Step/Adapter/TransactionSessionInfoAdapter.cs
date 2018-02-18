@@ -37,7 +37,12 @@ namespace BBTransaction.Step.Adapter
         /// <summary>
         /// The step converter.
         /// </summary>
-        private readonly Func<TStepIdFrom, TStepIdTo> stepConverter;
+        private readonly Func<TStepIdTo, TStepIdFrom> stepConverter;
+
+        /// <summary>
+        /// The reverse step converter.
+        /// </summary>
+        private readonly Func<TStepIdFrom, TStepIdTo> revereseStepConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionSessionInfoAdapter<TStepIdFrom, TStepIdTo>"/> class.
@@ -46,11 +51,13 @@ namespace BBTransaction.Step.Adapter
         /// <param name="infoForUndo">The session info for an undo action.</param>
         /// <param name="infoForPost">The session info for a post action.</param>
         /// <param name="stepConverter">The step converter.</param>
+        /// <param name="reverseStepConverter">The reverse step converter.</param>
         public TransactionSessionInfoAdapter(
             IStepTransactionSessionInfo<TStepIdFrom> infoForStep,
             IUndoTransactionSessionInfo<TStepIdFrom> infoForUndo,
             IPostTransactionSessionInfo<TStepIdFrom> infoForPost,
-            Func<TStepIdFrom, TStepIdTo> stepConverter)
+            Func<TStepIdTo, TStepIdFrom> stepConverter,
+            Func<TStepIdFrom, TStepIdTo> reverseStepConverter)
         {
             this.infoForStep = infoForStep;
             this.infoForUndo = infoForUndo;
@@ -74,12 +81,13 @@ namespace BBTransaction.Step.Adapter
             }
 
             this.stepConverter = stepConverter ?? throw new ArgumentNullException(nameof(stepConverter));
+            this.revereseStepConverter = reverseStepConverter ?? throw new ArgumentNullException(nameof(reverseStepConverter));
         }
 
         /// <summary>
         /// Gets the current step id.
         /// </summary>
-        public TStepIdTo CurrentStepId => this.stepConverter(this.main.CurrentStepId);
+        public TStepIdTo CurrentStepId => this.revereseStepConverter(this.main.CurrentStepId);
 
         /// <summary>
         /// Gets or sets a value indicating whether the transaction was recovered.
@@ -107,6 +115,26 @@ namespace BBTransaction.Step.Adapter
         public void Cancel()
         {
             this.infoForStep.Cancel();
+        }
+
+        /// <summary>
+        /// Moves the transaction forward to a specific step. 
+        /// </summary>
+        /// <param name="id">The step id to move.</param>
+        /// <param name="comparer">The equality comparer.</param>
+        public void GoForward(TStepIdTo id, IEqualityComparer<TStepIdTo> comparer)
+        {
+            this.infoForStep.GoForward(this.stepConverter(id), comparer == null ? null : new EqualityComparerAdapter<TStepIdTo, TStepIdFrom>(comparer, this.revereseStepConverter));
+        }
+
+        /// <summary>
+        /// Moves the transaction back to a specific step (all undo functions for the back steps will be executed). 
+        /// </summary>
+        /// <param name="id">The step id to move.</param>
+        /// <param name="comparer">The equality comparer.</param>
+        public void GoBack(TStepIdTo id, IEqualityComparer<TStepIdTo> comparer)
+        {
+            this.infoForStep.GoBack(this.stepConverter(id), comparer == null ? null : new EqualityComparerAdapter<TStepIdTo, TStepIdFrom>(comparer, this.revereseStepConverter));
         }
     }
 }

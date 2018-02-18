@@ -89,8 +89,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.MoveNext();
-                            RunSessionOperation.RunSession(session);
+                            RunSessionOperation.MoveToNextStep(session, true);
                         }
                     });
 #else
@@ -100,8 +99,7 @@ namespace BBTransaction.Transaction.Operations.StepAction
 
                         if (!session.Ended)
                         {
-                            session.StepEnumerator.MoveNext();
-                            await RunSessionOperation.RunSession(session);
+                            await RunSessionOperation.MoveToNextStep(session, true);
                         }
                     });
 #endif
@@ -120,8 +118,62 @@ namespace BBTransaction.Transaction.Operations.StepAction
                         return;
                     }
 
-                    session.StepEnumerator.MoveNext();
+#if NET35 || NOASYNC
+                    RunSessionOperation.MoveToNextStep(session, false);
+#else
+                    await RunSessionOperation.MoveToNextStep(session, false);
+#endif
                 }
+            }
+        }
+
+#if NET35 || NOASYNC
+        private static void MoveToNextStep<TStepId, TData>(ITransactionSession<TStepId, TData> session, bool runSession)
+#else
+        private static async Task MoveToNextStep<TStepId, TData>(ITransactionSession<TStepId, TData> session, bool runSession)
+#endif
+        {
+            if (session.MoveInfo == null)
+            {
+                session.StepEnumerator.MoveNext();
+
+                if (runSession
+                    && !session.Ended)
+                {
+#if NET35 || NOASYNC
+                    RunSessionOperation.RunSession(session);
+#else
+                    await RunSessionOperation.RunSession(session);
+#endif
+                }
+
+            }
+            else
+            {
+#if NET35 || NOASYNC
+                MoveToStepOperation.MoveToStep(new MoveToStepContext<TStepId, TData>()
+#else
+                await MoveToStepOperation.MoveToStep(new MoveToStepContext<TStepId, TData>()
+#endif
+                {
+                    Session = session,
+#if NET35 || NOASYNC
+                    MoveToStepFinishAction = () => 
+#else
+                    MoveToStepFinishAction = async () =>
+#endif
+                    {
+                        if (runSession
+                            && !session.Ended)
+                        {
+#if NET35 || NOASYNC
+                            RunSessionOperation.RunSession(session);
+#else
+                            await RunSessionOperation.RunSession(session);
+#endif
+                        }
+                    }
+                });
             }
         }
     }
