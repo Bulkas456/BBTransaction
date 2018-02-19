@@ -9,7 +9,7 @@ namespace BBTransaction.Step.Adapter
     /// </summary>
     /// <typeparam name="TFrom">The source type.</typeparam>
     /// <typeparam name="TTo">The destination type.</typeparam>
-    internal class EqualityComparerAdapter<TFrom, TTo> : IEqualityComparer<TTo>
+    public class EqualityComparerAdapter<TFrom, TTo> : IEqualityComparer<TTo>
     {
         /// <summary>
         /// The original comparer.
