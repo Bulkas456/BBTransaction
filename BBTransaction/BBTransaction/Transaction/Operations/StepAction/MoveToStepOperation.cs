@@ -9,6 +9,8 @@ using BBTransaction.Transaction.Session.StepEnumerator;
 using BBTransaction.Transaction.Session.StepEnumerator.StepMove;
 using BBTransaction.Transaction.TransactionResult;
 using BBTransaction.Transaction.Operations.Undo;
+using BBTransaction.Transaction.Operations.SessionEnd;
+using BBTransaction.Step;
 
 namespace BBTransaction.Transaction.Operations.StepAction
 {
@@ -105,6 +107,81 @@ namespace BBTransaction.Transaction.Operations.StepAction
         public static async Task MoveBack<TStepId, TData>(MoveToStepContext<TStepId, TData> context)
 #endif
         {
+            IMoveInfo<TStepId> moveInfo = context.Session.MoveInfo;
+            bool stepFound = false;
+
+            Func<ITransactionStep<TStepId, TData>, bool> processStepPredicate = step => 
+            {
+                if (step == null)
+                {
+                    return false;
+                }
+
+                if (stepFound)
+                {
+                    return false;
+                }
+                else
+                {
+                    stepFound = moveInfo.Comparer.Equals(step.Id, moveInfo.Id);
+                    return true;
+                }
+            };
+
+#if NET35 || NOASYNC
+            RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#else
+            await RunUndoOperation.RunUndo(new RunUndoContext<TStepId, TData>()
+#endif
+            {
+                Session = context.Session,
+                NoSessionEnd = true,
+                ProcessStepPredicate = processStepPredicate,
+#if NET35 || NOASYNC
+                UndoFinishAction = () => MoveBackUndoFinishAction(context, stepFound)
+#else
+                UndoFinishAction = async () => await MoveBackUndoFinishAction(context, stepFound)
+#endif
+            });
+        }
+
+#if NET35 || NOASYNC
+        public static void MoveBackUndoFinishAction<TStepId, TData>(MoveToStepContext<TStepId, TData> context, bool stepFound)
+#else
+        public static async Task MoveBackUndoFinishAction<TStepId, TData>(MoveToStepContext<TStepId, TData> context, bool stepFound)
+#endif
+        {
+            context.Session.MoveInfo = null;
+
+            if (context.Session.Ended)
+            {
+                return;
+            }
+
+            if (stepFound)
+            {
+                context.Session.StepEnumerator.MoveNext();
+            }
+            else
+            { 
+#if NET35 || NOASYNC
+                SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
+#else
+                await SessionEndPreparationOperation.PrepareEndSession(new SessionEndContext<TStepId, TData>()
+#endif
+                {
+                    Session = context.Session,
+                    RunPostActions = false,
+                    Result = ResultType.Failed
+                }
+                .AddError(new InvalidOperationException(string.Format("Could not move back to a step with id '{0}' as the step does not exist.", context.Session.MoveInfo.MoveType))));
+            }
+
+#if NET35 || NOASYNC
+            context.MoveToStepFinishAction();
+#else
+            await context.MoveToStepFinishAction();
+#endif
         }
     }
 }
