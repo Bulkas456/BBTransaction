@@ -151,15 +151,15 @@ namespace BBTransaction.Transaction.Operations.StepAction
         public static async Task MoveBackUndoFinishAction<TStepId, TData>(MoveToStepContext<TStepId, TData> context, bool stepFound)
 #endif
         {
-            context.Session.MoveInfo = null;
-
             if (context.Session.Ended)
             {
+                context.Session.MoveInfo = null;
                 return;
             }
 
             if (stepFound)
             {
+                context.Session.MoveInfo = null;
                 context.Session.StepEnumerator.MoveNext();
             }
             else
@@ -174,7 +174,8 @@ namespace BBTransaction.Transaction.Operations.StepAction
                     RunPostActions = false,
                     Result = ResultType.Failed
                 }
-                .AddError(new InvalidOperationException(string.Format("Could not move back to a step with id '{0}' as the step does not exist.", context.Session.MoveInfo.MoveType))));
+                .AddError(new InvalidOperationException(string.Format("Could not move back to a step with id '{0}' as the step does not exist.", context.Session.MoveInfo.Id))));
+                context.Session.MoveInfo = null;
             }
 
 #if NET35 || NOASYNC
