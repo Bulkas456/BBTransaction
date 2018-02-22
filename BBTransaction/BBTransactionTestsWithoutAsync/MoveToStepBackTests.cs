@@ -15,13 +15,13 @@ using BBTransaction.Transaction.Session.Storage.TransactionData;
 using System.Threading;
 using System.Linq;
 
-namespace BBTransactionTestsWithAsync
+namespace BBTransactionTestsWithoutAsync
 {
     [TestClass]
     public class MoveToStepBackTests
     {
         [TestMethod]
-        public async Task WhenGoBackOnceWithoutComparer_ShouldMoveToStepProperly()
+        public void WhenGoBackOnceWithoutComparer_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -44,74 +44,35 @@ namespace BBTransactionTestsWithAsync
                     Id = index
                 };
 
-                if (i == 3)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "3"
+                        && numberOfGoBack++ == 0)
                     {
-                        if (numberOfGoBack++ == 0)
-                        {
-                            info.GoBack("1");
-                        }
+                        info.GoBack("1");
+                    }
 
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
 
-                if (i % 3 == 0)
+                step.UndoAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i % 2 == 0)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runPostActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runPostActions.Add(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -122,15 +83,15 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+            target.Run(settings =>
             {
                 settings.Data = transactionData;
                 settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult => transactionCallbackResult = callbackResult;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
             });
 
             // Assert
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -145,7 +106,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackToTheSameStep_ShouldMoveToStepProperly()
+        public void WhenGoBackToTheSameStep_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -168,74 +129,35 @@ namespace BBTransactionTestsWithAsync
                     Id = index
                 };
 
-                if (i == 3)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "3"
+                        && numberOfGoBack++ == 0)
                     {
-                        if (numberOfGoBack++ == 0)
-                        {
-                            info.GoBack("3");
-                        }
+                        info.GoBack("3");
+                    }
 
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
 
-                if (i % 3 == 0)
+                step.UndoAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i % 2 == 0)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runPostActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runPostActions.Add(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -246,15 +168,15 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+            target.Run(settings =>
             {
                 settings.Data = transactionData;
                 settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult => transactionCallbackResult = callbackResult;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
             });
 
             // Assert
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -269,7 +191,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackMoreTimes_ShouldMoveToStepProperly()
+        public void WhenGoBackMoreTimes_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -293,82 +215,41 @@ namespace BBTransactionTestsWithAsync
                     Id = index
                 };
 
-                if (i == 1)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "3"
+                        && step3BackCount++ < 2)
                     {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
+                        info.GoBack("1");
+                    }
 
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
+                    if (info.CurrentStepId == "4"
+                        && step4BackCount++ < 1)
                     {
-                        if (info.CurrentStepId == "3"
-                            && step3BackCount++ < 2)
-                        {
-                            info.GoBack("1");
-                        }
+                        info.GoBack("2");
+                    }
 
-                        if (info.CurrentStepId == "4"
-                            && step4BackCount++ < 1)
-                        {
-                            info.GoBack("2");
-                        }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
 
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                    };
-                }
+                step.UndoAction = (data, info) =>
+                {
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i % 3 == 0)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
-
-                if (i % 2 == 0)
-                {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runPostActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runPostActions.Add(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -380,15 +261,15 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+            target.Run(settings =>
             {
                 settings.Data = transactionData;
                 settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult => transactionCallbackResult = callbackResult;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
             });
 
             // Assert
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -403,7 +284,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackWithComparerWithCompareSuccess_ShouldMoveToStepProperly()
+        public void WhenGoBackWithComparerWithCompareSuccess_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -426,75 +307,35 @@ namespace BBTransactionTestsWithAsync
                     Id = index
                 };
 
-                if (i == 3)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "A3"
+                        && goBackCounter++ == 0)
                     {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
+                        info.GoBack("a0", StringComparer.OrdinalIgnoreCase);
+                    }
 
-                        if (goBackCounter++ == 0)
-                        {
-                            info.GoBack("a0", StringComparer.OrdinalIgnoreCase);
-                        }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
 
-                        await Task.CompletedTask;
-                    };
-                }
-                else
+                step.UndoAction = (data, info) =>
                 {
-                    step.StepAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i % 3 == 0)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
-
-                if (i % 2 == 0)
-                {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runPostActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runPostActions.Add(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -505,15 +346,15 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+            target.Run(settings =>
             {
                 settings.Data = transactionData;
                 settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult => transactionCallbackResult = callbackResult;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
             });
 
             // Assert
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -528,7 +369,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackWithComparerWithCompareFailure_ShouldFailTransaction()
+        public void WhenGoBackWithComparerWithCompareFailure_ShouldFailTransaction()
         {
             // Arrange
             object transactionData = new object();
@@ -550,70 +391,34 @@ namespace BBTransactionTestsWithAsync
                     Id = index
                 };
 
-                if (i == 2)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "A2")
                     {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
                         info.GoBack("a0", StringComparer.Ordinal);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                    };
-                }
+                    }
 
-                if (i % 3 == 0)
-                {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                };
 
-                if (i % 2 == 0)
+                step.UndoAction = (data, info) =>
                 {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
+
+                step.PostAction = (data, info) =>
                 {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runPostActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runPostActions.Add(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -624,15 +429,15 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+            target.Run(settings =>
             {
                 settings.Data = transactionData;
                 settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult => transactionCallbackResult = callbackResult;
+                settings.TransactionResultCallback = callbackResult => result = callbackResult;
             });
 
             // Assert
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.Count().Should().Be(1);
             result.Errors.First().Message.Contains("Could not move back to a step with id 'a0' as the step does not exist.").Should().BeTrue();
@@ -644,7 +449,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackWithoutComparerWithStepExecutors_ShouldMoveToStepProperly()
+        public void WhenGoBackWithoutComparerWithStepExecutors_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -701,86 +506,41 @@ namespace BBTransactionTestsWithAsync
                     Id = index,
                     StepActionExecutor = stepExecutors[i],
                     PostActionExecutor = postExecutors[i],
-                    UndoActionExecutor = undoStepExecutors[i] 
+                    UndoActionExecutor = undoStepExecutors[i]
                 };
 
-                if (i != 2)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "3"
+                        && goBackCounter++ == 0)
                     {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
+                        info.GoBack("1");
+                    }
 
-                        if (info.CurrentStepId == "3"
-                            && goBackCounter++ == 0)
-                        {
-                            info.GoBack("1");
-                        }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                    stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                };
 
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
+                step.UndoAction = (data, info) =>
                 {
-                    step.StepAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                    };
-                }
+                    undoActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i % 4 == 0)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        undoActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        undoActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
-
-                if (i == 1
-                    || i == 2)
-                {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    runPostActions.Add(index);
+                    postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    info.CurrentStepId.Should().Be(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0: executor for other thread (step action)
@@ -793,17 +553,24 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+
+            using (ManualResetEvent transactionEndResetEvent = new ManualResetEvent(false))
             {
-                settings.Data = transactionData;
-                settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult =>
+                target.Run(settings =>
                 {
-                    transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
-                    transactionCallbackResult = callbackResult;
-                };
-                settings.TransactionResultCallbackExecutor = callBackExecutor;
-            });
+                    settings.Data = transactionData;
+                    settings.Mode = RunMode.Run;
+                    settings.TransactionResultCallback = callbackResult =>
+                    {
+                        transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
+                        result = callbackResult;
+                        transactionEndResetEvent.Set();
+                    };
+                    settings.TransactionResultCallbackExecutor = callBackExecutor;
+                });
+                transactionEndResetEvent.WaitOne();
+            }
 
             // Assert
             callBackExecutor.Dispose();
@@ -813,7 +580,6 @@ namespace BBTransactionTestsWithAsync
                 executor.Dispose();
             }
 
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -861,7 +627,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackWithComparerWithCompareSuccessWithStepExecutors_ShouldMoveToStepProperly()
+        public void WhenGoBackWithComparerWithCompareSuccessWithStepExecutors_ShouldMoveToStepProperly()
         {
             // Arrange
             object transactionData = new object();
@@ -913,79 +679,37 @@ namespace BBTransactionTestsWithAsync
                                            : postExecutors[i]
                 };
 
-                if (i != 2)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
+                    if (info.CurrentStepId == "B2"
+                        && goBackCounter++ == 0)
                     {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
-                    {
-                        if (goBackCounter++ == 0)
-                        {
-                            info.GoBack("b0", StringComparer.OrdinalIgnoreCase);
-                        }
+                        info.GoBack("b0", StringComparer.OrdinalIgnoreCase);
+                    }
 
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                    stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                };
 
-                if (i % 4 == 0)
+                step.UndoAction = (data, info) =>
                 {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
 
-                if (i == 1
-                    || i == 2)
+                step.PostAction = (data, info) =>
                 {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    runPostActions.Add(index);
+                    postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    info.CurrentStepId.Should().Be(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -998,17 +722,24 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+
+            using (ManualResetEvent transactionEndResetEvent = new ManualResetEvent(false))
             {
-                settings.Data = transactionData;
-                settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult =>
+                target.Run(settings =>
                 {
-                    transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
-                    transactionCallbackResult = callbackResult;
-                };
-                settings.TransactionResultCallbackExecutor = callBackExecutor;
-            });
+                    settings.Data = transactionData;
+                    settings.Mode = RunMode.Run;
+                    settings.TransactionResultCallback = callbackResult =>
+                    {
+                        transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
+                        result = callbackResult;
+                        transactionEndResetEvent.Set();
+                    };
+                    settings.TransactionResultCallbackExecutor = callBackExecutor;
+                });
+                transactionEndResetEvent.WaitOne();
+            }
 
             // Assert
             callBackExecutor.Dispose();
@@ -1018,7 +749,6 @@ namespace BBTransactionTestsWithAsync
                 executor.Dispose();
             }
 
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.ShouldAllBeEquivalentTo(new Exception[0]);
             result.Recovered.Should().BeFalse();
@@ -1060,7 +790,7 @@ namespace BBTransactionTestsWithAsync
         }
 
         [TestMethod]
-        public async Task WhenGoBackWithComparerWithCompareFailureWithStepExecutors_ShouldFailTransaction()
+        public void WhenGoBackWithComparerWithCompareFailureWithStepExecutors_ShouldFailTransaction()
         {
             // Arrange
             object transactionData = new object();
@@ -1111,75 +841,36 @@ namespace BBTransactionTestsWithAsync
                                            : postExecutors[i]
                 };
 
-                if (i != 2)
+                step.StepAction = (data, info) =>
                 {
-                    step.AsyncStepAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.StepAction = (data, info) =>
+                    if (info.CurrentStepId == "B2")
                     {
                         info.GoBack("b0", StringComparer.Ordinal);
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runStepActions.Add(index);
-                        stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                    };
-                }
+                    }
 
-                if (i % 4 == 0)
-                {
-                    step.AsyncUndoAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
-                {
-                    step.UndoAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        info.CurrentStepId.Should().Be(index);
-                        runUndoActions.Add(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runStepActions.Add(index);
+                    stepActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                };
 
-                if (i == 1
-                    || i == 2)
+                step.UndoAction = (data, info) =>
                 {
-                    step.AsyncPostAction = async (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                        await Task.CompletedTask;
-                    };
-                }
-                else
+                    data.Should().BeSameAs(transactionData);
+                    info.CurrentStepId.Should().Be(index);
+                    runUndoActions.Add(index);
+                };
+
+                step.PostAction = (data, info) =>
                 {
-                    step.PostAction = (data, info) =>
-                    {
-                        data.Should().BeSameAs(transactionData);
-                        runPostActions.Add(index);
-                        postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
-                        info.CurrentStepId.Should().Be(index);
-                    };
-                }
+                    data.Should().BeSameAs(transactionData);
+                    runPostActions.Add(index);
+                    postActionThreadId.Add(Thread.CurrentThread.ManagedThreadId);
+                    info.CurrentStepId.Should().Be(index);
+                };
 
                 target.Add(step);
             }
-            ITransactionResult<object> transactionCallbackResult = null;
 
             /*
              0:
@@ -1192,17 +883,24 @@ namespace BBTransactionTestsWithAsync
              */
 
             // Act
-            ITransactionResult<object> result = await target.Run(settings =>
+            ITransactionResult<object> result = null;
+
+            using (ManualResetEvent transactionEndResetEvent = new ManualResetEvent(false))
             {
-                settings.Data = transactionData;
-                settings.Mode = RunMode.Run;
-                settings.TransactionResultCallback = callbackResult =>
+                target.Run(settings =>
                 {
-                    transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
-                    transactionCallbackResult = callbackResult;
-                };
-                settings.TransactionResultCallbackExecutor = callBackExecutor;
-            });
+                    settings.Data = transactionData;
+                    settings.Mode = RunMode.Run;
+                    settings.TransactionResultCallback = callbackResult =>
+                    {
+                        transactionCallbackThreadId = Thread.CurrentThread.ManagedThreadId;
+                        result = callbackResult;
+                        transactionEndResetEvent.Set();
+                    };
+                    settings.TransactionResultCallbackExecutor = callBackExecutor;
+                });
+                transactionEndResetEvent.WaitOne();
+            }
 
             // Assert
             callBackExecutor.Dispose();
@@ -1212,7 +910,6 @@ namespace BBTransactionTestsWithAsync
                 executor.Dispose();
             }
 
-            result.Should().BeSameAs(transactionCallbackResult);
             result.Data.Should().BeSameAs(transactionData);
             result.Errors.Count().Should().Be(1);
             result.Errors.First().Message.Contains("Could not move back to a step with id 'b0' as the step does not exist.").Should().BeTrue();

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddStepsToTransactionTests.cs" />
+    <Compile Include="MoveToStepBackTests.cs" />
     <Compile Include="MoveToStepForwardTests.cs" />
     <Compile Include="ProcessingStepsTests.cs" />
     <Compile Include="ProcessingUndoTests.cs" />
