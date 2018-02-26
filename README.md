@@ -5,6 +5,8 @@ The code is available for:
 * .NET Framework 4.5
 * NET Core 1.0
 # How does it work?
+The library produces a transaction object which runs actions for a steps in a specific order. When an exception occurred or a transaction is cancelled then undo methods for a finished steps are processed. When transaction finish successfully then post actions are invoked.
+Let's see an example:
 First of all you need an idea for a transaction, i.e. safely write a binary data to a file:
 1. Create a simple DTO for all necessary data to a file write operation:
 ```c#
@@ -93,7 +95,7 @@ switch (result.Result)
 }
 ```
 # Settings and features:
-1. Settings for a transaction creation
+ ## Settings for a transaction creation
 * Transaction logs forwarding: if an additional logs for a transaciton are needed then you can specify a transaction log forwarding: 
 ```c#
 ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
@@ -141,7 +143,19 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().
      options.TransactionStorageCreator = context => new MyStorage(context);
 });
 ```
-2. Transaction run settings
+ ## Transaction run settings
+* Specifying a transaction data. 
+The data is injected to all transaction methods as the first parameter.
+```c#
+ITransactionResult<FileWriteData> result = await transaction.Run(settings => 
+{
+    settings.Data = new FileWriteData()
+    {
+        DataToWrite = new byte[] { 0x01, 0x02 },
+        File = "path to the file"
+    };
+});
+```
 # Transaction recovering process
 
 # Build notes
