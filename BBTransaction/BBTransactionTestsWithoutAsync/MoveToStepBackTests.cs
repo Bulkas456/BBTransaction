@@ -99,10 +99,13 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "1", "2", "3", "4" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
-            storageMock.Verify(x => x.SessionStarted(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
-            storageMock.Verify(x => x.StepPrepared(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(8));
-            storageMock.Verify(x => x.StepReceding(It.IsAny<ITransactionData<object>>()), Times.Exactly(3));
-            storageMock.Verify(x => x.RemoveSession(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -184,10 +187,13 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "3", "4" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4" });
-            storageMock.Verify(x => x.SessionStarted(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
-            storageMock.Verify(x => x.StepPrepared(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(6));
-            storageMock.Verify(x => x.StepReceding(It.IsAny<ITransactionData<object>>()), Times.Exactly(1));
-            storageMock.Verify(x => x.RemoveSession(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -277,10 +283,13 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "1", "2", "3", "1", "2", "3", "4", "2", "3", "4", "5" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1", "3", "2", "1", "4", "3", "2" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5" });
-            storageMock.Verify(x => x.SessionStarted(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
-            storageMock.Verify(x => x.StepPrepared(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(15));
-            storageMock.Verify(x => x.StepReceding(It.IsAny<ITransactionData<object>>()), Times.Exactly(9));
-            storageMock.Verify(x => x.RemoveSession(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -362,10 +371,13 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "A0", "A1", "A2", "A3", "A0", "A1", "A2", "A3", "A4" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "A3", "A2", "A1", "A0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "A0", "A1", "A2", "A3", "A4" });
-            storageMock.Verify(x => x.SessionStarted(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
-            storageMock.Verify(x => x.StepPrepared(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Exactly(9));
-            storageMock.Verify(x => x.StepReceding(It.IsAny<ITransactionData<object>>()), Times.Exactly(4));
-            storageMock.Verify(x => x.RemoveSession(It.Is<ITransactionData<object>>(y => y.Data == transactionData)), Times.Once);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -446,6 +458,13 @@ namespace BBTransactionTestsWithoutAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "A0", "A1", "A2" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "A2", "A1", "A0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[0]);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]

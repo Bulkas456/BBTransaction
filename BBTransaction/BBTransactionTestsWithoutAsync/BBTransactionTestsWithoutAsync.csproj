@@ -70,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddStepsToTransactionTests.cs" />
+    <Compile Include="AssertExtensions.cs" />
+    <Compile Include="AssertStorageOperationsContext.cs" />
     <Compile Include="MoveToStepBackTests.cs" />
     <Compile Include="MoveToStepForwardTests.cs" />
     <Compile Include="ProcessingStepsTests.cs" />

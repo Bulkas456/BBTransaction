@@ -184,7 +184,8 @@ namespace BBTransaction.Transaction.Operations.SessionPreparation
                 return;
             }
 
-            if (session.StepEnumerator.IsFirstStep())
+            if (session.StepEnumerator.IsFirstStep()
+                && !session.Recovered)
             {
 #if NET35 || NOASYNC
                 RunSessionPreparationOperation.StartSession(session);

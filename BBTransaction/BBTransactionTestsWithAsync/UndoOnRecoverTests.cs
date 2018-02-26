@@ -146,6 +146,14 @@ namespace BBTransactionTestsWithAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "2", "3", "4", "5" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "2" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5" });
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -273,6 +281,14 @@ namespace BBTransactionTestsWithAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "3", "4", "5" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[0]);
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "3", "4", "5" });
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -400,6 +416,14 @@ namespace BBTransactionTestsWithAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "0" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5" });
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -527,6 +551,14 @@ namespace BBTransactionTestsWithAsync
             runStepActions.ShouldAllBeEquivalentTo(new string[] { "1", "2", "3", "4", "5" });
             runUndoActions.ShouldAllBeEquivalentTo(new string[] { "3", "2", "1" });
             runPostActions.ShouldAllBeEquivalentTo(new string[] { "0", "1", "2", "3", "4", "5" });
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -744,6 +776,14 @@ namespace BBTransactionTestsWithAsync
                 /*step 6*/ postExecutors[3].ThreadId
             });
             transactionCallbackThreadId.Should().Be(callBackExecutor.ThreadId);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
 
         [TestMethod]
@@ -961,6 +1001,14 @@ namespace BBTransactionTestsWithAsync
                 /*step 6*/ postExecutors[3].ThreadId
             });
             transactionCallbackThreadId.Should().Be(callBackExecutor.ThreadId);
+            storageMock.AssertStorageOperations(new AssertStorageOperationsContext<string, object>()
+            {
+                SessionStartedTimes = Times.Never(),
+                TransactionData = transactionData,
+                Transaction = target,
+                ExpectedStepsOrder = runStepActions,
+                ExpectedUndoOrder = runUndoActions
+            });
         }
     }
 }
