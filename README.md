@@ -87,8 +87,12 @@ switch (result.Result)
         break;
 }
 ```
+# Features:
+* 
+# Build notes
+You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
 # Requirements:
 The code is available for:
-* .NET Framework 3.5
+* .NET Framework 3.5 (no async await functionality)
 * .NET Framework 4.5
 * NET Core 1.0
