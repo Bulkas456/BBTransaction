@@ -1,4 +1,9 @@
 If you need a simple and customizable transaction mechanism for a code methods then this library is for you!
+# Requirements:
+The code is available for:
+* .NET Framework 3.5 (no async await functionality)
+* .NET Framework 4.5
+* NET Core 1.0
 # How does it work?
 First of all you need an idea for a transaction, i.e. safely write a binary data to a file:
 1. Create a simple DTO for all necessary data to a file write operation:
@@ -87,7 +92,7 @@ switch (result.Result)
         break;
 }
 ```
-# Features:
+# Settings and features:
 1. Settings for a transaction creation
 * Transaction logs forwarding: if an additional logs for a transaciton are needed then you can specify a transaction log forwarding: 
 ```c#
@@ -129,19 +134,15 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().
     options.TransactionInfo.SessionIdCreator = () => this.myGuidCreator.CreateGuid();
 });
 ```
-* Transaction state storage: when you specify a storage for a transaciton state the transaction can be recoverable. It means that you will be able to continue not finished transaction after an unexpected situation like application crash or a power lost (see a point about recovering process).
+* Transaction state storage: when you specify a storage for a transaction state the transaction can be recoverable. It means that you will be able to continue a not finished transaction after an unexpected situation like an application crash or a power lost (see a point about recovering process).
  ```c#
  ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
  {
      options.TransactionStorageCreator = context => new MyStorage(context);
 });
 ```
+2. Transaction run settings
 # Transaction recovering process
 
 # Build notes
 You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
-# Requirements:
-The code is available for:
-* .NET Framework 3.5 (no async await functionality)
-* .NET Framework 4.5
-* NET Core 1.0
