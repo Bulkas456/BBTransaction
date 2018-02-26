@@ -11,9 +11,24 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
     public struct TransactionData<TStepId, TData> : ITransactionData<TData>
     {
         /// <summary>
-        /// The session.
+        /// The index in the definition for the current step.
         /// </summary>
-        private readonly ITransactionSession<TStepId, TData> session;
+        private readonly int currentStepIndex;
+
+        /// <summary>
+        /// The session start timestamp.
+        /// </summary>
+        private readonly DateTime startTimestamp;
+
+        /// <summary>
+        /// The session id.
+        /// </summary>
+        private readonly Guid sessionId;
+
+        /// <summary>
+        /// The current data for the transaction.
+        /// </summary>
+        private readonly TData data;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionData<TStepId, TData>"/> class.
@@ -21,7 +36,10 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         /// <param name="session">The session.</param>
         public TransactionData(ITransactionSession<TStepId, TData> session)
         {
-            this.session = session;
+            this.currentStepIndex = session.StepEnumerator.CurrentStepIndex;
+            this.startTimestamp = session.StartTimestamp;
+            this.sessionId = session.SessionId;
+            this.data = session.RunSettings.Data;
         }
 
         /// <summary>
@@ -31,7 +49,7 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         {
             get
             {
-                return this.session.StepEnumerator.CurrentStepIndex;
+                return this.currentStepIndex;
             }
         }
 
@@ -42,7 +60,7 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         {
             get
             {
-                return this.session.StartTimestamp;
+                return this.startTimestamp;
             }
         }
 
@@ -53,7 +71,7 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         {
             get
             {
-                return this.session.SessionId;
+                return this.sessionId;
             }
         }
 
@@ -64,7 +82,7 @@ namespace BBTransaction.Transaction.Session.Storage.TransactionData
         {
             get
             {
-                return this.session.RunSettings.Data;
+                return this.data;
             }
         }
     }

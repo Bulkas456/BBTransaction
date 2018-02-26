@@ -10,7 +10,6 @@ using BBTransaction.Info.Validator;
 using BBTransaction.Definition;
 using BBTransaction.Factory.Context.Part;
 using BBTransaction.Transaction.Session.Storage;
-using BBTransaction.Transaction.Session.Storage.Default;
 
 namespace BBTransaction.Factory
 {
@@ -76,16 +75,9 @@ namespace BBTransaction.Factory
 
         protected virtual ITransactionStorage<TData> CreateStateStorage<TStepId, TData>(ICreatePartContext<TStepId, TData> context)
         {
-            ITransactionStorage<TData> stateStorage = context.Context.TransactionStorageCreator == null
-                   ? EmptyTransactionStorage<TData>.Instance
-                   : context.Context.TransactionStorageCreator(context);
-
-            if (stateStorage == null)
-            {
-                throw new InvalidOperationException(string.Format("Transaction '{0}': no state storage created from state storage creator.", context.Info.Name));
-            }
-
-            return stateStorage;
+            return context.Context.TransactionStorageCreator == null
+                     ? null
+                     : context.Context.TransactionStorageCreator(context);
         }
     }
 }
