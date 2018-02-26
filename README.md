@@ -1,4 +1,4 @@
-If you need a simple and customizable transaction mechanism for a code methods then this library is for you!
+If you need a simple and customizable transaction mechanism for a code methods which is able to continue processing steps after an unexpected crash or a power lost then this library is for you!
 # Requirements:
 The code is available for:
 * .NET Framework 3.5 (no async await functionality)
