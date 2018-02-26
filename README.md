@@ -1,4 +1,4 @@
-If you need a simple transaction mechanism for a code methods then this library is for you!
+If you need a simple and customizable transaction mechanism for a code methods then this library is for you!
 # How does it work?
 First of all you need an idea for a transaction, i.e. safely write a binary data to a file:
 1. Create a simple DTO for all necessary data to a file write operation:
@@ -21,7 +21,7 @@ public enum WriteStepId
 ```c#
 ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options => 
 {
-    options.TransactionInfo.Name = "Example transaction"
+    options.TransactionInfo.Name = "Example transaction";
 });
 ```
 4. Add steps to the created transaction:
@@ -83,12 +83,61 @@ switch (result.Result)
         break;
     case ResultType.Failed:
         break;
-     case ResultType.NoTransactionToRecover:
+    case ResultType.NoTransactionToRecover:
         break;
 }
 ```
 # Features:
-* 
+1. Settings for a transaction creation
+* Transaction logs forwarding: if an additional logs for a transaciton are needed then you can specify a transaction log forwarding: 
+```c#
+ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+{
+    options.TransactionInfo.Name = "Example transaction";
+    options.LoggerContext.DebugFormatAction = (format, parameters) => Debug.WriteLine(format, parameters);
+    options.LoggerContext.ErrorFormatAction = (format, parameters) => Trace.WriteLine(string.Format(format, parameters));
+    options.LoggerContext.ExecutionTimeLogAction = (time, format, parameters) => Debug.WriteLine(format, parameters);
+});
+```
+or you can specify your own transaction logger:
+```c#
+ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+{
+    options.TransactionInfo.Name = "Example transaction";
+    options.LoggerContext.Logger = new MyTransactionLogger();
+});
+```
+* Transaction information settings
+  - Transaction name: you can specify a transaction name which will be added to any logs:
+```c#
+ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+{
+    options.TransactionInfo.Name = "Example transaction";
+});
+```
+  - Transaction time provider: you can set a time provider for each DateTime dependent transaction features:
+```c#
+ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+{
+    options.TransactionInfo.GetCurrentTimeFunction = () => this.timeProvider.Now;
+});
+```
+  - Session id: there is a possiblity to override a session id creation operation:
+```c#
+ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+{
+    options.TransactionInfo.SessionIdCreator = () => this.myGuidCreator.CreateGuid();
+});
+```
+* Transaction state storage: when you specify a storage for a transaciton state the transaction can be recoverable. It means that you will be able to continue not finished transaction after an unexpected situation like application crash or a power lost (see a point about recovering process).
+ ```c#
+ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory().Create<WriteStepId, FileWriteData>(options =>
+ {
+     options.TransactionStorageCreator = context => new MyStorage(context);
+});
+```
+# Transaction recovering process
+
 # Build notes
 You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
 # Requirements:
