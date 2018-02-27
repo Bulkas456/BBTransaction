@@ -156,6 +156,17 @@ ITransactionResult<FileWriteData> result = await transaction.Run(settings =>
     };
 });
 ```
+* Choose the run mode
+There are three available modes for a transaction run which can be specified when invoking the Run method:
+   - Run: this is a basic mode in which all steps are run in the defined order from the first one to the last one.
+   - RecoverAndUndoAndRun: recovers the transaction (see Transaction recovering process), runs undo operations for completed steps and then starts the transaction from the first step to the last one. NOTE: If there is no session to recover the transaction is ended without run.
+   - RecoverAndContinue: Recovers the transaction and runs not completed steps. NOTE: If there is no session to recover the transaction is ended without run.
+```c#
+transaction.Run(settings => 
+{
+    settings.Mode = RunMode.Run;
+});
+```
 # Transaction recovering process
 
 # Build notes
