@@ -4,6 +4,8 @@ The code is available for:
 * .NET Framework 3.5 (no async await functionality)
 * .NET Framework 4.5
 * NET Core 1.0
+# Build notes
+You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
 # How it works
 The library produces a transaction object which runs actions for a steps in a specific order. When an exception occurred or a transaction is cancelled then undo methods for a finished steps are processed. When transaction finish successfully then post actions are invoked.
 Let's see an example:
@@ -95,7 +97,7 @@ switch (result.Result)
         break;
 }
 ```
-# Settings and features:
+# Transaction object settings and features:
  ## Settings for a transaction creation
 * Transaction logs forwarding: if an additional logs for a transaciton are needed then you can specify a transaction log forwarding: 
 ```c#
@@ -103,9 +105,18 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
                                                        .Create<WriteStepId, FileWriteData>(options =>
 {
     options.TransactionInfo.Name = "Example transaction";
-    options.LoggerContext.DebugFormatAction = (format, parameters) => Debug.WriteLine(format, parameters);
-    options.LoggerContext.ErrorFormatAction = (format, parameters) => Trace.WriteLine(string.Format(format, parameters));
-    options.LoggerContext.ExecutionTimeLogAction = (time, format, parameters) => Debug.WriteLine(format, parameters);
+    options.LoggerContext.DebugFormatAction = (format, parameters) =>
+    {
+        Debug.WriteLine(format, parameters);
+    };
+    options.LoggerContext.ErrorFormatAction = (format, parameters) =>
+    {
+        Trace.WriteLine(string.Format(format, parameters));
+    };
+    options.LoggerContext.ExecutionTimeLogAction = (time, format, parameters) =>
+    {
+        Debug.WriteLine(format, parameters);
+    };
 });
 ```
 or you can specify your own transaction logger:
@@ -165,9 +176,9 @@ ITransactionResult<FileWriteData> result = await transaction.Run(settings =>
 ```
 * Choose the run mode
 There are three available modes for a transaction run which can be specified when invoking the Run method:
-   - Run: this is a basic mode in which all steps are run in the defined order from the first one to the last one.
-   - RecoverAndUndoAndRun: recovers the transaction (see Transaction recovering process), runs undo operations for completed steps and then starts the transaction from the first step to the last one. NOTE: If there is no session to recover the transaction is ended without run.
-   - RecoverAndContinue: Recovers the transaction and runs not completed steps. NOTE: If there is no session to recover the transaction is ended without run.
+   - **Run**: this is a basic mode in which all steps are run in the defined order from the first one to the last one.
+   - **RecoverAndUndoAndRun**: recovers the transaction (see Transaction recovering process), runs undo operations for completed steps and then starts the transaction from the first step to the last one. NOTE: If there is no session to recover the transaction is ended without run.
+   - **RecoverAndContinue**: Recovers the transaction and runs not completed steps. NOTE: If there is no session to recover the transaction is ended without run.
 ```c#
 transaction.Run(settings => 
 {
@@ -182,10 +193,18 @@ transaction.Run(settings =>
      settings.TransactionResultCallback = result => { };
 });
 ```
+You can specify an executor (see Executors for actions) for the callback via a property TransactionResultCallbackExecutor:
+```c#
+transaction.Run(settings => 
+{
+     settings.TransactionResultCallback = result => { };
+     settings.TransactionResultCallbackExecutor = new CallbackExecutor();
+});
+```
 * Other run settings
 The property contains a few other settings as flags 
-   - LogTimeExecutionForAllSteps: time execution for each step method will be written to log.
-   - DontRecoverTransactionData: a transaction data wouldn't be recovered (see Transaction recovering process) and will be taken from the run settings.
+   - **LogTimeExecutionForAllSteps**: time execution for each step method will be written to log.
+   - **DontRecoverTransactionData**: a transaction data wouldn't be recovered (see Transaction recovering process) and will be taken from the run settings.
 ```c#
 transaction.Run(settings => 
 {
@@ -193,8 +212,9 @@ transaction.Run(settings =>
                          | TransactionSettings.LogTimeExecutionForAllSteps;
 });
 ```
+# Steps preparation
+A step for a transaciton is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>.
 # Executors for actions
 # Transaction recovering process
+# Transactions merge
 
-# Build notes
-You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
