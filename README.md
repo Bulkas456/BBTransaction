@@ -213,7 +213,28 @@ transaction.Run(settings =>
 });
 ```
 # Steps preparation
-A step for a transaciton is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>.
+A step for a transaciton is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>. You can add a step to a transaction via a few methods in the transaciton object: 'Add', 'InsertAtIndex', 'InsertBefore' and 'InsertAfter', i.e.:
+```c#
+transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
+{
+    Id = WriteStepId.CreateBackup,
+    AsyncStepAction = CreateBackup,
+    PostAction = CreateBackupPost
+});
+```
+You can add an executor (see Executors for actions) for a step action, an undo action or a post action via properties: 'StepActionExecutor', 'UndoActionExecutor' and 'PostActionExecutor'.
+You can also specify properties for a step:
+```c#
+transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
+{
+     Settings = StepSettings.UndoOnRecover
+                | StepSettings.NotRunOnRecovered
+});
+```
+* **NotRunOnRecovered**: the step should not be invoked when the transaction was recovered
+* **UndoOnRecover**: the undo method for the step should be invoked when the step was recovered and is the first step to run
+* **LogExecutionTime**: time execution for the step method will be written to log (NOTE: when you specify a setting 'LogTimeExecutionForAllSteps' for the transactoon then an execution time for all steps will be logged no matter if the step has the setting
+* **SameExecutorForAllActions**: a step executor for the step action will be used for the undo and post actions if no executor was defined for the undo and post actions.
 # Executors for actions
 # Transaction recovering process
 # Transactions merge
