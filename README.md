@@ -212,7 +212,7 @@ transaction.Run(settings =>
                          | TransactionSettings.LogTimeExecutionForAllSteps;
 });
 ```
-# Steps preparation
+ ## Steps preparation
 A step for a transaciton is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>. You can add a step to a transaction via a few methods in the transaciton object: 'Add', 'InsertAtIndex', 'InsertBefore' and 'InsertAfter', i.e.:
 ```c#
 transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
@@ -235,7 +235,7 @@ transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
 * **UndoOnRecover**: the undo method for the step should be invoked when the step was recovered and is the first step to run
 * **LogExecutionTime**: time execution for the step method will be written to log (NOTE: when you specify a setting 'LogTimeExecutionForAllSteps' for the transactoon then an execution time for all steps will be logged no matter if the step has the setting
 * **SameExecutorForAllActions**: a step executor for the step action will be used for the undo and post actions if no executor was defined for the actions.
-# Executors for actions
+ ## Executors for actions
 An executor is an object which implements an interface BBTransaction.Executor.IExecutor. It can be used to invoke a step or steps on the other thread during a transaction, i.e. imagine that you have a transaction with three steps and you want to run the second step on a specific thread. Then you can write your own executor and set it to the second step definition:
 ```c#
 transaction.Add(new TransactionStep<string, Data>()
@@ -276,7 +276,7 @@ transaction.Add(new TransactionStep<string, Data>()
 });
 ```
 In this case the first step will be invoked on the thread on which the Run method of the transaction was invoked. The second step will be invoked on the other thread by the executor. The third step will be invoked on a thread provided by the OtherThreadExecutor.
-# Transaction recovering process
+ ## Transaction recovering process
 A transaction object is able to continue processing steps after an applicaiton crash or a power lost. To do this you need do a few things:
 1. Create a storage for a transaction state and add it to the transaction: the storage has to implement an interface BBTransaction.Transaction.Session.Storage.ITransactionStorage<TData>:
 ```c#
@@ -294,8 +294,36 @@ Looking on the interface there are a few methods:
 Let's looks on a storage example:
 
 2. Define appropriable steps for a transaction, i.e. a transaction which appends a data to a file can be done as:
-    
+ 
+ ## Transaction run cancellation
+You can cancel a transaction in a step action using a 'Cancel' method:
+```c#
+transaction.Add(new TransactionStep<string, Dto>()
+{
+     StepAction = (data, info) => info.Cancel()
+});
+```
+When a transaction is cancelled then undo methods for all run steps are invoked and the result of the transaction is 'ResultType.Cancelled', i.e.:
+when we have a transaction with steps '0', '1' and '2' and we cancel the transaction in step '1' then undo methods for steps '1' and '0' are invoked (in this order) and then the transaction ends.
+ ## Moving steps back and forward during a transaction
+You can move back to a previous step from a step action using a method 'GoBack' i.e.:
+```c#
+transaction.Add(new TransactionStep<string, Dto>()
+{
+     Id = "5",
+     StepAction = (data, info) => info.GoBack("1");
+});
+```
+when we have a transaction with steps '0', '1', '2', '3', '4', '5', '6' and we move back to a step '1' from a step '5' then undo methods for steps '5', '4', '3', '2', and '1' are invoked (in this order) and then the transaction continue run from the step '1' so a step action for the step '1' is invoked and then a step action for the step '2' etc.
+Move forward is simliar but in this case we only skip steps and no undo methods are invoked i.e.
+```c#
+transaction.Add(new TransactionStep<string, Dto>()
+{
+     Id = "1",
+     StepAction = (data, info) => info.GoForward("5");
+});
+```
+when we have a transaction with steps '0', '1', '2', '3', '4', '5', '6' and we move forward to a step '5' from a step '1' then after the step action for the step '1' will be invoked the step action for the step '5' so we skip step actions for steps '2', '3' and '4'.
+ ## Transactions merge
 
-# Transactions merge
-# Cancellation
-# Moving steps back and forward during a transaction
+
