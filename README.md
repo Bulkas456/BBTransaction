@@ -234,8 +234,48 @@ transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
 * **NotRunOnRecovered**: the step should not be invoked when the transaction was recovered
 * **UndoOnRecover**: the undo method for the step should be invoked when the step was recovered and is the first step to run
 * **LogExecutionTime**: time execution for the step method will be written to log (NOTE: when you specify a setting 'LogTimeExecutionForAllSteps' for the transactoon then an execution time for all steps will be logged no matter if the step has the setting
-* **SameExecutorForAllActions**: a step executor for the step action will be used for the undo and post actions if no executor was defined for the undo and post actions.
+* **SameExecutorForAllActions**: a step executor for the step action will be used for the undo and post actions if no executor was defined for the actions.
 # Executors for actions
+An executor is an object which implements an interface BBTransaction.Executor.IExecutor. It can be used to invoke a step or steps on the other thread during a transaction, i.e. imagine that you have a transaction with three steps and you want to run the second step on a specific thread. Then you can write your own executor and set it to the second step definition:
+```c#
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "First step",
+    AsyncStepAction = Action1
+});
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "Second step",
+    AsyncStepAction = ActionOnSpecificThread,
+    StepActionExecutor = new SpecificThreadExecutor()
+});
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "Third step",
+    AsyncStepAction = Action2
+});
+```
+In this case the first step will be invoked on the thread on which the 'Run' method of the transaction was invoked. The second step will be invoked on the specific thread by the executor. The third step will continue run on the thread from the second step so if you want to run only one step on the specific thread you need set an additional executor which change the thread for the next step:
+```c#
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "First step",
+    AsyncStepAction = Action1
+});
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "Second step",
+    AsyncStepAction = ActionOnSpecificThread,
+    StepActionExecutor = new SpecificThreadExecutor()
+});
+transaction.Add(new TransactionStep<string, Data>()
+{
+    Id = "Third step",
+    AsyncStepAction = Action2,
+    StepActionExecutor = new OtherThreadExecutor()
+});
+```
+In this case the first step will be invoked on the thread on which the Run method of the transaction was invoked. The second step will be invoked on the other thread by the executor. The third step will be invoked on a thread provided by the OtherThreadExecutor.
 # Transaction recovering process
 # Transactions merge
 
