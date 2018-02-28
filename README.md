@@ -1,5 +1,5 @@
 If you need a simple and customizable transaction mechanism for a code methods which is able to continue processing steps after an unexpected crash or a power lost then this library is for you!
-# Requirements:
+# Availability and Requirements:
 The code is available for:
 * .NET Framework 3.5 (no async await functionality)
 * .NET Framework 4.5
@@ -231,7 +231,7 @@ transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
                 | StepSettings.NotRunOnRecovered
 });
 ```
-* **NotRunOnRecovered**: the step should not be invoked when the transaction was recovered
+* **NotRunOnRecovered**: the step should not be invoked when the transaction was recovered (see transaction recovering process)
 * **UndoOnRecover**: the undo method for the step should be invoked when the step was recovered and is the first step to run
 * **LogExecutionTime**: time execution for the step method will be written to log (NOTE: when you specify a setting 'LogTimeExecutionForAllSteps' for the transactoon then an execution time for all steps will be logged no matter if the step has the setting
 * **SameExecutorForAllActions**: a step executor for the step action will be used for the undo and post actions if no executor was defined for the actions.
@@ -277,5 +277,25 @@ transaction.Add(new TransactionStep<string, Data>()
 ```
 In this case the first step will be invoked on the thread on which the Run method of the transaction was invoked. The second step will be invoked on the other thread by the executor. The third step will be invoked on a thread provided by the OtherThreadExecutor.
 # Transaction recovering process
-# Transactions merge
+A transaction object is able to continue processing steps after an applicaiton crash or a power lost. To do this you need do a few things:
+1. Create a storage for a transaction state and add it to the transaction: the storage has to implement an interface BBTransaction.Transaction.Session.Storage.ITransactionStorage<TData>:
+```c#
+ITransaction<string, Dto> transaction = new TransactionFactory()
+                                          .Create<string, Dto>(options =>
+{
+     options.TransactionStorageCreator = context => new MyStorage(context);
+});
+```
+Looking on the interface there are a few methods:
+* **SessionStarted**: this method is invoked when a transaction starting before the first step for run mode 'Run'
+* **StepPrepared**: invoked before a step processing
+* **StepReceding**: invoked before a step undo method. It indicates that the step is receding due to an error or a step move
+* **RemoveSession**: invoked after the transaction end, here all states for the transaction should be removed from the storage
+Let's looks on a storage example:
 
+2. Define appropriable steps for a transaction, i.e. a transaction which appends a data to a file can be done as:
+    
+
+# Transactions merge
+# Cancellation
+# Moving steps back and forward during a transaction
