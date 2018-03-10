@@ -99,7 +99,7 @@ switch (result.Result)
 ```
 # Transaction object settings and features:
  ## Settings for a transaction creation
-* Transaction logs forwarding: if an additional logs for a transaciton are needed then you can specify a transaction log forwarding: 
+* Transaction logs forwarding: if an additional logs for a transaction are needed then you can specify a transaction log forwarding: 
 ```c#
 ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()              
                                                        .Create<WriteStepId, FileWriteData>(options =>
@@ -186,7 +186,7 @@ transaction.Run(settings =>
 });
 ```
 * Run callback
-This is a method invoked when the transaction ends its work. When async await functionality is not available then this is the only way to get the transaciton result.
+This is a method invoked when the transaction ends its work. When async await functionality is not available then this is the only way to get the transaction result.
 ```c#
 transaction.Run(settings => 
 {
@@ -213,7 +213,7 @@ transaction.Run(settings =>
 });
 ```
  ## Steps preparation
-A step for a transaciton is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>. You can add a step to a transaction via a few methods in the transaciton object: 'Add', 'InsertAtIndex', 'InsertBefore' and 'InsertAfter', i.e.:
+A step for a transaction is an object which implements the interface: BBTransaction.Step.ITransactionStep<TStepId, TData>. You can add a step to a transaction via a few methods in the transaction object: 'Add', 'InsertAtIndex', 'InsertBefore' and 'InsertAfter', i.e.:
 ```c#
 transaction.Add(new TransactionStep<WriteStepId, FileWriteData>()
 {
@@ -471,11 +471,15 @@ public async Task RunTransaction2()
 }
 ```
 When we run the first transaction we will see:
+
 Transaction1 step '0', data '100'
+
 Transaction1 step '1', data '100'
 
 When we run the second transaction we will see:
+
 Transaction2 step 'abc'
+
 Transaction2 step 'def'
 
 The merged transaction can be done as:
@@ -506,5 +510,12 @@ public async Task RunMergedTransaction()
 ```
 When we run the merged transaction we will see:
 
+Transaction2 step 'abc'
 
-All steps from transaciton 1 and 2 were merged into one transaction.
+Transaction2 step 'def'
+
+Transaction1 step '0', data '123'
+
+Transaction1 step '1', data '123'
+
+All steps from transaction 1 and 2 were merged into one transaction.
