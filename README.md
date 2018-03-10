@@ -305,7 +305,7 @@ transaction.Add(new TransactionStep<string, Dto>()
 ```
 When a transaction is cancelled then undo methods for all run steps are invoked and the result of the transaction is 'ResultType.Cancelled', i.e.:
 when we have a transaction with steps '0', '1' and '2' and we cancel the transaction in step '1' then undo methods for steps '1' and '0' are invoked (in this order) and then the transaction ends.
- ## Moving steps back and forward during a transaction
+ ## Moving steps back and step forward during a transaction
 You can move back to a previous step from a step action using a method 'GoBack' i.e.:
 ```c#
 transaction.Add(new TransactionStep<string, Dto>()
@@ -325,5 +325,186 @@ transaction.Add(new TransactionStep<string, Dto>()
 ```
 when we have a transaction with steps '0', '1', '2', '3', '4', '5', '6' and we move forward to a step '5' from a step '1' then after the step action for the step '1' will be invoked the step action for the step '5' so we skip step actions for steps '2', '3' and '4'.
  ## Transactions merge
+There is a possibility to merge steps of two or more transactions into one transaction. To do this you need a three conversion methods:
+1. A step id converter from a source transaction to the destination transaction i.e. 
+when the source transaction has step ids as string and the destination transaction has step ids as int you can use a function:
+```c#
+int ToInt(string data)
+{
+    return int.Parse(data);
+}
+```
+2. A step id converter from the destination transaction to a specific source transaction (this is the reverse conversion for point 1) i.e.
+when the source transaction has step ids as string and the destination transaction has step ids as int you can use a function:
+```c#
+string ToString(int data)
+{
+    return data.ToString();
+}
+```
+3. A converter for a transaction data i.e.
+when the destination transaction has as transaction data an object:
+```c#
+class DestinationTransactionData
+{
+   ...
+}
+```
+and the source transaction has as transaction data an object:
+```c#
+class SourceTransactionData
+{
+   ...
+   public DestinationTransactionData Property { get; }
+   ...
+}
+```
+then the conversion can be done as:
+```c#
+DestinationTransactionData Convert(SourceTransactionData data)
+{
+    return data.Property;
+}
+```
+Lets see an example:
+we have two different transactions:
+transaction 1:
+```c#
+class Transaction1Data
+{
+     public int IntegerProperty { get; set; }   
+}
+
+private IEnumerable<ITransactionStep<int, Transaction1Data>> Transaction1Steps
+{
+     get
+     {
+           yield return new TransactionStep<int, Transaction1Data>()
+           {
+               Id = 0,
+               StepAction = (data, info) =>
+               {
+                    Console.WriteLine(string.Format(
+                       "Transaction1 step '{0}', data '{1}'", 
+                       info.CurrentStepId, 
+                       data.IntegerProperty));
+               }
+            };
+            yield return new TransactionStep<int, Transaction1Data>()
+            {
+                Id = 1,
+                StepAction = (data, info) =>
+                {
+                     Console.WriteLine(string.Format(
+                        "Transaction1 step '{0}', data '{1}'", 
+                        info.CurrentStepId, 
+                        data.IntegerProperty));
+                }
+            };
+     }
+}
+
+public async Task RunTransaction1()
+            {
+                ITransactionResult<Transaction1Data> result = await new TransactionFactory()
+                                                                .Create<int, Transaction1Data>(options => 
+                {
+                    options.TransactionInfo.Name = "Transaction1";
+                })
+                .Add(this.Transaction1Steps)
+                .Run(settings => 
+                {
+                    settings.Data = new Transaction1Data() { IntegerProperty = 100 };
+                    settings.Mode = RunMode.Run;
+                });
+            }
+```
+transaction 2:
+```c#
+class Transaction2Data
+{        
+     public string StringProperty { get; set; }
+
+     public Transaction1Data Data { get; set; }
+}
+
+private IEnumerable<ITransactionStep<string, Transaction2Data>> Transaction2Steps
+{
+     get
+     {
+         yield return new TransactionStep<string, Transaction2Data>()
+         {
+              Id = "abc",
+              StepAction = (data, info) =>
+              {
+                  Console.WriteLine(string.Format("Transaction2 step '{0}'", info.CurrentStepId));
+              }
+         };
+         yield return new TransactionStep<string, Transaction2Data>()
+         {
+              Id = "def",
+              StepAction = (data, info) => 
+              {
+                  Console.WriteLine(string.Format("Transaction2 step '{0}'", info.CurrentStepId));
+              }
+         };
+      }
+}
+
+public async Task RunTransaction2()
+{
+      ITransactionResult<Transaction2Data> result = await new TransactionFactory()
+                                                             .Create<string, Transaction2Data>(options =>
+      {
+            options.TransactionInfo.Name = "Transaction2";
+      })
+      .Add(this.Transaction2Steps)
+      .Run(settings =>
+      {
+            settings.Data = new Transaction2Data()
+            {
+                 StringProperty = "xyz",
+                 Data = new Transaction1Data() { IntegerProperty = 123 }
+             };
+             settings.Mode = RunMode.Run;
+       });
+}
+```
+When we run the first transaction we will see:
+Transaction1 step '0', data '100'
+Transaction1 step '1', data '100'
+
+When we run the second transaction we will see:
+Transaction2 step 'abc'
+Transaction2 step 'def'
+
+The merged transaction can be done as:
+```c#
+public async Task RunMergedTransaction()
+{
+       ITransactionResult<Transaction2Data> result = await new TransactionFactory()
+                                                       .Create<string, Transaction2Data>(options =>
+       {
+            options.TransactionInfo.Name = "Merged transaction";
+       })
+       .Add(this.Transaction2Steps)
+       .AddAdapter(
+           this.Transaction1Steps, 
+           transaction1StepId => transaction1StepId.ToString(), // This is the convereter from point 1
+           transaction2StepId => int.Parse(transaction2StepId), // This is the converter from point 2
+           transaction2Data => transaction2Data.Data) // This is the converter from point 3
+        .Run(settings =>
+        {
+             settings.Data = new Transaction2Data()
+             {
+                  StringProperty = "xyz",
+                  Data = new Transaction1Data() { IntegerProperty = 123 }
+             };
+             settings.Mode = RunMode.Run;
+         });
+}
+```
+When we run the merged transaction we will see:
 
 
+All steps from transaciton 1 and 2 were merged into one transaction.
