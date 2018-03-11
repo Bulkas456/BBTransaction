@@ -129,7 +129,8 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
 });
 ```
 * Transaction information settings
-  - Transaction name: you can specify a transaction name which will be added to any logs:
+
+ Transaction name: you can specify a transaction name which will be added to any logs:
 ```c#
 ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
                                                        .Create<WriteStepId, FileWriteData>(options =>
@@ -137,7 +138,7 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
     options.TransactionInfo.Name = "Example transaction";
 });
 ```
-  - Transaction time provider: you can set a time provider for each DateTime dependent transaction features:
+ Transaction time provider: you can set a time provider for each DateTime dependent transaction features:
 ```c#
  ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
                                                         .Create<WriteStepId, FileWriteData>(options =>
@@ -145,7 +146,7 @@ ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
     options.TransactionInfo.GetCurrentTimeFunction = () => this.timeProvider.Now;
 });
 ```
-  - Session id: there is a possiblity to override a session id creation operation:
+ Session id: there is a possiblity to override a session id creation operation:
 ```c#
 ITransaction<WriteStepId, FileWriteData> transaction = new TransactionFactory()
                                                        .Create<WriteStepId, FileWriteData>(options =>
