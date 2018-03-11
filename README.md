@@ -294,7 +294,14 @@ Looking on the interface there are a few methods:
 Let's looks on a storage example:
 
 2. Define appropriable steps for a transaction, i.e. a transaction which appends a data to a file can be done as:
+
+ **step 1**
+ - **action**: create a backup for a destination file
+ - **undo action**: switch the backup with the destination file and remove the backup
+ - **post action**: remove the backup
  
+ **step 2**
+ - **action**: write data to the destination file
  ## Transaction run cancellation
 You can cancel a transaction in a step action using a 'Cancel' method:
 ```c#
