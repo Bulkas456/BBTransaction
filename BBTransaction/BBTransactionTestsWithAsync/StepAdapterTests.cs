@@ -29,8 +29,6 @@ namespace BBTransactionTestsWithAsync
             bool stepActionExecuted = false;
             bool undoActionExecuted = false;
             Mock<ITransactionStep<int, byte>> step = new Mock<ITransactionStep<int, byte>>();
-            step.SetupGet(x => x.Description)
-                .Returns("description");
             step.SetupGet(x => x.Id)
                 .Returns(123);
             step.SetupGet(x => x.Settings)
@@ -138,7 +136,6 @@ namespace BBTransactionTestsWithAsync
             undoActionExecuted.Should().BeTrue();
 
             // Assert
-            adapter.Description.Should().Be(step.Object.Description);
             int.Parse(adapter.Id).Should().Be(step.Object.Id);
             adapter.Settings.Should().Be(step.Object.Settings);
             adapter.PostActionExecutor.Should().BeSameAs(step.Object.PostActionExecutor);

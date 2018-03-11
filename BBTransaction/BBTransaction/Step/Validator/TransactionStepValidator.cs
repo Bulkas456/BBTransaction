@@ -22,11 +22,6 @@ namespace BBTransaction.Step.Validator
                 throw new ArgumentNullException(nameof(step));
             }
 
-            if (step.Description == null)
-            {
-                throw new NotSupportedException(string.Format("Improper step data for id '{0}': '{1}' cannot be null.", step.Id, nameof(step.Description)));
-            }
-
             if (step.StepAction == null
 #if !NET35 && !NOASYNC
                 && step.AsyncStepAction == null

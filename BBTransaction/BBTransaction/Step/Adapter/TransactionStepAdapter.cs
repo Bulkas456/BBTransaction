@@ -116,11 +116,6 @@ namespace BBTransaction.Step.Adapter
         public TStepIdTo Id => this.stepConverter(this.original.Id);
 
         /// <summary>
-        /// Gets the step description (optional).
-        /// </summary>
-        public string Description => this.original.Description;
-
-        /// <summary>
         /// Gets the action which will be invoked for the step.
         /// </summary>
         public Action<TDataTo, IStepTransactionSessionInfo<TStepIdTo>> StepAction => this.stepAction;

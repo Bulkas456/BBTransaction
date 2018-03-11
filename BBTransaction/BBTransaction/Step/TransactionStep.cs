@@ -28,15 +28,6 @@ namespace BBTransaction.Step
         }
 
         /// <summary>
-        /// Gets or sets the step description (optional).
-        /// </summary>
-        public string Description
-        {
-            get;
-            set;
-        } = string.Empty;
-
-        /// <summary>
         /// Gets or sets the action which will be invoked for the step.
         /// </summary>
         public Action<TData, IStepTransactionSessionInfo<TStepId>> StepAction
