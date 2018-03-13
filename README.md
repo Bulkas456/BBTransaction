@@ -420,19 +420,19 @@ private IEnumerable<ITransactionStep<int, Transaction1Data>> Transaction1Steps
 }
 
 public async Task RunTransaction1()
-            {
-                ITransactionResult<Transaction1Data> result = await new TransactionFactory()
-                                                                .Create<int, Transaction1Data>(options => 
-                {
-                    options.TransactionInfo.Name = "Transaction1";
-                })
-                .Add(this.Transaction1Steps)
-                .Run(settings => 
-                {
-                    settings.Data = new Transaction1Data() { IntegerProperty = 100 };
-                    settings.Mode = RunMode.Run;
-                });
-            }
+{
+     ITransactionResult<Transaction1Data> result = await new TransactionFactory()
+                                                      .Create<int, Transaction1Data>(options => 
+     {
+           options.TransactionInfo.Name = "Transaction1";
+     })
+     .Add(this.Transaction1Steps)
+     .Run(settings => 
+     {
+           settings.Data = new Transaction1Data() { IntegerProperty = 100 };
+           settings.Mode = RunMode.Run;
+     });
+}
 ```
 transaction 2:
 ```c#
