@@ -303,6 +303,13 @@ Let's looks on a storage example:
  
  **step 2**
  - **action**: write data to the destination file
+ 3. To continue the transaction after a crash or a power lost you need to run the transaction with an appropriable RunMode (RunMode.RecoverAndContinue or RunMode.RecoverAndUndoAndRun):
+ ```c#
+ transaction.Run(settings => 
+{
+    settings.Mode = RunMode.RecoverAndContinue;
+});
+ ```
  ## Transaction run cancellation
 You can cancel a transaction in a step action using a 'Cancel' method:
 ```c#
