@@ -293,7 +293,45 @@ Looking on the interface there are a few methods:
 * **StepReceding**: invoked before a step undo method. It indicates that the step is receding due to an error or a step move
 * **RemoveSession**: invoked after the transaction end, here all states for the transaction should be removed from the storage
 Let's looks on a storage example:
+```c#
+public class TransactionDataFileStorage : ITransactionStorage<TransactionData>
+{
+    private readonly string name;
+    
+    public TransactionDataStorage(string name)
+    {
+        this.name = name;
+    }
 
+    public Task<ITransactionData<TransactionData>> RecoverTransaction()
+    {
+        // Read the content of the last created file in method StepPrepared
+        // (or SessionStarted if there was no StepPrepared method invocation).
+    }
+
+    public Task RemoveSession(ITransactionData<TransactionData> data)
+    {
+        // Remove all files created in SessionStarted and StepPrepared methods.
+    }
+
+    public Task SessionStarted(ITransactionData<TransactionData> data)
+    {
+        // Write all properties from ITransactionData<TransactionData> to 
+        // a file with name 'Start' + this.name + '.transaction'
+    }
+
+    public Task StepPrepared(ITransactionData<TransactionData> data)
+    {
+         // Write all properties from ITransactionData<TransactionData> data to 
+         // a file with name 'Step' + data.CurrentStepIndex + this.name + '.transaction'
+    }
+
+    public Task StepReceding(ITransactionData<TransactionData> data)
+    {
+         // Remove a file with name 'Step' + data.CurrentStepIndex + this.name + '.transaction'
+    }
+}
+```
 2. Define appropriable steps for a transaction, i.e. a transaction which appends a data to a file can be done as:
 
  **step 1**
@@ -310,6 +348,7 @@ Let's looks on a storage example:
     settings.Mode = RunMode.RecoverAndContinue;
 });
  ```
+ If there is no transaction to recover then the Run method returns a result with ResultType.NoTransactionToRecover.
  ## Transaction run cancellation
 You can cancel a transaction in a step action using a 'Cancel' method:
 ```c#
