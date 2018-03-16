@@ -481,6 +481,7 @@ namespace BBTransactionTestsWithAsync
         [TestMethod]
         public async Task WhenInsertStepsAfterIdWitComparer_ShouldInsertProperly()
         {
+            // Arrange
             List<string> runStepActions = new List<string>();
             ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
             {
@@ -536,6 +537,36 @@ namespace BBTransactionTestsWithAsync
                 "inserted 3",
                 "6"
             });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task WhenAddStepAfterTransactionRun_ShouldThrowException()
+        {
+            // Arrange
+            ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
+            {
+                options.TransactionInfo.Name = "test transaction";
+            });
+            target.Add(new TransactionStep<string, object>()
+            {
+                Id = "1",
+                StepAction = (data, info) => { }
+            });
+            ITransactionResult<object> result = await target.Run(settings =>
+            {
+                settings.Mode = RunMode.Run;
+            });
+
+            // Act
+            target.Add(new TransactionStep<string, object>()
+            {
+                Id = "1",
+                StepAction = (data, info) => { }
+            });
+
+            // Assert
+            Assert.Fail("An exception is expected.");
         }
     }
 }

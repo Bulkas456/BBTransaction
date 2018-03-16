@@ -577,5 +577,35 @@ namespace BBTransactionTestsWithoutAsync
                 "6"
             });
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void WhenAddStepAfterTransactionRun_ShouldThrowException()
+        {
+            // Arrange
+            ITransaction<string, object> target = new TransactionFactory().Create<string, object>(options =>
+            {
+                options.TransactionInfo.Name = "test transaction";
+            });
+            target.Add(new TransactionStep<string, object>()
+            {
+                Id = "1",
+                StepAction = (data, info) => { }
+            });
+            target.Run(settings =>
+            {
+                settings.Mode = RunMode.Run;
+            });
+
+            // Act
+            target.Add(new TransactionStep<string, object>()
+            {
+                Id = "1",
+                StepAction = (data, info) => { }
+            });
+
+            // Assert
+            Assert.Fail("An exception is expected.");
+        }
     }
 }

@@ -169,7 +169,7 @@ namespace BBTransaction.Definition
         /// </summary>
         public void NotifyTransactionStarted()
         {
-            if (!this.canAddStep)
+            if (this.canAddStep)
             {
                 lock (this.syncLock)
                 {
