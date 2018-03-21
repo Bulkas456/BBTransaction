@@ -2,8 +2,7 @@ If you need a simple and customizable transaction mechanism for a code methods w
 # Availability and Requirements:
 The code is available for:
 * .NET Framework 3.5 (no async await functionality)
-* .NET Framework 4.5
-* NET Core 1.0
+* NET standard 1.0
 # Build notes
 You can remove the async await functionality from builds by specifying 'NOASYNC' in compilation symbols. 
 # How it works
